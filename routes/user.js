@@ -67,8 +67,8 @@ router
             user.identity = helper.checkString(user.identity, 'identity').toLowerCase();
             if (['manager', 'user', 'admin'].every(obj => obj !== user.identity)) throw CustomException("Invalid identity.")
             user.avatar = helper.checkWebsite(user.avatar);
-            user.first_name = helper.checkString(user.first_name, 'first name');
-            user.last_name = helper.checkString(user.last_name, 'last name');
+            user.firstName = helper.checkString(user.firstName, 'first name');
+            user.lastName = helper.checkString(user.lastName, 'last name');
             user.phone = helper.checkPhone(user.phone)
             user.password = helper.checkPassword(user.password)
             user.email = helper.checkEmail(user.email)
@@ -78,7 +78,7 @@ router
         }
 
         try{
-            const args = [user.identity, user.username, user.avatar, user.first_name, user.last_name, user.phone, user.password, user.email]
+            const args = [user.identity, user.username, user.avatar, user.firstName, user.lastName, user.phone, user.password, user.email]
             const user = await userFuncs.create(args)
             res.status(200).render('/user/login')
         }

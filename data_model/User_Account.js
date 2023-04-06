@@ -14,6 +14,7 @@ export function CustomException(message) {
     return error;
 }
 
+const refInfo = {"username": helper.checkString(key="username"), "avatar": helper.checkWebsite(), "firstName": helper.checkString(key="firstName"), "lastName": helper.checkString(key="lastName"), "phone": helper.checkPhone(), "password": helper.checkPassword(), "email": helper.checkEmail()}
 
 export async function create(...args){
     if (args.length < 8) throw CustomException("Missing inputs.")
@@ -62,10 +63,22 @@ export async function getUser (username){
 }
 
 //TODO: update user info
-export async function update()
+export async function updateUser(username, set)
 {
+    if (typeof set !== "object" || Array.isArray(set)|| set === "null") throw Error("invalid update input")
+    username = helper.checkString(username, 'username');
+    const tempAccount = await Account();
+    let updateInfo = {}
+    for (let items in set.keys())
+    {
+        updateInfo[items] = refInfo[items](set.items)
+    }
+    const userInfo = await tempAccount.findOneUpdate({username: username}, {$set, set}, {returnDocument: 'after'});
     
 }
+
+//TODO: add delete update orders
+export async function updateOrder(order_id, set)
 
 //TODO: create order
 export async function bookHotel(hotel_id, room_id, user_id, check_in, check_out, guests, price){
