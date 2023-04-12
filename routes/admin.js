@@ -25,3 +25,5 @@ router
             }
         }
     })
+    .route('/admin/account')
+    .get()

@@ -1,12 +1,12 @@
 import express from 'express'
 import { Account } from "../Mongo_Connections/mongoCollections.js";
 import { Order } from "../Mongo_Connections/mongoCollections.js";
+import { Room } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import helper from "../helper.js";
 import bcrypt from 'bcryptjs'
 
 const saltRounds = 12;
-
 export function CustomException(message) {
     const error = new Error(message);
   
@@ -14,7 +14,7 @@ export function CustomException(message) {
     return error;
 }
 
-const refInfo = {"username": helper.checkString(key="username"), "avatar": helper.checkWebsite(), "firstName": helper.checkString(key="firstName"), "lastName": helper.checkString(key="lastName"), "phone": helper.checkPhone(), "password": helper.checkPassword(), "email": helper.checkEmail()}
+const refInfo = {"username": helper.checkString.bind(null, key="username"), "avatar": helper.checkWebsite, "firstName": helper.checkString.bind(null, key="firstName"), "lastName": helper.checkString.bind(null, key="lastName"), "phone": helper.checkPhone, "password": helper.checkPassword, "email": helper.checkEmail}
 
 export async function create(...args){
     if (args.length < 8) throw CustomException("Missing inputs.")
@@ -74,20 +74,66 @@ export async function updateUser(username, set)
         updateInfo[items] = refInfo[items](set.items)
     }
     const userInfo = await tempAccount.findOneUpdate({username: username}, {$set, set}, {returnDocument: 'after'});
-    
+    if (userInfo.lastErrorObject.n === 0) throw Error(`Could not update the document with id ${id}`);
+    return userInfo;
 }
 
 //TODO: add delete update orders
-export async function updateOrder(order_id, set)
+//add order
+export async function addOrder(arg){
+    if (arg.keys().length < 8) throw CustomException("Missing inputs.")
+    arg.hotel_id = ObjectId(helper.checkId(arg.hotel_id));
+    arg.user_id = ObjectId(helper.checkId(arg.user_id));
+    arg.room_id = ObjectId(helper.checkId(arg.room_id));
+    //how to check date?
+    arg.checkin_date = helper.checkDate(arg.checkin_date);
+    arg.checkout_date = helper.checkDate(arg.checkout_date);
+    if (!arg.guests || arg.guests === "null") {arg.guests = {};}
+    else{arg.guests = helper.checkGuests(arg.guests);}
+    arg.price = helper.checkPrice(arg.price);
+    arg.status = helper.checkStatus(arg.status);
+    arg.review = "";
 
-//TODO: create order
-export async function bookHotel(hotel_id, room_id, user_id, check_in, check_out, guests, price){
+    //update user account, and add order to order database
+    const tempOrder = await Order();
+    const tempAccount = await Account();
+    const orderInfo = tempOrder.insertOne(arg);
+    if (orderInfo.insertedCount.n === 0) throw Error(`Could not add the order.`);
+    const updateInfo = await tempAccount.findOneUpdate({_id: ObjectId(args.user_id)}, {$set, set}, {returnDocument: 'after'});
+    if (updateInfo.lastErrorObject.n === 0) throw Error(`Could not update the account with id ${args.user_id}`);
 
+    //update room 
+    const tempRoom = await Room();
+    const roomInfo = await tempRoom.findOneUpdate({_id: ObjectId(arg.room_id)}, {$set, set}, {returnDocument: 'after'});
+    if(roomInfo.lastErrorObject.n === 0) throw Error(`Could not update the room with id ${arg.room_id}`);
+
+    return true;
 }
 
-//TODO: add review
-export async function comment(user_id, hotel_id, rating, comment){
+//change order status to canceled
+export async function deleteOrder(order_id){
+    order_id = helper.checkId(order_id);
 
+    const tempOrder = await Order();
+    const orderInfo = await tempOrder.findOneUpdate({"_id": order_id}, {"status": "canceled"});
+    if (orderInfo.lastErrorObject.n === 0) throw Error(`Could not update the document with id ${order_id}`);
+    return orderInfo;
+}
+
+export async function updateOrder(order_id, set){
+    if (typeof set !== "object" || Array.isArray(set)|| set === null) throw Error("invalid update input")
+    const tempOrder = await Order();
+    let updateInfo = {}
+    const orderInfo = await tempOrder.findOneUpdate({_id: ObjectId(order_id)}, {$set, set}, {returnDocument: 'after'});
+    if (orderInfo.lastErrorObject.n === 0) throw Error(`Could not update the document with id ${id}`);
+    return orderInfo;
+}
+
+
+//TODO: add review  to hotel
+export async function addReview(hotel_id, user_id, review, rating){
+     //rating is 1-5 stars
+    
 }
 
 //TODO: vote review

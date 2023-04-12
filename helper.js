@@ -40,7 +40,7 @@ export function checkArray(arr, key){
 
 export function checkDate(date){
     if(!date || typeof date !== "string" || date.trim().length === 0) throw new CustomException("releaseDate must exist and must be a non empty string.");
-    if(!moment(date.trim(), "MM/DD/YYYY", true).isValid()) throw new CustomException("releaseDate must be a valid date.");
+    if(!moment(date.trim(), "YYYY-MM-DD", true).isValid()) throw new CustomException("releaseDate must be a valid date.");
     date = date.trim();
     let temp = +date.split("/")[-1];
     if (temp < 1900 || temp > 2023)
@@ -88,4 +88,22 @@ export function checkEmail(email)
     if(!email || typeof email !== 'string') throw new CustomException("Email must exist and must be a string type");
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new CustomException("Invalid email address")
     return email
+}
+
+export function checkGuest(obj)
+{
+    if (!obj || !Array.isArray(obj)) throw new CustomException("Object must exist and must be an object.");
+    for (let guest in obj){
+        guest.firstName = checkString(guest.firstName, "First name")
+        guest.lastName = checkString(quest.lastName, "last name")
+    }
+
+    return obj
+}
+
+export function checkPrice(price)
+{
+    if (!price || typeof price !== "number") throw new CustomException("Price must exist and must be a number.");
+
+    return price
 }
