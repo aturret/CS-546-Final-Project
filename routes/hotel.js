@@ -2,7 +2,7 @@ import {Strategy as auth} from 'passport-local'
 import express from 'express'
 import passport from 'passport'
 import bcrypt from 'bcryptjs'
-import {userFuncs} from '../data_model/User_Account.js'
+import {userFuncs} from '/data_model/User_Account.js'
 import helper from "../helper.js";
 import {checkIdentity, checkLogin} from './user.js'
 const router = express.Router()

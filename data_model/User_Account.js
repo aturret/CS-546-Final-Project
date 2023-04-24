@@ -78,7 +78,7 @@ export async function updateUser(username, set)
     return userInfo;
 }
 
-//TODO: add delete update orders
+//TODO: add delete orders
 //add order
 export async function addOrder(arg){
     if (arg.keys().length < 8) throw CustomException("Missing inputs.")
@@ -120,24 +120,48 @@ export async function deleteOrder(order_id){
     return orderInfo;
 }
 
-export async function updateOrder(order_id, set){
-    if (typeof set !== "object" || Array.isArray(set)|| set === null) throw Error("invalid update input")
-    const tempOrder = await Order();
-    let updateInfo = {}
-    const orderInfo = await tempOrder.findOneUpdate({_id: ObjectId(order_id)}, {$set, set}, {returnDocument: 'after'});
-    if (orderInfo.lastErrorObject.n === 0) throw Error(`Could not update the document with id ${id}`);
-    return orderInfo;
-}
 
 
 //TODO: add review  to hotel
-export async function addReview(hotel_id, user_id, review, rating){
+export async function addReview(order_id, hotel_id, user_id, review, rating){
      //rating is 1-5 stars
-    
+    const tempOrder = await Order();
+    const tempHotel = await Hotel();
+    const tempReview = await Review();
+
+    order_id = helper.checkId(order_id);
+    hotel_id = helper.checkId(hotel_id);
+    user_id = helper.checkId(user_id);
+    review = helper.checkString(review, 'review');
+    rating = helper.checkRating(rating);
+    const review = {
+        hotel_id: hotel_id,
+        user_id: user_id,
+        comment: review,
+        rating: rating,
+        upvote: 0,
+        downvote: 0,
+    }
+
+    const reviewInfo = await tempReview.insertOne(review);
+    if (reviewInfo.insertedCount.n === 0) throw Error(`Could not add the review.`);
+    const updateInfo = await tempOrder.findOneUpdate({_id: ObjectId(order_id)}, {$set: {review: reviewInfo.insertedId}}, {returnDocument: 'after'});
+    if (updateInfo.lastErrorObject.n === 0) throw Error(`Could not update the order with id ${order_id}`);
+
+    const hotelInfo = await tempHotel.findOneUpdate({_id: ObjectId(hotel_id)}, {$addToSet: {review: reviewInfo.insertedId}}, {returnDocument: 'after'});
+    if (hotelInfo.lastErrorObject.n === 0) throw Error(`Could not update the hotel with id ${hotel_id}`);
+
+    return true;
 }
 
 //TODO: vote review
 export async function voteReview(review_id){
 
+    review_id = helper.checkId(review_id);
 
+    const tempReview = await Review();
+    const updateInfo = await tempReview.findOneUpdate({_id: ObjectId(review_id)}, {$inc: {upvote: 1}}, {returnDocument: 'after'});
+    if (updateInfo.lastErrorObject.n === 0) throw Error(`Could not update the document with id ${review_id}`);
+
+    return true;
 }

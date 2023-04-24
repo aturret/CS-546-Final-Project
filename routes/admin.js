@@ -2,12 +2,13 @@ import {Strategy as auth} from 'passport-local'
 import express from 'express'
 import passport from 'passport'
 import bcrypt from 'bcryptjs'
-import {userFuncs} from '../data_model/User_Account.js'
+import {userFuncs} from '/data_model/User_Account.js'
 import helper from "../helper.js";
 import checkIdentity from './user.js'
 
+const router = express.Router() 
 router
-    .route('/admin')
+    .route('/')
     .get(checkIdentity('admin'), async (req, res) => {
         try{
             req.user.username = helper.checkString(req.user.username)
@@ -25,5 +26,5 @@ router
             }
         }
     })
-    .route('/admin/account')
+    .route('/account')
     .get()
