@@ -52,6 +52,7 @@ app.use(flash())
 passport.use(new auth(
     async (req, res, next) => {
         //get username and user password
+        console.log("passport authentication fired")
         const { username, password } = req.body;
         username = helper.checkString(username, 'username');
         password = helper.checkPassword(password);
@@ -85,6 +86,7 @@ passport.serializeUser((user, next) => {
 );
 
 passport.deserializeUser(async (user, next) => {
+    //verifying no errors in serialization process
     const userInfo = await Account.findOne({username: user.username});
     if (userInfo === null) return next(null, false, {message: "Internal server error."});
     process.nextTick(() => {
@@ -94,6 +96,14 @@ passport.deserializeUser(async (user, next) => {
 
 app.use(passport.initialize())
 app.use(passport.session())
+
+
+//for debugging purposes
+app.use((req, res, next) => {
+    const now = new Date().toUTCString();
+    console.log(`${now} ${req.method} ${req.originalUrl} ${req.user.username}`);
+    next();
+})
 
 configRoutes(app);
 

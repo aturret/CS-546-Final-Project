@@ -17,3 +17,5 @@ const getCollectionFn = (collection) => {
 export const account = getCollectionFn('accounts')
 export const order = getCollectionFn('orders')
 export const review = getCollectionFn('reviews')
+export const room = getCollectionFn('rooms')
+export const hotel = getCollectionFn('hotels')

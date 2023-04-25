@@ -14,7 +14,8 @@ router
             if (!req.isAuthenticated()) {
                 return res.redirect("/user/login");
             }
-            if (req.session && req.session.identity === 'user') {
+            if (req.user && req.user.identity === 'user') {
+                req.flash("You are not allow to access this page")
                 return res.redirect("/user/dashboard");
             }
             next();
@@ -23,16 +24,23 @@ router
         try{
             req.user.username = helper.checkString(req.user.username)
             const user = await userFuncs.getUser(req.user.username)
+            if (req.session && req.session.status) {
+                user.status = req.session.status;
+                user.errorMessage = req.session.errorMessage;
+                req.session.status = null;
+                req.session.errorMessage = null;
+            }
             return res.render('manager', user)
         }
         catch(e){
-            if (!e.code){ 
-                res.status(404).render('/user/register', { errorMessage: e.message });
+            //customized error are thrown. if e.code exist its a customized error. Otherwise, its a server error.
+            if (!e.code) {
+                req.session.status = 500;
+            } 
+            else {
+                req.session.status = e.code;
             }
-            else
-            {
-                console.error(e);
-                res.status(500).json({Error: "Internal server error"});
-            }
+            req.session.errorMessage = e.message;
+            res.redirect("/user/dashboard/:username");
         }
     })
