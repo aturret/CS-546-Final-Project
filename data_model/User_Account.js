@@ -2,6 +2,8 @@ import express from "express";
 import { Account } from "../Mongo_Connections/mongoCollections.js";
 import { Order } from "../Mongo_Connections/mongoCollections.js";
 import { Room } from "../Mongo_Connections/mongoCollections.js";
+import { Hotel } from "../Mongo_Connections/mongoCollections.js";
+import { request } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import helper from "../helper.js";
 import bcrypt from "bcryptjs";
@@ -260,3 +262,6 @@ export async function voteReview(review_id) {
 
   return true;
 }
+
+//TODO: create request
+export async function createRequest(username) {}

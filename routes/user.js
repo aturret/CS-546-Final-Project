@@ -163,7 +163,7 @@ router
 //TODO: ask which implementation is better
 router
     .route("/dashboard/:username/edit_info")
-    .post(
+    .patch(
         isAuth,
         async (req, res) => {
             try{
@@ -200,6 +200,11 @@ router
         }
     )
 
+//TODO: this function suppose to create a new request to admin. You need to define a funciton in user_model to create a new collection for requests schema.
+router.route("/dashboard/:username/upgrade").post(isAuth, async (req, res) => {
+
+});
+
 router
   .route("/dashboard/:username/logout").get(
     (req, res, next) => {
@@ -234,7 +239,6 @@ router
             }
             req.session.errorMessage = e.message;
             res.redirect("/user/dashboard/:username");
-
         }
     }
   )
