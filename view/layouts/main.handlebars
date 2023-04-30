@@ -1,0 +1,21 @@
+{{! This will be your default layout for all handlebars file rendered. This will be inherited by all other templates. }}
+{{! Refer lecture code to learn more on how this works
+don't forget to include your css and your client-side script file references in the layout.
+}}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/public/css/hotels.css">
+    
+</head>
+<body>
+      <h1>{{title}}</h1>
+    <main>        
+        {{{body}}}
+    </main>
+    {{!-- <script src="/public/js/lab10.js"></script> --}}
+</body>
+</html>

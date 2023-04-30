@@ -1,0 +1,16 @@
+{{!--
+
+If the user is logged in and they are an admin user, and 'GET /admin' endpoint is called, you will render this view
+based on the specs.
+
+
+
+--}}
+
+<div class="display">
+    <p>Welcome {{firstName}}, the time is now: {{currentTime}}. You get super secret admin access since you are an admin. Remember, with great power comes great responsibility</p>
+</div>
+<button class="logout" onclick="window.location.href='/logout';">Logout</button>
+<button class="admin-button" onclick="window.location.href='/protected';">Protected</button>
+
+

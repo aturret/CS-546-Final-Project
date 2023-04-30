@@ -1,0 +1,11 @@
+{{!--
+
+You can use this if they try to access a route that they should not be able to. You will redirect them here. For
+example, if they go to /protected without being logged in, or they try to access /admin without beinging logged in or
+they are not an admin user.
+
+--}}
+<div class="error">
+<p>Error Code {{status_code}}: {{error}}</p>
+</div>
+<button class="back-button" onclick="window.location.href='/';">Back to index</button>
