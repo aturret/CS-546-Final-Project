@@ -31,7 +31,16 @@ const handlebarsInstance = exphbs.create({
           return new Handlebars.SafeString(JSON.stringify(obj, null, spacing));
   
         return new Handlebars.SafeString(JSON.stringify(obj));
-      }
+      },
+      eq: function (value1, value2) {
+        return value1 === value2;
+      },
+      and: function (condition1, condition2) {
+        return condition1 && condition2;
+      },
+      or: function (condition1, condition2) {
+        return condition1 || condition2;
+      },
     }
   });
 
