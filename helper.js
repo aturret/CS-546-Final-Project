@@ -1,14 +1,13 @@
 import { Account } from "./Mongo_Connections/mongoCollections.js";
 import { ObjectId } from 'mongodb';
 import moment from 'moment';
-import _ from 'underscore'
 
 
 
 export function CustomException(message, flag) {
     const error = new Error(message);
   
-    error.code = flag? 400 : 404;
+    error.code = flag? 400 : 404;x
     return error;
 }
 

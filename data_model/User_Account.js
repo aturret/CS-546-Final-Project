@@ -5,19 +5,19 @@ import { Room } from "../Mongo_Connections/mongoCollections.js";
 import { Hotel } from "../Mongo_Connections/mongoCollections.js";
 import { request } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
-import helper from "../helper.js";
+import * as helper from "../helper.js";
 import bcrypt from "bcryptjs";
 import { CustomException } from "../helper.js";
 const saltRounds = 12;
 
 const refInfo = {
-  username: helper.checkString.bind(null, (key = "username"), (flag = true)),
-  avatar: helper.checkWebsite.bind(null, (flag = true)),
-  firstName: helper.checkString.bind(null, (key = "firstName"), (flag = true)),
-  lastName: helper.checkString.bind(null, (key = "lastName"), (flag = true)),
-  phone: helper.checkPhone.bind(null, (flag = true)),
-  password: helper.checkPassword.bind(null, (flag = true)),
-  email: helper.checkEmail.bind(null, (flag = true)),
+  username: helper.checkString.bind(null, undefined, "username", true),
+  avatar: helper.checkWebsite.bind(null, undefined, true),
+  firstName: helper.checkString.bind(null, undefined, "first name", true),
+  lastName: helper.checkString.bind(null, undefined, "last name", true),
+  phone: helper.checkPhone.bind(null, undefined, true),
+  password: helper.checkPassword.bind(null, undefined, true),
+  email: helper.checkEmail.bind(null, undefined, true),
 };
 
 export async function create(...args) {
@@ -207,7 +207,7 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
   user_id = helper.checkId(user_id, true);
   review = helper.checkString(review, "review", true);
   rating = helper.checkRating(rating, true);
-  const review = {
+  const newReview = {
     hotel_id: hotel_id,
     user_id: user_id,
     comment: review,
@@ -216,7 +216,7 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
     downvote: 0,
   };
 
-  const reviewInfo = await tempReview.insertOne(review);
+  const reviewInfo = await tempReview.insertOne(newReview);
   if (reviewInfo.insertedCount.n === 0)
     throw CustomException(`Could not add the review.`, true);
   const updateInfo = await tempOrder.findOneUpdate(
@@ -263,5 +263,6 @@ export async function voteReview(review_id) {
   return true;
 }
 
-//TODO: create request
+//TODO: create request. request document should have three field. id, user_id, hotel_id.
 export async function createRequest(username) {}
+

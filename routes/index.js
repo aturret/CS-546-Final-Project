@@ -6,7 +6,6 @@ const constructorMethod = app => {
     app.use("/user", userRouter);
     app.use("/admin", adminRouter)
     app.use("/", hotelRouter)
-    app.use("/manager", managerRouter)
     app.use("*", (req, res) => {
         res.status(404).json({Error: "Not found"});
     })
