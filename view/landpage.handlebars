@@ -1,0 +1,23 @@
+{{!--
+
+login form handlebar template
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+
+<p>Search for the best hotel you can have for your vacation!</p>
+<form action="/login" method="POST" id="login-form" class="new-form">
+    <label for="SearchBar" id="SearchBar-label">  
+        Search: 
+    </label>
+    <input type="email" name="SearchBar" id="SearchBar"></input>
+</form>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+<a href="/register">Click here to register!</a>

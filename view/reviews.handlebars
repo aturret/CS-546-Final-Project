@@ -1,0 +1,35 @@
+{{!--
+
+hotel_photo: the first photo of the Pictures attribute of the hotel
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+<h2>{{reviewTitle}}</h2>
+<div class="hotelInfo">
+    <div class="hotelPhoto"><img src="{{hotelPhoto}}"></div>
+</div>
+<div class="reviewResult">
+    <div class="reviewItem">
+        <div class="reviewUserItem">
+            <div class="reviewUserPhoto">{{userAvatar}}</div>
+        </div>
+        <div class="reviewContentItem">
+            <div class="reviewTitle"><a href="/reviews/{{reviewId}}">{{reviewTitle}}</a></div>
+            <div class="reviewRating"><p>{{reviewTating}}</p></div>
+            <div class="reviewComment"><p>{{reviewComment}}</p></div>
+        </div>
+        
+        {{#if managerReply}}
+            <div class="managerReply"><p>Manager reply: {{managerReply}}</p></div>
+        {{/if}}
+    </div>    
+</div>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+<a href="/register">Click here to register!</a>

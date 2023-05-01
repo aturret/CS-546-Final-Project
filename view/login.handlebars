@@ -1,0 +1,28 @@
+{{!--
+
+login form handlebar template
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+
+<p>Please log in your account.</p>
+<form action="/login" method="POST" id="login-form" class="new-form">
+    <label for="emailAddressInput" id="emailAddressInput-label">  
+        Email: 
+    </label>
+    <input type="email" name="emailAddressInput" id="emailAddressInput"></input>
+    <label for="passwordInput" id="passwordInput-label">  
+        Password:
+    </label>
+    <input type="password" name="passwordInput" id="passwordInput"></input>
+    <button type="submit" id="login-button">Login</button>
+</form>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+<a href="/register">Click here to register!</a>
