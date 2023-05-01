@@ -1,7 +1,7 @@
 import {Strategy as auth} from 'passport-local'
 import express from 'express'
 import bcrypt from 'bcryptjs'
-import {userFuncs} from '../data_Model/User_Account.js'
+import * as userFuncs from './data_model/User_Account.js'
 import session from 'express-session'
 import passport from 'passport'
 import exphbs from 'express-handlebars'
@@ -39,7 +39,7 @@ app.engine('handlebars', handlebarsInstance.engine);
 app.set('views engine', 'handlebars');
 
 app.use(express.json());
-app.user(session({
+app.use(session({
     name: "Cookie",
     secret: "property of group47",
     resave: false,

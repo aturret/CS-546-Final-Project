@@ -2,12 +2,13 @@ import { Strategy as auth } from "passport-local";
 import express from "express";
 import passport from "passport";
 import bcrypt from "bcryptjs";
-import { userFuncs } from "/data_model/User_Account.js";
-import helper, { CustomException } from "../helper.js";
+import * as userFuncs from "../data_model/User_Account.js";
+import * as helper from "../helper.js";
+import { CustomException } from "../helper.js";
 
 const router = express.Router();
 
-const isAuth = (req, res, next) => {
+export const isAuth = (req, res, next) => {
         if (!req.isAuthenticated()) {
             return res.redirect("/user/login");
         }
@@ -220,6 +221,7 @@ router
     }
   );
 
+//get orders and delete orders. By delete orders, means changing orders state to cancelled.
 router
   .route("/dashboard/:username/bookings")
   .get(
@@ -262,3 +264,5 @@ router
         res.redirect("/user/dashboard/:username");
     }
   });
+
+export default router;

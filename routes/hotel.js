@@ -1,10 +1,12 @@
 import {Strategy as auth} from 'passport-local'
-import express from 'express'
+import express, { Router } from 'express'
 import passport from 'passport'
 import bcrypt from 'bcryptjs'
-import {userFuncs} from '/data_model/User_Account.js'
-import helper from "../helper.js";
-import {checkIdentity, checkLogin} from './user.js'
+import * as userFuncs from '../data_model/User_Account.js'
+import * as helper from "../helper.js";
+import isAuth from './user.js'
+
+
 const router = express.Router()
 
 
@@ -24,13 +26,71 @@ router
     .get((req, res) => {
 
     })
-    .post(checkLogin, (req, res) => {
+    .post(isAuth, (req, res) => {
 
     })
 
 //TODO: Room detail page
 router
-    .router('/:hotel_name/:room_id')
+    .route('/:hotel_name/:room_id')
     .get((req, res) => {
 
     })
+    
+    
+//TODO: load hotel information for the manager
+router
+    .route('/hotel_management')
+    .get(
+        (req, res, next) => {
+            if (!req.isAuthenticated()) {
+                return res.redirect("/user/login");
+            }
+            if (req.user && req.user.identity === 'user') {
+                req.flash("You are not allow to access this page")
+                return res.redirect("/user/dashboard");
+            }
+            next();
+        }
+        ,async (req, res) => {
+        try{
+            req.user.username = helper.checkString(req.user.username)
+            const user = await userFuncs.getUser(req.user.username)
+            if (req.session && req.session.status) {
+                user.status = req.session.status;
+                user.errorMessage = req.session.errorMessage;
+                req.session.status = null;
+                req.session.errorMessage = null;
+            }
+            return res.status(200).render('hotel_management', user)
+        }
+        catch(e){
+            //customized error are thrown. if e.code exist its a customized error. Otherwise, its a server error.
+            if (!e.code) {
+                req.session.status = 500;
+            } 
+            else {
+                req.session.status = e.code;
+            }
+            req.session.errorMessage = e.message;
+            res.redirect("/user/dashboard/:username");
+        }
+    })
+    //TODO: edit hotel information
+    .post(
+        (req, res, next) => {
+            if (!req.isAuthenticated()) {
+                return res.redirect("/user/login");
+            }
+            if (req.user && req.user.identity === 'user') {
+                req.flash("You are not allow to access this page")
+                return res.redirect("/user/dashboard");
+            }
+            next();
+        },
+        async (req, res) => {
+            
+
+            });
+export default router;
+    
