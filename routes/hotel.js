@@ -30,7 +30,7 @@ router
 
 //TODO: Room detail page
 router
-    .router('/:hotel_name/:room_id')
+    .router('/:hotel_name/:room_id') // I think this should be room type id, since customers won't select room by single rooms -- Jichen
     .get((req, res) => {
 
     })

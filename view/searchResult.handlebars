@@ -1,23 +1,25 @@
 {{!--
 
-login form handlebar template
+
 
 --}}
 
 {{#if error}}
 <div class="error">
-    <p>Error code {{status_code}}: {{error}}</p>
+    <p>Error code {{statusCode}}: {{error}}</p>
 </div>
 {{/if}}
 <h2>Search Result</h2>
 <div class="searchResult">
 <ol>
-    {{#each venues}}
+    {{#each hotels}}
+    <li>
     <div class="searchResultItem">
-        <li>
-            <a href="/venuedetails/{{id}}">{{name}}</a>
-        </li>
+        <div class="hotelTitle"><a href="/hotel/{{hotelId}}">{{hotelName}}</a></div>
+        <div class="hotelRating"><p>{{hotelRating}}</p></div>
+        <div class="hotelAddress"><p>{{hotelAddress}}</p></div>
     </div>
+    </li>
     {{/each}}
 </ol>
 </div>
