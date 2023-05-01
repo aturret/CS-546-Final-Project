@@ -41,6 +41,9 @@ const handlebarsInstance = exphbs.create({
       or: function (condition1, condition2) {
         return condition1 || condition2;
       },
+      ne: function (value1, value2) {
+        return value1 !== value2;
+      }
     }
   });
 
