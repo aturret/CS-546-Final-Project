@@ -1,0 +1,71 @@
+{{!--
+
+
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+<h2>Room Search Result</h2>
+<div class="searchResult">
+    {{#if hotelRoom}}
+    <div class="hotelRoom">
+        <p>{{remainingHotelRooms}} rooms for this hotel are available, click the button to book now!</p>
+        <form action="/order" method="POST" class="new-form">
+            <div class="roomsInfo">
+                <ul>
+                    {{#each roomType}}
+                    <li>
+                        <div class="roomItem">
+                            <input type="radio" id="{{roomTypeId}}" name="roomCheck" value="{{roomTypeId}}">
+                            <label for="{{roomTypeId}}">{{roomTypeName}}</label>
+                            <div class="roomPhoto"><img src="{{roomPhoto}}"></div>
+                            <div class="roomInfo">
+                                {{!-- <div class="roomTypeName">
+                                    <p>{{roomTypeName}}</p>
+                                </div> --}}
+                                <div class="roomPrice">
+                                    <p>Price: {{roomPrice}}</p>
+                                </div>
+                                <div class="roomBook"><a href="{{hotelId}}/{{roomTypeId}}">Book</a></div>
+                            </div>
+                        </div>
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div class="otherInfo">
+                <div class="guests">
+                    {{!-- This part will be increased by DOM operation. You need to get all guestFirstName and
+                    guestLastName and solve it at the backend. --}}
+                    <div class="guestItem" id="guest-1">
+                        <input type="text" name="guestFirstName-1">
+                        <label for="guestFirstName-1">Guest 1 firstname</label>
+                        <input type="text" name="guestLastName-1">
+                        <label for="guestLastName-1">Guest 1 lastname</label>
+                    </div>
+                    <button id="addNewGuest">Add another guest</button>
+                </div>
+                <input type="hidden" name="hotelId" value="{{hotelId}}">
+                <input type="hidden" name="checkInDate" value="{{checkInDate}}">
+                <input type="hidden" name="checkOutDate" value="{{checkOutDate}}">
+                <input type="hidden" name="status" value="pending">
+                <button type="submit" id="book-button">Book</button>
+            </div>
+        </form>
+    </div>
+    {{/if}}
+    {{#if noRoom}}
+    <div class="noRoom">
+        <p>Sorry, there is no room available for this hotel during date you choose.</p>
+    </div>
+    {{/if}}
+</div>
+
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+<a href="/register">Click here to register!</a>

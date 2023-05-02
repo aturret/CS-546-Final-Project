@@ -1,6 +1,8 @@
 {{!--
 
-login form handlebar template
+    Purpose:
+    This file is the main page of the website. It is the first page that the user will see when they visit the website. 
+    It contains a search bar that allows the user to search for hotels.
 
 --}}
 
@@ -11,13 +13,14 @@ login form handlebar template
 {{/if}}
 
 <p>Search for the best hotel you can have for your vacation!</p>
-<form action="/login" method="POST" id="login-form" class="new-form">
+<form action="/hotel" method="POST" id="login-form" class="new-form">
     <label for="SearchBar" id="SearchBar-label">  
         Search: 
     </label>
-    <input type="email" name="SearchBar" id="SearchBar"></input>
+    <input type="text" name="SearchBar" id="SearchBar"></input>
 </form>
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-<a href="/register">Click here to register!</a>
+<p>You can <a href="/register">register</a> or <a href="/login">login</a> first.</p>
+
