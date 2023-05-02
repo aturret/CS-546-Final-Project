@@ -1,0 +1,74 @@
+{{!--
+
+if cannot find a room fit the modified date, the server should return a 400 error
+order.guests should be the guests list of this order.
+Please assign a variable number as order.guests.number for each guest to render the guest input tags
+
+order has status: pending, completed, cancelled.
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+<h2>Search Result</h2>
+<div class="searchResult">
+    <ol>
+        {{#each order}}
+        <li>
+            <div class="orderItem">
+                <div class="orderItemInfo">
+                    <div class="hotelName"><a href="/hotel/{{order.hotelId}}">{{order.hotelName}}</a></div>
+                    <div class="roomType">
+                        <p>{{order.roomType}}</p>
+                    </div>
+                    <div class="startDate">
+                        <p>{{order.startDate}}</p>
+                    </div>
+                    <div class="endDate">
+                        <p>{{order.endDate}}</p>
+                    </div>
+                </div>
+                {{#if (eq order.status "pending")}}
+                <div class="editOrder">
+                    <button class="editOrderButton" onclick="showEditOrderWindow()">Edit</button>
+                    <div class="editOrderWindow" hidden="true">
+                        <form action="/order/{{order.orderId}}/edit" method="PATCH" id="editOrder-form"
+                            class="new-form">
+
+                            {{#ecah order.guests}}
+                            <div class="guestItem" id="guest-{{order.guests.number}}">
+                                <input type="text" name="guestFirstName-{{order.guests.number}}">
+                                <label for="guestFirstName-{{order.guests.number}}">Guest {{order.guests.number}}
+                                    firstname</label>
+                                <input type="text" name="guestLastName-{{order.guests.number}}">
+                                <label for="guestLastName-{{order.guests.number}}">Guest {{order.guests.number}}
+                                    lastname</label>
+                                <button type="button" onclick="removeGuest({{order.guests.number}})">Remove</button>
+                            </div>
+                            {{/each}}
+                            <button type="submit" class="editOrderButton">Edit</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="cancelOrder">
+                    <div class="cancelOrderWindow">
+                        <form action="/order/{{order.orderId}}/cancel" method="PATCH" id="cancelOrder-form"
+                            class="new-form">
+                            <button type="submit" class="cancelOrderButton">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+                {{/if}}
+                {{#if (eq order.status "completed")}}
+                <a href="/hotel/{{hotel}}">Have a review on it!</a>
+                {{/if}}
+        </li>
+        {{/each}}
+    </ol>
+</div>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>

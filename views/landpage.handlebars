@@ -21,3 +21,19 @@ login form handlebar template
     <p id="client-error"></p>
 </div>
 <a href="/register">Click here to register!</a>
+
+<p>Search for the best hotel you can have for your vacation!</p>
+<form action="/hotel" method="POST" id="login-form" class="new-form">
+    <label for="SearchBar" id="SearchBar-label">  
+        Search: 
+    </label>
+    <input type="text" name="SearchBar" id="SearchBar">
+</form>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+{{#if (eq user.identity "guest")}}
+<div class="new-user">
+    <p>You can <a href="/register">register</a> or <a href="/login">login</a> first.</p>
+</div>
+{{/if}}

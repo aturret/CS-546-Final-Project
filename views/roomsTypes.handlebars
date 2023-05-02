@@ -1,0 +1,59 @@
+{{!--
+
+
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+<h2>All rooms of the hotel</h2>
+<div class="searchResult">
+    <ol>
+        {{#each roomTypes}}
+        <li>
+            <div class="searchResultItem">
+                <div class="roomTypePictures">
+                    {{#each roomTypes.pictures}}
+                    <img src="{{roomTypes.pictures}}" alt="roomTypePicture">
+                    {{/each}}
+                </div>
+                <div class="roomTypeName">
+                    <p>{{roomTypes.name}}</p>
+                </div>                
+                <div class="roomTypePrice">
+                    <p>{{roomTypes.roomTypePrice}}</p>
+                </div>
+            </div>
+        </li>
+        {{/each}}
+    </ol>
+    <div class="addNewRoomType">
+        <form action="/hotel/{{hotelId}}/roomType" method="POST" id="addNewRoom-form" class="new-form">
+            <label for="roomTypeName" id="roomTypeName-label">
+                Room Type:
+            </label>
+            <input type="text" name="roomTypeName" id="roomTypeName">
+            <label for="roomTypePrice" id="roomTypePrice-label">
+                Room Price:
+            </label>
+            <input type="number" name="roomTypePrice" id="roomTypePrice">
+            <select name="roomTypeInput" id="roomTypeInput">
+                {{#each roomTypes}}
+                <option value="{{roomTypes.typeName}}">{{roomTypes.typeName}}</option>
+                {{/each}}
+            </select>
+            <button type="submit" id="addNewRoom-button">Add</button>
+        </form>
+    </div>
+</div>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+{{#if (eq user.identity "guest")}}
+<div class="new-user">
+    <p>You can <a href="/register">register</a> or <a href="/login">login</a> first.</p>
+</div>
+{{/if}}
