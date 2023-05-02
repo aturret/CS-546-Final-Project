@@ -3,6 +3,7 @@ import { Account } from "../Mongo_Connections/mongoCollections.js";
 import { Order } from "../Mongo_Connections/mongoCollections.js";
 import { Room } from "../Mongo_Connections/mongoCollections.js";
 import { Hotel } from "../Mongo_Connections/mongoCollections.js";
+import { roomType } from "../Mongo_Connections/mongoCollections.js";
 import { request } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import * as helper from "../helper.js";
@@ -33,7 +34,7 @@ export async function create(...args) {
   user.phone = args[5]? helper.checkNumber(args[5], true): args[5];
   args[6] = helper.checkPassword(args[6], true);
   user.email = helper.checkEmail(args[7], true);
-  user.hotel = [];
+  user.hotels = [];
   user.orders = {};
 
   user.password = await bcrypt.hash(args[6], saltRounds);
@@ -85,7 +86,17 @@ export async function updateUser(username, set) {
 }
 
 //TODO: add delete orders
-//add order
+//get order for user.  return order details
+/*
+@params: username
+@return: hotel_name: 1,
+        checkin_date: 1,
+        checkout_date: 1,
+        guests: 1,
+        order_price: 1,
+        order_status: 1,
+        review: 1
+*/
 export async function getOrder(username) {
   username = helper.checkString(username, "username", true);
   const tempAccount = await Account();
@@ -258,6 +269,8 @@ export async function voteReview(review_id) {
 
   return true;
 }
+
+
 
 //TODO: create request. request document should have three field. id, user_id, hotel_id.
 export async function createRequest(username) {}

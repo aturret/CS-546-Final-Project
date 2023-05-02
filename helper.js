@@ -39,7 +39,7 @@ export function checkArray(arr, key, flag){
 
 export function checkDate(date, flag){
     if(!date || typeof date !== "string" || date.trim().length === 0) throw new CustomException("releaseDate must exist and must be a non empty string.", flag);
-    if(!moment(date.trim(), "YYYY-MM-DD", true).isValid()) throw new CustomException("releaseDate must be a valid date.", flag);
+    if(!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw new CustomException("releaseDate must be a valid date.", flag);
     date = date.trim();
     let temp = +date.split("/")[-1];
     if (temp < 1900 || temp > 2023)
