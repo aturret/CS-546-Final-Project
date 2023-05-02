@@ -12,6 +12,11 @@ registration handelbars
 
 <p>Please register your account.</p>
 <form action="/register" method="POST" id="registration-form" class="new-form">
+    <label for="username" id="username-label">  
+        Username:
+    </label>
+    <input type="text" name="username" id="username"></input>
+
     <label for="firstNameInput" id="firstNameInput-label">  
         First Name:
     </label>
@@ -23,12 +28,19 @@ registration handelbars
 
     <label for="emailAddressInput" id="emailAddressInput-label">  
         Email: 
+        <input type="email" name="emailAddressInput" id="emailAddressInput"></input>
     </label>
-    <input type="email" name="emailAddressInput" id="emailAddressInput"></input>
+    
+      <label>
+        Phone:
+        <input type="phone" name="phone" id="phone"></input>
+    </label>
+
     <label for="passwordInput" id="passwordInput-label">  
         Password:
+        <input type="password" name="passwordInput" id="passwordInput"></input>
     </label>
-    <input type="password" name="passwordInput" id="passwordInput"></input>
+
     <label for="confirmPasswordInput" id="confirmPasswordInput-label">  
         Confirm Password:
     </label>
@@ -43,7 +55,7 @@ registration handelbars
     </select>
     <button type="submit" id="register-button">Register</button>
 </form>
-<div class="error" id="client">
+<p class="error" id="client">{{errorMessage}}
     
-</div>
+</p>
 <a href="/login">Already have an account? Click here to log-in!</a>

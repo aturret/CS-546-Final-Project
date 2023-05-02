@@ -14,6 +14,11 @@ const router = express.Router()
 router
     .route('/')
     .get((req, res) => {
+        const code = req.session && req.session.status? req.session.status : 200;
+        const error = req.session && req.session.errorMessage? req.session.errorMessage : undefined;
+        if (req.session) req.session.errorMessage = undefined;
+        if (req.session) req.session.status = undefined;
+        return res.status(code).render("hotel", { errorMessage: error });
         
     })
     .post((req, res) => {

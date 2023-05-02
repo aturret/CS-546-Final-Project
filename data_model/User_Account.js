@@ -21,17 +21,16 @@ const refInfo = {
 };
 
 export async function create(...args) {
-  if (args.length < 8) throw CustomException("Missing inputs.", true);
+  console.log(args);
   let user = {};
-
   user.username = helper.checkString(args[1], "username", true);
   user.identity = helper.checkString(args[0], "identity", true).toLowerCase();
   if (["manager", "user", "admin"].every((obj) => obj !== user.identity))
     throw CustomException("Invalid identity.", true);
-  user.avatar = helper.checkWebsite(args[2], true);
+  user.avatar = args[2]? helper.checkWebsite(args[2], true): args[2];
   user.firstName = helper.checkString(args[3], "first name", true);
   user.lastName = helper.checkString(args[4], "last name", true);
-  user.phone = helper.checkNumber(args[5], true);
+  user.phone = args[5]? helper.checkNumber(args[5], true): args[5];
   args[6] = helper.checkPassword(args[6], true);
   user.email = helper.checkEmail(args[7], true);
   user.hotel = [];
@@ -39,18 +38,15 @@ export async function create(...args) {
 
   user.password = await bcrypt.hash(args[6], saltRounds);
 
-  const tempAccount = await account();
-  if (!(await tempAccount.findOne({ username: user.username })))
+  const tempAccount = await Account();
+  if ((await tempAccount.findOne({ username: user.username })))
     throw Error(`Account with username ${user.username} already exist.`);
 
   const insertInfo = tempAccount.insertOne(user);
   if (insertInfo.insertedCount === 0) throw Error("Can not create user.");
 
-  const tempId = insertInfo.insertedId;
 
-  const curAccount = await tempAccount.findOne({ _id: tempId });
-  curAccount._id = curAccount._id.toString();
-  return curAccount;
+  return {message: "Create user successfully."};
 }
 
 export async function getUser(username) {
