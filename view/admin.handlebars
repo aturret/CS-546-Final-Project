@@ -1,0 +1,37 @@
+{{!--
+
+roomTypes: Please pass all roomTpyes when rendering this template.
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+<h2>Welcome, powerful admin.</h2>
+<div class="searchResult">
+    <ol>
+        {{#each applications}}
+        <li>
+            <div class="applicationItem">
+                <div class="applicationName">
+                    <p>{{applications.applicationName}}</p>
+                </div>
+                <div class="applicationStatus">
+                    <p>{{applications.applicationStatus}}</p>
+            </div>
+        </li>
+        {{/each}}
+    </ol>
+
+</div>
+</div>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+{{#if (eq user.identity "guest")}}
+<div class="new-user">
+    <p>You can <a href="/register">register</a> or <a href="/login">login</a> first.</p>
+</div>
+{{/if}}

@@ -4,6 +4,8 @@ if cannot find a room fit the modified date, the server should return a 400 erro
 order.guests should be the guests list of this order.
 Please assign a variable number as order.guests.number for each guest to render the guest input tags
 
+order has status: pending, completed, cancelled.
+
 --}}
 
 {{#if error}}
@@ -29,6 +31,7 @@ Please assign a variable number as order.guests.number for each guest to render 
                         <p>{{order.endDate}}</p>
                     </div>
                 </div>
+                {{#if (eq order.status "pending")}}
                 <div class="editOrder">
                     <button class="editOrderButton" onclick="showEditOrderWindow()">Edit</button>
                     <div class="editOrderWindow" hidden="true">
@@ -58,6 +61,10 @@ Please assign a variable number as order.guests.number for each guest to render 
                         </form>
                     </div>
                 </div>
+                {{/if}}
+                {{#if (eq order.status "completed")}}
+                <a href="/hotel/{{hotel}}">Have a review on it!</a>
+                {{/if}}
         </li>
         {{/each}}
     </ol>

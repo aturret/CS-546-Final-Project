@@ -27,44 +27,19 @@
                     <p>{{roomTypes.roomTypePrice}}</p>
                 </div>
             </div>
-            {{#if (eq rooms.roomStatus "available")}}
-            <div class="deleteRoom">
-                <form action="/hotel/{{hotelId}}/room/{{rooms.roomId}}/delete" method="DELETE">
-                    <button type="submit">Delete</button>
-                </form>
-            </div>
-            <div class="editRoom">
-                <form action="/hotel/{{hotelId}}/room/{{rooms.roomId}}/edit" method="PATCH" id="editRoom-form"
-                    class="new-form">
-                    <label for="roomNumberInput" id="roomNumberInput-label">
-                        Room Number:
-                    </label>
-                    <input type="text" name="roomNumberInput" id="roomNumberInput">
-                    <label for="roomTypeInput" id="roomTypeInput-label">
-                        Room Type:
-                    </label>
-                    <select name="roomTypeInput" id="roomTypeInput">
-                        {{#each roomTypes}}
-                        <option value="{{roomTypes.typeName}}">{{roomTypes.typeName}}</option>
-                        {{/each}}
-                    </select>
-                    <button type="submit" id="editRoom-button">Edit</button>
-                </form>
-            </div>
-            {{/if}}
         </li>
         {{/each}}
     </ol>
-    <div class="addNewRoom">
-        <form action="/hotel/{{hotelId}}/room/add" method="POST" id="addNewRoom-form" class="new-form">
-            <label for="roomNumberInput" id="roomNumberInput-label">
-                Room Number:
-            </label>
-            <input type="text" name="roomNumberInput" id="roomNumberInput">
-            <label for="roomTypeInput" id="roomTypeInput-label">
+    <div class="addNewRoomType">
+        <form action="/hotel/{{hotelId}}/roomType" method="POST" id="addNewRoom-form" class="new-form">
+            <label for="roomTypeName" id="roomTypeName-label">
                 Room Type:
             </label>
-            <input type="text" name="roomTypeInput" id="roomTypeInput">
+            <input type="text" name="roomTypeName" id="roomTypeName">
+            <label for="roomTypePrice" id="roomTypePrice-label">
+                Room Price:
+            </label>
+            <input type="number" name="roomTypePrice" id="roomTypePrice">
             <select name="roomTypeInput" id="roomTypeInput">
                 {{#each roomTypes}}
                 <option value="{{roomTypes.typeName}}">{{roomTypes.typeName}}</option>
