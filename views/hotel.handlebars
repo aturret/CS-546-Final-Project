@@ -99,7 +99,8 @@ hotel book button: You can modify the reletive address for your own purpose
         <div class="hotelContacts">
             <p>Contacts: Phone: {{hotelPhone}} Email: {{hotelEmail}}</p>
         </div>
-    </div>
+    </div>    
+    {{#if (ne user.identity "guest")}}
     <div class="booking">
         <p>Please choose the date and search if there are rooms available.</p>
         <form action="/hotel/{{hotelId}}/result" method="POST" id="registration-form" class="new-form">
@@ -114,6 +115,11 @@ hotel book button: You can modify the reletive address for your own purpose
             <button type="submit">Search</button>
         </form>
     </div>
+    {{#else}}
+    <div class="booking">
+        <p>Please log in to book a room.</p>
+    </div>
+    {{/if}}    
     {{#if (eq user.hotel hotelId)}}
     <div class="edit">
         <button class="editHotelInfo">Edit Hotel Basic Info</button>
