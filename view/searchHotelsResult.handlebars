@@ -1,6 +1,7 @@
 {{!--
 
-
+hotelRating: to calculate the average rating of the hotel
+hotelPrice: might be the lowest price or average price. I think lowest is better.
 
 --}}
 
@@ -15,10 +16,11 @@
     {{#each hotels}}
     <li>
     <div class="searchResultItem">
-        <div class="hotelTitle"><a href="/hotel/{{hotelId}}">{{hotelName}}</a></div>
-        <div class="hoteReviewNumber"><p>{{hotelReviewNumber}}</p></div>
-        <div class="hotelRating"><p>{{hotelRating}}</p></div>
-        <div class="hotelAddress"><p>{{hotelAddress}}</p></div>
+        <div class="hotelName"><a href="/hotel/{{hotels.hotelId}}">{{hotels.hotelName}}</a></div>
+        <div class="hoteReviewNumber"><p>{{hotels.hotelReviewNumber}}</p></div>
+        <div class="hotelRating"><p>{{hotels.hotelRating}}</p></div>
+        <div class="hotelAddress"><p>{{hotels.hotelAddress}}</p></div>
+        <div class="hotelPrice"><p>{{hotels.hotelPrice}}</p></div>
     </div>
     </li>
     {{/each}}
@@ -27,4 +29,8 @@
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-<a href="/register">Click here to register!</a>
+{{#if (eq user.identity "guest")}}
+<div class="new-user">
+    <p>You can <a href="/register">register</a> or <a href="/login">login</a> first.</p>
+</div>
+{{/if}}

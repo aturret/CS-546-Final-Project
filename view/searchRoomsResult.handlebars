@@ -46,8 +46,9 @@
                         <label for="guestFirstName-1">Guest 1 firstname</label>
                         <input type="text" name="guestLastName-1">
                         <label for="guestLastName-1">Guest 1 lastname</label>
+                        <button type="button" onclick="removeGuest(1)">Remove</button>
                     </div>
-                    <button id="addNewGuest">Add another guest</button>
+                    <button id="addNewGuest" onclick="addGuest()">Add another guest</button>
                 </div>
                 <input type="hidden" name="hotelId" value="{{hotelId}}">
                 <input type="hidden" name="checkInDate" value="{{checkInDate}}">
@@ -64,8 +65,11 @@
     </div>
     {{/if}}
 </div>
-
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-<a href="/register">Click here to register!</a>
+{{#if (eq user.identity "guest")}}
+<div class="new-user">
+    <p>You can <a href="/register">register</a> or <a href="/login">login</a> first.</p>
+</div>
+{{/if}}
