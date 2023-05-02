@@ -21,9 +21,7 @@ router
     //check if user is already logged in
     (req, res, next) => {
       if (req.isAuthenticated()) {
-        return res.redirect("/dashboard/:username", {
-          username: req.user.username,
-        });
+        return res.redirect("/dashboard");
       }
       next();
     },
@@ -40,7 +38,6 @@ router
       failureFlash: true
     })
     ,(req, res) => {
-      req.session = {}
       return res.redirect("/")
     }
   );
@@ -49,57 +46,55 @@ router
   .route("/register")
   .get(
     (req, res) => {
-      const error = req.body.errorMessage;
-      return res.render("register", { errorMessage: error });
+      const code = req.session && req.session.status? req.session.status : 200;
+      const error = req.session && req.session.errorMessage? req.session.errorMessage : undefined;
+      if (req.session) req.session.errorMessage = undefined;
+      if (req.session) req.session.status = undefined;
+      return res.status(code).render("register", { errorMessage: error });
     }
   )
   .post(
     async (req, res) => {
     const user = req.body;
+    console.log(user)
     try {
       user.username = helper.checkString(user.username, "username", true);
-      user.identity = helper
-        .checkString(user.identity, "identity", true)
+      user.roleInput = helper
+        .checkString(user.roleInput, "identity", true)
         .toLowerCase();
-      if (["manager", "user", "admin"].every((obj) => obj !== user.identity))
+      if (["manager", "user", "admin"].every((obj) => obj !== user.roleInput))
         throw CustomException("Invalid identity.", true);
-      user.avatar = helper.checkWebsite(user.avatar, true);
-      user.firstName = helper.checkString(user.firstName, "first name", true);
-      user.lastName = helper.checkString(user.lastName, "last name", true);
-      user.phone = helper.checkPhone(user.phone, true);
-      user.password = helper.checkPassword(user.password, true);
-      user.email = helper.checkEmail(user.email, true);
-    } catch (e) {
-      res.status(e.code).render("/user/register", { errorMessage: e.message });
-    }
+      user.avatar = user.avatar? helper.checkWebsite(user.avatar, true): undefined;
+      user.firstNameInput = helper.checkString(user.firstNameInput, "first name", true);
+      user.lastNameInput = helper.checkString(user.lastNameInput, "last name", true);
+      user.phone = user.phone? helper.checkPhone(user.phone, true): undefined;
+      user.passwordInput = helper.checkPassword(user.passwordInput, true);
+      user.emailAddressInput = helper.checkEmail(user.emailAddressInput, true);
 
-    try {
-      const args = [
-        user.identity,
+      const newUser = await userFuncs.create(     user.roleInput,
         user.username,
         user.avatar,
-        user.firstName,
-        user.lastName,
+        user.firstNameInput,
+        user.lastNameInput,
         user.phone,
-        user.password,
-        user.email,
-      ];
-      const user = await userFuncs.create(args);
-      res.status(200).render("/user/login");
+        user.passwordInput,
+        user.emailAddressInput);
+
+      return res.redirect("/user/login");
     } catch (e) {
-      {
-        if (!e.code) {
-          res.status(500).render("/user/register", { errorMessage: e.message });
-        } else {
-          console.error(e);
-          res.status(e.code).json({ Error: e.message });
-        }
+      if (!e.code) {
+        req.session.status = 500;
+      } 
+      else {
+          req.session.status = e.code;
       }
+      req.session.errorMessage = e.message;
+      return res.redirect("/user/register")
     }
   });
 
 router
-  .route("/dashboard/:username")
+  .route("/dashboard")
   .get(
     isAuth,
     async (req, res) => {
@@ -116,7 +111,7 @@ router
         return res.render("dashboard", user);
       } catch (e) {
         if (!e.code) {
-          res.status(404).render("/user/register", { errorMessage: e.message });
+          res.redirect("/user/register");
         } else {
           console.error(e);
           res.status(e.code).json({ errorMessage: e.message});
@@ -149,14 +144,14 @@ router
         }
         catch(e)
         {
-            if (!e.code) {
-                req.session.status = 500;
-                req.session.errorMessage = "Internal server error";
-                res.redirect("/user/dashboard/:username");
-            } else {
-                console.error(e);
-                res.status(e.code).json({ errorMessage: e.message});
-            }
+          if (!e.code) {
+            req.session.status = 500;
+          } 
+          else {
+              req.session.status = e.code;
+          }
+          req.session.errorMessage = e.message;
+          res.redirect("/user/dashboard/:username")
         }
     }
 )
@@ -185,7 +180,7 @@ router
                     req.user.username
                 ];
                 const user = await userFuncs.updateUser(req.user.username, args);
-                return res.redirect("/dashboard/:username");
+                return res.redirect("/user/dashboard");
             }
             catch(e)
             {
@@ -196,7 +191,7 @@ router
                     req.session.status = e.code;
                 }
                 req.session.errorMessage = e.message;
-                res.redirect("/user/dashboard/:username");
+                res.redirect("/user/dashboard");
             }
         }
     )

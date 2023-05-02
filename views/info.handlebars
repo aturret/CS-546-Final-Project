@@ -1,0 +1,24 @@
+{{!--
+
+userAvatar: the avatar of the user
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+<div class="Avatar">
+    <img src="{{userAvatar}}">
+</div>
+<h2>{{userName}}</h2>
+<div class="basic information">
+    <p>{{}}</p>
+</div>
+
+
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+<a href="/register">Click here to register!</a>

@@ -7,7 +7,7 @@ import moment from 'moment';
 export function CustomException(message, flag) {
     const error = new Error(message);
   
-    error.code = flag? 400 : 404;x
+    error.code = flag? 400 : 404;
     return error;
 }
 
@@ -77,7 +77,7 @@ export function checkPhone(n, flag)
 {
     n = n.trim()
     if(!n || typeof n !== 'string') throw new CustomException("Phone number must exist and must be a string type.", flag);
-    if(!/^\d{3}[-]?\d{3}[-]?\d{4}$/.test(web)) throw new CustomException("Cell phone number has to match the format. xxxxxxxxxxx, xxx-xxx-xxxxx or (xxx)xxx-xxxxx", flag)
+    if(!/^\d{3}[-]?\d{3}[-]?\d{4}$/.test(n)) throw new CustomException("Cell phone number has to match the format. xxxxxxxxxxx, xxx-xxx-xxxxx or (xxx)xxx-xxxxx", flag)
     return n
 }
 
