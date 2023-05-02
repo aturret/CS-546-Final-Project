@@ -5,9 +5,9 @@ hotelPrice: might be the lowest price or average price. I think lowest is better
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{statusCode}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <h2>Search Result</h2>
@@ -17,7 +17,7 @@ hotelPrice: might be the lowest price or average price. I think lowest is better
     <li>
     <div class="searchResultItem">
         <div class="hotelName"><a href="/hotel/{{hotels.hotelId}}">{{hotels.hotelName}}</a></div>
-        <div class="hoteReviewNumber"><p>{{hotels.hotelReviewNumber}}</p></div>
+        <div class="hotelReviewNumber"><p>{{hotels.hotelReviewNumber}}</p></div>
         <div class="hotelRating"><p>{{hotels.hotelRating}}</p></div>
         <div class="hotelAddress"><p>{{hotels.hotelAddress}}</p></div>
         <div class="hotelPrice"><p>{{hotels.hotelPrice}}</p></div>
