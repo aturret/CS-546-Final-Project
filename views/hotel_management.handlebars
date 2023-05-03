@@ -31,7 +31,7 @@ room information
     <div class="edit">
         <button class="editHotelInfo">Edit Hotel Basic Info</button>
         <div hidden="true" class="hotelInfoEdit">
-            <form action="/room" method="POST" id="registration-form" class="new-form">
+            <form action="/room" method="POST" id="registration-form" class="my-form">
                 <label for="hotelName" id="hotelName-label">
                     Hotel Name:
                 </label>
@@ -102,7 +102,7 @@ room information
     {{#if (ne user.identity "guest")}}
     <div class="booking">
         <p>Please choose the date and search if there are rooms available.</p>
-        <form action="/hotel/{{hotelId}}/result" method="POST" id="registration-form" class="new-form">
+        <form action="/hotel/{{hotelId}}/result" method="POST" id="registration-form" class="my-form">
             <label for="startDate" id="startDate-label">
                 Start Date:
             </label>
@@ -123,7 +123,7 @@ room information
     <div class="edit">
         <button class="editHotelInfo">Edit Hotel Basic Info</button>
         <div hidden="true" class="hotelInfoEdit">
-            <form action="/room" method="POST" id="registration-form" class="new-form">
+            <form action="/room" method="POST" id="registration-form" class="my-form">
                 <input type="text" name="hotelState" id="hotelState" placeholder="State">
                 <button type="submit">Submit Info Change</button>
             </form>

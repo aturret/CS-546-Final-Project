@@ -65,7 +65,7 @@ input {
     color: red;
 }
 
-form.new-form {
+form.my-form {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -73,7 +73,7 @@ form.new-form {
     justify-content: left;
 }
 
-.new-form input, .new-form label {
+.my-form input, .my-form label {
     margin-bottom: 1rem;
 }
 
