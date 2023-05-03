@@ -2,6 +2,9 @@
 
 hotel_photo: the first photo of the Pictures attribute of the hotel
 hotel book button: You can modify the reletive address for your own purpose
+hotel room: you should calculate this variable of if there are available rooms to determine whether to show the hotel
+room information
+userHasReviewed: Please pass this boolean variable to the template to determine whether to show the review button
 
 --}}
 
@@ -13,66 +16,83 @@ hotel book button: You can modify the reletive address for your own purpose
 <h2>{{hotelName}}</h2>
 <div class="hotelInfo">
     <div class="hotelBasicInfo">
-    <div class="hotelPhoto"><img src="{{hotelPhoto}}"></div>
-    <div class="hotelRating"><p>Rating: {{hotelRating}}</p></div>
+        <div class="hotelPhoto"><img src="{{hotelPhoto}}"></div>
+        <div class="hotelRating">
+            <p>Rating: {{hotelRating}}</p>
+        </div>
     </div>
     <div class="hotelIntro">
-        <div class="hotelAddress"><p>Address: {{hotelAddress}}</p></div>        
-        <div class="hotelContacts"><p>Contacts: Phone: {{hotelPhone}} Email: {{hotelEmail}}</p></div>
+        <div class="hotelAddress">
+            <p>Address: {{hotelAddress}}</p>
+        </div>
+        <div class="hotelContacts">
+            <p>Contacts: Phone: {{hotelPhone}} Email: {{hotelEmail}}</p>
+        </div>
     </div>
     {{#if hotelRoom}}
     <div class="hotelRoom">
-        <p>{{remainingHotelRooms}} rooms for this hotel are available, click the button to book now!</p> 
+        <p>{{remainingHotelRooms}} rooms for this hotel are available, click the button to book now!</p>
         <div class="roomsInfo">
             <ul>
-        {{#each roomType}}
-            <li>
-                <div class="roomItem">
-                    <div class="roomPhoto"><img src="{{roomPhoto}}"></div>
-                    <div class="roomInfo">
-                        <div class="roomTypeName"><p>{{roomTypeName}}</p></div>
-                        <div class="roomPrice"><p>Price: {{roomPrice}}</p></div>
-                        <div class="roomBook"><a href="{{hotelId}}/{{roomTypeId}}">Book</a></div>
+                {{#each roomType}}
+                <li>
+                    <div class="roomItem">
+                        <div class="roomPhoto"><img src="{{roomPhoto}}"></div>
+                        <div class="roomInfo">
+                            <div class="roomTypeName">
+                                <p>{{roomTypeName}}</p>
+                            </div>
+                            <div class="roomPrice">
+                                <p>Price: {{roomPrice}}</p>
+                            </div>
+                            <div class="roomBook"><a href="{{hotelId}}/{{roomTypeId}}">Book</a></div>
+                        </div>
                     </div>
-                </div>
-            </li>
-        {{/each}}
+                </li>
+                {{/each}}
             </ul>
         </div>
     </div>
-    {{/if}}
-    <div>
-
+    {{else}}
+    <div class="hotelRoom">
+        <p>Sorry, there is no room available for this hotel.</p>
     </div>
+    {{/if}}
 </div>
 <div class="reviewResult">
-<ol>
-    {{#each reviews}}
-    <li>
-    <div class="reviewItem">
-        <div class="reviewUserItem">
-            <div class="reviewUserPhoto">{{userAvatar}}</div>
-        </div>
-        <div class="reviewContentItem">
-            <div class="reviewTitle"><a href="/reviews/{{reviewId}}">{{reviewTitle}}</a></div>
-            <div class="reviewRating"><p>{{reviewRating}}</p></div>
-            <div class="reviewComment"><p>{{reviewComment}}</p></div>
-        </div>        
-        {{#if managerReply}}
-            <div class="managerReply"><p>Manager reply: {{managerReply}}</p></div>
-        {{/if}}
-        {{#if managerReplyWindow}}
-            <div class="managerReplyWindow">
-                <form action="/reviews/{{reviewId}}" method="POST">
-                    <textarea name="managerReply" placeholder="Reply to this review"></textarea>
-                    <button type="submit">Submit</button>
-                </form>
+    <ol>
+        {{#each reviews}}
+        <li>
+            <div class="reviewItem">
+                <div class="reviewUserItem">
+                    <div class="reviewUserPhoto">{{userAvatar}}</div>
+                </div>
+                <div class="reviewContentItem">
+                    <div class="reviewTitle"><a href="/reviews/{{reviewId}}">{{reviewTitle}}</a></div>
+                    <div class="reviewRating">
+                        <p>{{reviewRating}}</p>
+                    </div>
+                    <div class="reviewComment">
+                        <p>{{reviewComment}}</p>
+                    </div>
+                </div>
+                {{#if managerReply}}
+                <div class="managerReply">
+                    <p>Manager reply: {{managerReply}}</p>
+                </div>
+                {{/if}}
+                {{#if managerReplyWindow}}
+                <div class="managerReplyWindow">
+                    <form action="/reviews/{{reviewId}}" method="POST">
+                        <textarea name="managerReply" placeholder="Reply to this review"></textarea>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+                {{/if}}
             </div>
-        {{/if}}
-    </div>
-    </li>
-    {{/each}}
-</ol>
+        </li>
+        {{/each}}
+    </ol>
 </div>
 <div class="error" id="client">
     <p id="client-error"></p>
@@ -99,7 +119,7 @@ hotel book button: You can modify the reletive address for your own purpose
         <div class="hotelContacts">
             <p>Contacts: Phone: {{hotelPhone}} Email: {{hotelEmail}}</p>
         </div>
-    </div>    
+    </div>
     {{#if (ne user.identity "guest")}}
     <div class="booking">
         <p>Please choose the date and search if there are rooms available.</p>
@@ -119,18 +139,6 @@ hotel book button: You can modify the reletive address for your own purpose
     <div class="booking">
         <p>Please <a href="/register">log in</a> to book a room.</p>
     </div>
-    {{/if}}    
-    {{#if (eq user.hotel hotelId)}}
-    <div class="edit">
-        <button class="editHotelInfo">Edit Hotel Basic Info</button>
-        <div hidden="true" class="hotelInfoEdit">
-            <form action="/room" method="POST" id="registration-form" class="new-form">
-                <input type="text" name="hotelState" id="hotelState" placeholder="State">
-                <button type="submit">Submit Info Change</button>
-            </form>
-        </div>
-        <button class="AddHotelRoom">Edit Hotel Rooms</button>
-    </div>
     {{/if}}
 </div>
 <div class="reviewSection">
@@ -143,7 +151,7 @@ hotel book button: You can modify the reletive address for your own purpose
                 </button>
             </div>
             <div hidden="true" class="editReviewWindow">
-                <form action="/reviews/{{reviewId}}" method="PATCH">
+                <form action="/reviews/{{reviewId}}" method="PATCH">                    
                     <textarea name="reviewComment" placeholder="Comment">{{reviewComment}}</textarea>
                     <select name="reviewRating" id="reviewRating">
                         <option value="1">1</option>
@@ -155,73 +163,74 @@ hotel book button: You can modify the reletive address for your own purpose
                     <button type="submit">Submit</button>
                 </form>
             </div>
-            {{/if}}
-            {{#if(ne userHasReviewed)}}
-            <div class="addReview">
-                <div class="addReviewButton">
-                    <button class="addReview" onclick="addReview()">
-                        Add Review
-                    </button>
-                </div>
-                <div hidden="true" class="addReviewWindow">
-                    <form action="/reviews" method="POST">
-                        <input type="text" name="reviewTitle" placeholder="Title">
-                        <textarea name="reviewComment" placeholder="Comment"></textarea>
-                        <select name="reviewRating" id="reviewRating">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                        <button type="submit">Submit</button>
-                    </form>
-                </div>
-                {{/if}}
-                <ol>
-                    {{#each reviews}}
-                    <li>
-                        <div class="reviewItem">
-                            <div class="reviewUserItem">
-                                <div class="reviewUserPhoto">{{reviews.userAvatar}}</div>
-                            </div>
-                            <div class="reviewContentItem">
-                                <div class="reviewTitle"><a
-                                        href="/reviews/{{reviews.reviewId}}">{{reviews.reviewTitle}}</a></div>
-                                <div class="reviewRating">
-                                    <p>{{reviews.reviewRating}}</p>
-                                </div>
-                                <div class="reviewComment">
-                                    <p>{{reviews.reviewComment}}</p>
-                                </div>
-                                <div class="reviewUpvote">
-                                    <p>Upvote: {{reviews.reviewUpvote}}</p>
-                                </div>
-                                <div class="reviewDownvote">
-                                    <p>Downvote: {{reviews.reviewDownvote}}</p>
-                                </div>
-                            </div>
-                            {{#if managerReply}}
-                            <div class="managerReply">
-                                <p>Manager reply: {{managerReply}}</p>
-                            </div>
-                            {{/if}}
-                            {{#if managerReplyWindow}}
-                            <div class="managerReplyWindow">
-                                <form action="/reviews/{{reviewId}}" method="POST">
-                                    <textarea name="managerReply" placeholder="Reply to this review"></textarea>
-                                    <button type="submit">Submit</button>
-                                </form>
-                            </div>
-                            {{/if}}
-                        </div>
-                    </li>
-                    {{/each}}
-                </ol>
+        </div>
+        {{#else}}        
+        <div class="addReview">
+            <div class="addReviewButton">
+                <button class="addReview" onclick="addReview()">
+                    Add Review
+                </button>
+            </div>
+            <div hidden="true" class="addReviewWindow">
+                <form action="/reviews" method="POST">
+                    <input type="text" name="reviewTitle" placeholder="Title">
+                    <textarea name="reviewComment" placeholder="Comment"></textarea>
+                    <select name="reviewRating" id="reviewRating">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                    <button type="submit">Submit</button>
+                </form>
             </div>
         </div>
+        {{/if}}
+        <ol>
+            {{#each reviews}}
+            <li>
+                <div class="reviewItem">
+                    <div class="reviewUserItem">
+                        <div class="reviewUserPhoto">{{reviews.userAvatar}}</div>
+                    </div>
+                    <div class="reviewContentItem">
+                        <div class="reviewTitle"><a href="/reviews/{{reviews.reviewId}}">{{reviews.reviewTitle}}</a>
+                        </div>
+                        <div class="reviewRating">
+                            <p>{{reviews.reviewRating}}</p>
+                        </div>
+                        <div class="reviewComment">
+                            <p>{{reviews.reviewComment}}</p>
+                        </div>
+                        <div class="reviewUpvote">
+                            <p>Upvote: {{reviews.reviewUpvote}}</p>
+                        </div>
+                        <div class="reviewDownvote">
+                            <p>Downvote: {{reviews.reviewDownvote}}</p>
+                        </div>
+                    </div>
+                    {{#if managerReply}}
+                    <div class="managerReply">
+                        <p>Manager reply: {{managerReply}}</p>
+                    </div>
+                    {{/if}}
+                    {{#if managerReplyWindow}}
+                    <div class="managerReplyWindow">
+                        <form action="/reviews/{{reviewId}}" method="POST">
+                            <textarea name="managerReply" placeholder="Reply to this review"></textarea>
+                            <button type="submit">Submit</button>
+                        </form>
+                    </div>
+                    {{/if}}
+                </div>
+            </li>
+            {{/each}}
+        </ol>
     </div>
-    <div class="error" id="client">
-        <p id="client-error"></p>
-    </div>
-    <a href="/register">Click here to register!</a>
+</div>
+</div>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+<a href="/register">Click here to register!</a>

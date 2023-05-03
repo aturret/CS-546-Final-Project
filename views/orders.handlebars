@@ -43,7 +43,6 @@ order has status: pending, completed, cancelled.
                     <div class="orderStatus">
                         <p>{{order.status}}</p>
                     </div>
-
                 </div>
                 {{#if (eq order.status "pending")}}
                 <div class="editOrder">
@@ -59,6 +58,7 @@ order has status: pending, completed, cancelled.
                                 <input type="date" name="endDate" value="{{order.endDate}}">
                                 <label for="endDate">End Date</label>
                             </div>
+                            <div class="orderGuests">                            
                             {{#ecah order.guests}}
                             <div class="guestItem" id="guest-{{order.guests.number}}">
                                 <input type="text" name="guestFirstName-{{order.guests.number}}">
@@ -70,6 +70,8 @@ order has status: pending, completed, cancelled.
                                 <button type="button" onclick="removeGuest({{order.guests.number}})">Remove</button>
                             </div>
                             {{/each}}
+                            <button type="button" onclick="addGuest()">Add Guest</button>
+                            </div>
                             <button type="submit" class="editOrderButton">Edit</button>
                         </form>
                     </div>
@@ -86,6 +88,7 @@ order has status: pending, completed, cancelled.
                 {{#if (eq order.status "completed")}}
                 <a href="/hotel/{{hotel}}">Have a review on it!</a>
                 {{/if}}
+            </div>
         </li>
         {{/each}}
     </ol>

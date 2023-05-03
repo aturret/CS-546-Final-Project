@@ -59,18 +59,18 @@ You can add a new key-value pair to the roomTypes collection, or you can just ca
     </ol>
     <div class="addNewRoomType">
         <form action="/hotel/{{hotelId}}/roomType" method="POST" id="addNewRoom-form" class="new-form">
-            <label for="roomTypeName" id="roomTypeName-label">
+            <label for="newRoomTypeName" id="newRoomTypeName-label">
                 Room Type:
             </label>
-            <input type="text" name="roomTypeName" id="roomTypeName">
-            <label for="roomTypePrice" id="roomTypePrice-label">
+            <input type="text" name="newRoomTypeName" id="newRoomTypeName">
+            <label for="newRoomTypePrice" id="newRoomTypePrice-label">
                 Room Price:
             </label>
-            <input type="number" name="roomTypePrice" id="roomTypePrice">
-            <label for="roomTypePictures" id="roomTypePictures-label">
+            <input type="number" name="newRoomTypePrice" id="newRoomTypePrice">
+            <label for="newRoomTypePictures" id="newRoomTypePictures-label">
                 Room Pictures:
             </label>
-            <input type="file" name="roomTypePictures" id="roomTypePictures">
+            <input type="file" name="newRoomTypePictures" id="newRoomTypePictures">
             <input type="hidden" name="hotelId" value="{{hotelId}}">
             <button type="submit" id="addNewRoom-button">Add</button>
         </form>
