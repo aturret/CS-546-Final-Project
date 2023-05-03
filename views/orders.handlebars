@@ -4,6 +4,8 @@ if cannot find a room fit the modified date, the server should return a 400 erro
 order.guests should be the guests list of this order.
 Please assign a variable number as order.guests.number for each guest to render the guest input tags
 
+Please pass a number for the guest item to render the guest input and div tags.
+
 order has status: pending, completed, cancelled.
 
 --}}
@@ -24,12 +26,24 @@ order has status: pending, completed, cancelled.
                     <div class="roomType">
                         <p>{{order.roomType}}</p>
                     </div>
+                    <div class="orderPrice">
+                        <p>{{order.orderPrice}}</p>
+                    </div>
                     <div class="startDate">
                         <p>{{order.startDate}}</p>
                     </div>
                     <div class="endDate">
                         <p>{{order.endDate}}</p>
                     </div>
+                    <div class="orderGuests">
+                        {{#each order.guests}}
+                        <p>{{order.guests.number}}. {{order.guests.firstName}} {{order.guests.lastName}}</p>
+                        {{/each}}
+                    </div>
+                    <div class="orderStatus">
+                        <p>{{order.status}}</p>
+                    </div>
+
                 </div>
                 {{#if (eq order.status "pending")}}
                 <div class="editOrder">
@@ -37,7 +51,14 @@ order has status: pending, completed, cancelled.
                     <div class="editOrderWindow" hidden="true">
                         <form action="/order/{{order.orderId}}/edit" method="PATCH" id="editOrder-form"
                             class="new-form">
-
+                            <div class="startDate">
+                                <input type="date" name="startDate" value="{{order.startDate}}">
+                                <label for="startDate">Start Date</label>
+                            </div>
+                            <div class="endDate">
+                                <input type="date" name="endDate" value="{{order.endDate}}">
+                                <label for="endDate">End Date</label>
+                            </div>
                             {{#ecah order.guests}}
                             <div class="guestItem" id="guest-{{order.guests.number}}">
                                 <input type="text" name="guestFirstName-{{order.guests.number}}">
