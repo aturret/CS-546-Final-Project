@@ -34,30 +34,34 @@ roomTypes collection, or you can just calculate its availability and set it as a
                 </form>
             </div>
             <div class="editRoom">
-                <form action="/hotel/{{hotelId}}/room/{{rooms.roomId}}/edit" method="PATCH" id="editRoom-form"
-                    class="new-form">
-                    <label id="roomNumberInput-label-{{rooms.roomId}}">
-                        Room Number:
-                        <input type="text" name="roomNumberInput">
-                    </label>
-                    <label id="roomTypeInput-label-{{rooms.roomId}}">
-                        Room Type:
-                        <select name="roomTypeInput">
-                            {{#each roomTypes}}
-                            <option value="{{roomTypes.typeName}}">{{roomTypes.typeName}}</option>
-                            {{/each}}
-                        </select>
-                    </label>
-
-                    <button type="submit" id="editRoom-button">Edit</button>
-                </form>
+                <div class="editRoomButton">
+                    <button class="editRoom" onclick="editRoom({{rooms.roomId}})">Edit</button>
+                </div>
+                <div class="editRoomWindow" hidden="true" id="edit-{{rooms.roomId}}">
+                    <form action="/hotel/{{hotelId}}/room/{{rooms.roomId}}/edit" method="PATCH"
+                        id="editRoom-form-{{rooms.roomId}}" class="my-form">
+                        <label id="roomNumberInput-label-{{rooms.roomId}}">
+                            Room Number:
+                            <input type="text" name="roomNumberInput">
+                        </label>
+                        <label id="roomTypeInput-label-{{rooms.roomId}}">
+                            Room Type:
+                            <select name="roomTypeInput">
+                                {{#each roomTypes}}
+                                <option value="{{roomTypes.typeName}}">{{roomTypes.typeName}}</option>
+                                {{/each}}
+                            </select>
+                        </label>
+                        <button type="submit" id="editRoom-button">Edit</button>
+                    </form>
+                </div>
             </div>
             {{/if}}
         </li>
         {{/each}}
     </ol>
     <div class="addNewRoom">
-        <form action="/hotel/{{hotelId}}/room/add" method="POST" id="addNewRoom-form" class="new-form">
+        <form action="/hotel/{{hotelId}}/room/add" method="POST" id="addNewRoom-form" class="my-form">
             <label for="newRoomNumberInput" id="newRoomNumberInput-label">
                 Room Number:
             </label>
@@ -65,7 +69,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
             <label for="newRoomTypeInput" id="newRoomTypeInput-label">
                 Room Type:
             </label>
-            <select name="newRoomTypeInput" id="newRoomTypeInput">
+            <select name="newRoomTypeInput" id="newRoomTypeInput" class="roomTypeInput">
                 {{#each roomTypes}}
                 <option value="{{roomTypes.typeName}}">{{roomTypes.typeName}}</option>
                 {{/each}}
@@ -77,8 +81,3 @@ roomTypes collection, or you can just calculate its availability and set it as a
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-{{#if (eq user.identity "guest")}}
-<div class="new-user">
-    <p>You can <a href="/register">register</a> or <a href="/login">login</a> first.</p>
-</div>
-{{/if}}

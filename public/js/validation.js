@@ -9,12 +9,18 @@ const clientErrorDiv = document.getElementById('client');
 
 forms.forEach(form => {
     form.addEventListener('submit', async (event) => {
+        const textInputs = document.querySelectorAll('input[type="text"]');
+        const roomTypeInputs = document.querySelectorAll('select[class="roomType"]');
         const passwordInputs = document.querySelectorAll('input[type="password"]');
         const dateInputs = document.querySelectorAll('input[type="date"]');
         const emailInputs = document.querySelectorAll('input[type="email"]');
         const phoneInputs = document.querySelectorAll('input[class="phone"]');
         try {
+            textInputs.forEach(input => {
+                input.value = checkString(input.value, input.name, false);
+            })
             passwordInputs.forEach(input => {
+                input.value = checkPassword(input.value, false);
             })
             dateInputs.forEach(input => {
                 input.value = checkDate(input.value, false);
@@ -51,6 +57,10 @@ function CustomException(message, flag) {
     return error;
 }
 
+function checkString(s, key, flag){
+    if(!s || typeof s !== 'string' || s.trim().length === 0) throw new CustomException(`${key} must exist and must be a non empty string`, flag);
+    return s.trim();
+}
 
 function checkDate(date, flag) {
     if (!date || typeof date !== "string" || date.trim().length === 0) throw new CustomException("releaseDate must exist and must be a non empty string.", flag);
@@ -74,4 +84,12 @@ function checkPhone(n, flag)
     if(!n || typeof n !== 'string') throw new CustomException("Phone number must exist and must be a string type.", flag);
     if(!/^\d{3}[-]?\d{3}[-]?\d{4}$/.test(n)) throw new CustomException("Cell phone number has to match the format. xxxxxxxxxxx, xxx-xxx-xxxxx or (xxx)xxx-xxxxx", flag)
     return n
+}
+function checkPassword(password, flag){
+    if(!password|| typeof password !== "string") throw new CustomException("Password must exist and must be a string.", flag);
+    if(!/\d/.test(password)) throw new CustomException("Password must contain at least one digit.", flag);
+    if(!/[a-z]/.test(password)) throw new CustomException("Password must contain nat least one letter.", flag)
+    if(password === password.toLowerCase()) throw new CustomException("Password must have at least one upper case letter.", flag);
+
+    return password.trim()
 }
