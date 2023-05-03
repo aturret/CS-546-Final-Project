@@ -185,6 +185,32 @@ export async function addOrder(...args) {
   return true;
 }
 
+//Manager can update order dates, guests, price, status
+export async function updateOrder(order_id, checkin_date, checkout_date, guest, price, status) {
+  order_id = ObjectId(helper.checkId(order_id, true));
+  checkin_date = helper.checkDate(checkin_date, true);
+  checkout_date = helper.checkDate(checkout_date, true);
+  guest = helper.checkArray(guest, "guest", true);
+  price = helper.checkPrice(price, true);
+  status = helper.checkStatus(status, true);
+
+  const newInfo = {
+    checkin_date: checkin_date,
+    checkout_date: checkout_date,
+    guest: guest,
+    price: price,
+    status: status
+  }
+
+  const tempOrder = await Order();
+  const orderInfo = await tempOrder.findOneUpdate({_id: order_id}, {$set: newInfo}, {returnDocument: "after"});
+  if (orderInfo.lastErrorObject.n === 0) {
+    throw CustomException(`Could not update the order with id ${order_id}`, true);
+  }
+  return {message: "Order updated successfully."};
+}
+
+
 //change order status to canceled
 export async function deleteOrder(order_id) {
   order_id = helper.checkId(order_id, true);
