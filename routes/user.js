@@ -5,9 +5,9 @@ import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
-import Order from "../Mongo_Connections/mongoCollections.js";
-import Hotel from "../Mongo_Connections/mongoCollections.js";
+import {Order, Hotel, Room, roomType}from "../Mongo_Connections/mongoCollections.js";
 const router = express.Router();
+import * as hotelFuncs from "../data_model/Hotel_Data.js";
 
 export const isAuth = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -256,7 +256,9 @@ router
     }
   });
 
-router.route("dashboard/:username/bookings/:order_id")
+
+//manager or admin only
+router.route("dashboard/:username/hotel_orders")
 .get(
   (req, res, next) => {
     if (!req.isAuthenticated()) {
@@ -297,7 +299,7 @@ router.route("dashboard/:username/bookings/:order_id")
         }
       */
 
-      return res.status(200).render("order", { order: order });
+      return res.status(200).render("order", { order: orders });
     } catch {
       if (!e.code) {
         req.session.status = 500;
@@ -308,8 +310,58 @@ router.route("dashboard/:username/bookings/:order_id")
       res.redirect(`/user/dashboard/${req.user.username}`);
     }
   }
-);
-.post()
+)
+
+.patch((req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/user/login");
+  }
+  if (req.user.identity === "user") {
+    req.session.status = 403;
+    req.session.errorMessage = "You are not allowed to access this page";
+    return res.redirect(`/user/dashboard/${req.user.username}`);
+  }
+  next();
+},
+async (req, res) => {
+  try {
+    const order_id = helper.checkId(req.body.order_id, true);
+    const hotel_id = helper.checkId(req.body.hotel_id, true);
+    const checkin_date= helper.checkDate(req.body.check_in, true);
+    const checkout_date= helper.checkDate(req.body.check_out, true);
+    const guest = helper.checkArray(req.body.guest, "guest", true);
+    const room_id = helper.checkId(req.body.room_id, true)
+    const status = helper.checkStatus(req.body.status, "status", true);
+
+    const tempRoom = await Room();
+
+    const room_type = await tempRoom.findOne({_id: room_id}, {_id : 0, room_type: 1});
+    if (!room_type) throw new CustomException("Room not found", true);
+
+    //calculate new order_price
+    const tempRoomType = await roomType();
+    const price = helper.checkPrice(tempRoomType.findOne({hotel_id: hotel_id, room_type: room_type}).price);
+    const order_price = price * (moment(checkout_date, "YYYY/MM/DD").diff(moment(checkin_date, "YYYY/MM/DD"), 'days'))
+
+
+    if (!await hotelFuncs.checkRoomAvailability(hotel_id, room_id, checkin_date, checkout_date, order_id, status)) throw new CustomException("Room not available", true);
+    if(!room_id) throw new CustomException(`No available ${room_type}`, true);
+
+    const message = await userFuncs.updateOrder(order_id, checkin_date, checkout_date, guest, order_price);
+  
+    req.flash("success", message);
+    return res.status(200).redirect(`/user/dashboard/${req.user.username}/hotel_orders`);
+  }
+  catch (e) {
+    if (!e.code) {
+      req.session.status = 500;
+    } else {
+      req.session.status = e.code;
+    }
+    req.session.errorMessage = e.message;
+    res.redirect(`/user/dashboard/${req.user.username}/bookings`);
+  }
+});
 
 
 export default router;
