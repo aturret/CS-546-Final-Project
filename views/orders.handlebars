@@ -49,7 +49,7 @@ order has status: pending, completed, cancelled.
                     <button class="editOrderButton" onclick="showEditOrderWindow()">Edit</button>
                     <div class="editOrderWindow" hidden="true">
                         <form action="/order/{{order.orderId}}/edit" method="PATCH" id="editOrder-form"
-                            class="new-form">
+                            class="my-form">
                             <div class="startDate">
                                 <input type="date" name="startDate" value="{{order.startDate}}">
                                 <label for="startDate">Start Date</label>
@@ -79,7 +79,7 @@ order has status: pending, completed, cancelled.
                 <div class="cancelOrder">
                     <div class="cancelOrderWindow">
                         <form action="/order/{{order.orderId}}/cancel" method="PATCH" id="cancelOrder-form"
-                            class="new-form">
+                            class="my-form">
                             <button type="submit" class="cancelOrderButton">Cancel</button>
                         </form>
                     </div>
