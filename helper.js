@@ -41,11 +41,18 @@ export function checkDate(date, flag){
     if(!date || typeof date !== "string" || date.trim().length === 0) throw new CustomException("releaseDate must exist and must be a non empty string.", flag);
     if(!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw new CustomException("releaseDate must be a valid date.", flag);
     date = date.trim();
-    let temp = +date.split("/")[-1];
+    let temp = +date.split("/")[0];
     if (temp < 1900 || temp > 2023)
       throw new CustomException("The year of release of the album must be between 1900 and 2024.", flag);
 
-    return date
+    return date;
+}
+
+export function checkZip(zip, flag){
+    if(!zip || typeof zip !== 'string') throw new CustomException("Zip must exist and must be a string type.", flag);
+    zip = zip.trim()
+    if(!/^[0-9]{5}$/.test(zip)) throw new CustomException("Zip must be valid.", flag);
+    return zip
 }
 
 export function checkRating(rating, flag){
@@ -105,4 +112,12 @@ export function checkPrice(price, flag)
     if (!price || typeof price !== "number") throw new CustomException("Price must exist and must be a number.", flag);
 
     return price
+}
+
+export function checkStatus(status, flag)
+{
+    const ref = ["cancelled", "accepted"]
+    status = status.trim()
+    if (!status || typeof status !== "string" || !ref.includes(status)) throw new CustomException(`Invalid status `, flag);
+    return status
 }
