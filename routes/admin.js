@@ -40,4 +40,44 @@ router
     .route('/account')
     .get()
 
+router
+    .route('/admin/application')
+    .get(async (req, res) => {
+        //code here for GET
+        try {
+            const appList = admin.getAllApp();
+            res.render('application', { appList: appList });
+        } catch (e) {
+            let status = e[0] ? e[0] : 500;
+            let message = e[1] ? e[1] : 'Internal Server Error';
+            return res.status(status).send({error: message});
+        } 
+        });
+    
+router
+    .route('/admin/application/:id')
+    .get(async (req, res) => {
+        //code here for GET
+        try {
+        const id = helper.checkId(id, true);
+        const app = admin.getApp(id);
+        res.render('appApprove', { app: app });
+        } catch (e) {
+        let status = e[0] ? e[0] : 500;
+        let message = e[1] ? e[1] : 'Internal Server Error';
+        return res.status(status).send({error: message});
+        }
+    })
+    .post(async (req, res) => {
+        //code here for POST
+        const id = helper.checkId(id, true);
+        try {
+        const [app, message] = await admin.appApprove(id, req.params.response);
+        res.render('appApprove', { app: app, message: message });
+        } catch (e) {
+        let status = e[0] ? e[0] : 500;
+        let message = e[1] ? e[1] : 'Internal Server Error';
+        res.status(status).send({message: message});
+        }
+    })
 export default router;
