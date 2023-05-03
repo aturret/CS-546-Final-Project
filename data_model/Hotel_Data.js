@@ -1,12 +1,59 @@
+import {Hotel} from '../config/mongoCollections.js';
+import {ObjectId} from 'mongodb';
+import * as helper from "../helper.js";
+
 //crud for hotel
+export async function getAllHotels() {
+    const hotelCollection = await Hotel();
+    let hotelList = await hotelCollection.find({}).toArray();
+    hotelList = hotelList.map((element) => {
+      element._id = element._id.toString();
+      return element;
+    });
+    return hotelList;
+}
 
+export async function getHotel(id) {
+    id = helper.checkId(id, true);
+    const hotelCollection = await Hotel();
 
+    let hotel = await hotelCollection.find({_id: new ObjectId(id)});
 
+    if (!hotel) throw CustomException(`No hotel with ID ${id}`);
+    hotel._id = hotel._id.toString();
+    return hotel;
+}
 
+export async function hotelSearch(
+    name,
+    city,
+    state,
+    zipCode
+  ) {
+    const hotelCollection = await Hotel();
 
+    let query = {};
+    name = helper.checkString(name, "hotel name", true);   
+    query.name = { $regex: new RegExp(name, 'i') };
+    
+    city = helper.checkString(city, "city", true);   
+    query.city = { $regex: new RegExp(city, 'i') };
+    
+    state = helper.checkString(state, "state", true);  
+    query.state = { $regex: new RegExp(state, 'i') };
+    
+    zipCode = helper.checkString(zipCode, "ZIP Code", true);  
+    query.zipCode = { $regex: new RegExp(zipCode, 'i') };
 
+    let hotelList = await hotelCollection.find(query).toArray();
+    if (!hotelList) throw [404, 'Hotel not found'];
 
-
+    hotelList = hotelList.map((element) => {
+      element._id = element._id.toString();
+      return element;
+    });
+    return hotelList;
+  }
 
 //room type
 export async function addRoomType(...args){
@@ -43,4 +90,4 @@ export async function addRoomType(...args){
     if(!updateInfo) throw CustomException(`Could not update the hotel with id ${hotel_id}`, true);
 
     return {message: `Room type ${name} added successfully.`}
-  }
+}
