@@ -205,7 +205,24 @@ router
 //TODO: this function suppose to create a new request to admin. You need to define a funciton in user_model to create a new collection for requests schema.
 router
   .route("/dashboard/:username/upgrade")
-  .post(isAuth, async (req, res) => {});
+  .post(isAuth, async (req, res) => {
+    try {
+      req.user.username = helper.checkString(req.user.username, true);
+      const request = await userFuncs.createRequest(req.user.username);
+      req.flash("success_msg", "Your request has been sent to admin");
+      return res.redirect(`/user/dashboard/${req.user.username}`);
+    } catch (e) {
+      if (!e.code) {
+        req.session.status = 500;
+      } else {
+        req.session.status = e.code;
+      }
+      req.session.errorMessage = e.message;
+      res.redirect(`/user/dashboard/${req.user.username}`);
+    }
+  });
+
+
 
 router.route("/dashboard/:username/logout").get(
   (req, res, next) => {
