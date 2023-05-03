@@ -259,9 +259,15 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
     downvote: 0,
   };
 
+  //check if already reviewed
+  const orderInfo = await tempOrder.findOne({ _id: ObjectId(order_id) }, {review: 1});
+  if (orderInfo.review !== "") throw CustomException(`Already reviewed.`, true);
+
   const reviewInfo = await tempReview.insertOne(newReview);
   if (reviewInfo.insertedCount.n === 0)
     throw CustomException(`Could not add the review.`, true);
+  
+    //update order
   const updateInfo = await tempOrder.findOneUpdate(
     { _id: ObjectId(order_id) },
     { $set: { review: reviewInfo.insertedId } },
@@ -272,10 +278,12 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
       `Could not update the order with id ${order_id}`,
       true
     );
+  
 
+  //update hotel
   const hotelInfo = await tempHotel.findOneUpdate(
     { _id: ObjectId(hotel_id) },
-    { $addToSet: { review: reviewInfo.insertedId } },
+    { $addToSet: { reviews: reviewInfo.insertedId } },
     { returnDocument: "after" }
   );
   if (hotelInfo.lastErrorObject.n === 0)
@@ -283,20 +291,42 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
       `Could not update the hotel with id ${hotel_id}`,
       true
     );
+  
+  const newHotel = await tempAccount.findOne({_id: ObjectId(hotel_id)}, {reviews: 1});
+  if (newHotel.reviews.length === 0) throw CustomException(`Could not find hotel with id ${hotel_id}`, true);
+  
+  //calculate overall rating
+  let sum = 0;
+  for (let i = 0; i < newHotel.reviews.length; i++){
+    const tempReview = await tempReview.findOne({_id: ObjectId(newHotel.reviews[i])}, {rating: 1});
+    sum += tempReview.rating;
+  }
+  const overallRating = sum / newHotel.reviews.length;
+  const updateHotel = await tempHotel.findOneUpdate({_id: ObjectId(hotel_id)}, {$set: {overall_rating: overallRating}}, {returnDocument: "after"});
 
   return true;
 }
 
 //TODO: vote review
-export async function voteReview(review_id) {
+export async function voteReview(review_id, flag) {
   review_id = helper.checkId(review_id, true);
 
   const tempReview = await Review();
-  const updateInfo = await tempReview.findOneUpdate(
-    { _id: ObjectId(review_id) },
-    { $inc: { upvote: 1 } },
-    { returnDocument: "after" }
-  );
+  let updateInfo = undefined;
+  if (flag){
+    updateInfo = await tempReview.findOneUpdate(
+      { _id: ObjectId(review_id) },
+      { $inc: { upvote: 1 } },
+      { returnDocument: "after" }
+    );
+  }
+  else{
+    updateInfo = await tempReview.findOneUpdate(
+      { _id: ObjectId(review_id) },
+      { $inc: { downvote: 1 } },
+      { returnDocument: "after" }
+    );
+  }
   if (updateInfo.lastErrorObject.n === 0)
     throw CustomException(
       `Could not update the document with id ${review_id}`,
