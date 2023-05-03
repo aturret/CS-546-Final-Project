@@ -228,3 +228,59 @@ export async function checkRoomAvailability(...args) {
 
   return false;
 }
+
+
+//add room
+export async function addRoom(...args) {
+    const hotel_id = ObjectId(helper.checkId(args[0], true));
+    const room_number = helper.checkString(args[1], "room number", true);
+    if(!/^\[0-9]{0,5}$/.test(room_number)) throw CustomException(`Invalid room number.`, true);
+    const room_type = helper.checkString(args[2], "room type", true);
+    const order = {};
+
+    //check if hotel exists
+    const tempHotel = await Hotel();
+    const hotelInfo = await tempHotel.findOne({ _id: hotel_id });
+    if (!hotelInfo) throw CustomException(`Hotel with id ${hotel_id} does not exist.`, true);
+
+    //check if room type exists
+    const tempRoomType = await RoomType();
+    const roomTypeInfo = await tempRoomType.findOne({ hotel_id: hotel_id, name: room_type });
+    if (!roomTypeInfo) throw CustomException(`Room type ${room_type} does not exist.`, true);
+
+    const newRoom = {
+        hotel_id: hotel_id,
+        room_number: room_number,
+        room_type: room_type,
+        order: order
+    };
+
+    //check if room exists
+    const tempRoom = await Room();
+    const rv = tempRoom.findOne({ hotel_id: hotel_id, room_number: room_number });
+    if (rv) throw CustomException(`Room ${room_number} already exists.`, true);
+
+    //add room
+    const insertInfo = await tempRoom.insertOne(newRoom);
+    if (insertInfo.insertedCount === 0) throw CustomException(`Could not add the room.`, true);
+
+    const room_id = insertInfo.insertedId;
+    //add room to room type
+    const updateInfo = await tempRoomType.findOneUpdate(
+        { hotel_id: hotel_id, name: room_type },
+        { $addToSet: { rooms: room_id } },
+        { returnDocument: "after" }
+    );
+    if (!updateInfo) throw CustomException(`Could not update the room type ${room_type}.`, true);
+
+    //add room to hotel
+    const updateInfo2 = await tempHotel.findOneUpdate(
+        { _id: hotel_id },
+        { $addToSet: { rooms: room_id } },
+        { returnDocument: "after" }
+    );
+
+    if (!updateInfo2) throw CustomException(`Could not update the hotel with id ${hotel_id}`, true);
+
+    return { message: `Room ${room_number} added successfully.` };
+}

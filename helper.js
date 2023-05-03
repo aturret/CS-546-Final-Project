@@ -121,3 +121,11 @@ export function checkStatus(status, flag)
     if (!status || typeof status !== "string" || !ref.includes(status)) throw new CustomException(`Invalid status `, flag);
     return status
 }
+
+export function checkNameString(strVal, key, flag) {
+    strVal = strVal.trim();
+    if (/\s/.test(strVal)) throw CustomException(`Error: ${key} cannot contain spaces`, flag);
+    if (/\d/.test(strVal)) throw CustomException(`Error: ${key} cannot contain numbers`, flag);
+    if (strVal.length < 2 || strVal.length > 25) throw CustomException(`Error: ${key} must be between 2 and 25 characters`, flag);
+    return strVal;
+}

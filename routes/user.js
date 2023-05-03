@@ -61,19 +61,19 @@ router
     try {
       user.username = helper.checkString(user.username, "username", true);
       user.roleInput = helper
-        .checkString(user.roleInput, "identity", true)
+        .checkRole(user.roleInput, "identity", true)
         .toLowerCase();
       if (["manager", "user", "admin"].every((obj) => obj !== user.roleInput))
         throw CustomException("Invalid identity.", true);
       user.avatar = user.avatar
         ? helper.checkWebsite(user.avatar, true)
         : undefined;
-      user.firstNameInput = helper.checkString(
+      user.firstNameInput = helper.checkNameString(
         user.firstNameInput,
         "first name",
         true
       );
-      user.lastNameInput = helper.checkString(
+      user.lastNameInput = helper.checkNameString(
         user.lastNameInput,
         "last name",
         true
@@ -107,7 +107,7 @@ router
 
 router.route("/dashboard/:username").get(isAuth, async (req, res) => {
   try {
-    req.user.username = helper.checkString(req.user.username, true);
+    req.user.username = helper.checkString(req.user.username, "username", true);
     const user = await userFuncs.getUser(req.user.username);
     if (req.session && req.session.errorMessage) {
       user.errorMessage = req.session.errorMessage;
@@ -133,7 +133,7 @@ router
   .route("/dashboard/:username/check_password")
   .post(isAuth, async (req, res) => {
     try {
-      req.user.username = helper.checkString(req.user.username, true);
+      req.user.username = helper.checkString(req.user.username, "username", true);
       const user = await userFuncs.getUser(req.user.username);
       req.body.password = helper.checkPassword(req.body.password, true);
       let match = false;
@@ -161,19 +161,18 @@ router
   .route("/dashboard/:username/edit_info")
   .patch(isAuth, async (req, res) => {
     try {
-      req.user.username = helper.checkString(req.user.username, true);
       req.body.username = helper.checkString(
         req.body.username,
         "username",
         true
       );
       req.body.avatar = helper.checkWebsite(req.body.avatar, true);
-      req.body.firstName = helper.checkString(
+      req.body.firstName = helper.checkNameString(
         req.body.firstName,
         "first name",
         true
       );
-      req.body.lastName = helper.checkString(
+      req.body.lastName = helper.checkNameString(
         req.body.lastName,
         "last name",
         true
@@ -207,7 +206,7 @@ router
   .route("/dashboard/:username/upgrade")
   .post(isAuth, async (req, res) => {
     try {
-      req.user.username = helper.checkString(req.user.username, true);
+      req.user.username = helper.checkString(req.user.username, "username", true);
       const request = await userFuncs.createRequest(req.user.username);
       req.flash("success_msg", "Your request has been sent to admin");
       return res.redirect(`/user/dashboard/${req.user.username}`);
@@ -379,6 +378,7 @@ async (req, res) => {
     res.redirect(`/user/dashboard/${req.user.username}/bookings`);
   }
 });
+
 
 
 export default router;

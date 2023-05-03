@@ -76,8 +76,66 @@ router
             res.redirect("/user/dashboard/:username");
         }
     })
+    //add room type for the hotel, hotel mnr or admin only
+router
+    .route('/hotel_management/add_room_type')
+    .post((req, res, next) => {
+        if (!req.isAuthenticated()) {
+            return res.redirect("/user/login");
+        }
+        if (req.user && req.user.identity === 'user') {
+            req.flash("You are not allow to access this page")
+            return res.redirect("/user/dashboard");
+        }
+        next();
+    }, async (req, res) => {
+        try {
+            const hotel_name = req.body.hotel_name;
+            const room_type = req.body.room_type;
+            const room_price = req.body.room_price;
+            const room_picture = req.body.room_picture? req.body.room_picture: undefined;
+            const rooms = req.body.rooms? req.body.rooms: [];
+            const result = await userFuncs.addRoomType(hotel_name, room_type, room_price, room_picture, rooms);
+            req.flash({"successMessage": "Room type added successfully"});
+            return res.redirect(200).redirect("/hotel_management");
+        }
+        catch(e)
+        {
+            e.code = e.code ? e.code : 500;
+            req.session.errorMessage = e.message;
+            res.redirect("/hotel_management");
+        }
+    })
+    //add room for the hotel, hotel mnr or admin only
+router
+    .route('/hotel_management/add_room')
+    .post((req, res, next) => {
+        if (!req.isAuthenticated()) {
+            return res.redirect("/user/login");
+        }
+        if (req.user && req.user.identity === 'user') {
+            req.flash("You are not allow to access this page")
+            return res.redirect("/user/dashboard");
+        }
+        next();
+    }, async (req, res) => {
+        try {
+            const hotel_name = req.body.hotel_id;
+            const room_type = req.body.room_type;
+            const room_id = req.body.room_id;
+            const result = await userFuncs.addRoom(hotel_name, room_type, room_id);
+            req.flash(result);
+            return res.redirect(200).redirect("/hotel_management");
+        }
+        catch(e)
+        {
+            e.code = e.code ? e.code : 500;
+            req.session.errorMessage = e.message;
+            res.redirect("/hotel_management");
+        }
+    })
     //TODO: edit hotel information
-    .post(
+    .patch(
         (req, res, next) => {
             if (!req.isAuthenticated()) {
                 return res.redirect("/user/login");
