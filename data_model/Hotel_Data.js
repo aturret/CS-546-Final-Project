@@ -126,7 +126,7 @@ export async function hotelSearch(name, city, state, zipCode) {
   state = helper.checkString(state, "state", true);
   query.state = { $regex: new RegExp(state, "i") };
 
-  zipCode = helper.checkString(zipCode, "ZIP Code", true);
+  zipCode = helper.checkZip(zipCode, true);
   query.zipCode = { $regex: new RegExp(zipCode, "i") };
 
   let hotelList = await hotelCollection.find(query).toArray();
