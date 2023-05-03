@@ -1,6 +1,8 @@
 {{!--
 
-
+roomTypeDeletableStatus: Please pass a roomStatus variable when rendering this template. 
+This variable means if a roomType is deletable or not.
+You can add a new key-value pair to the roomTypes collection, or you can just calculate its availability and set it as a new variable. 
 
 --}}
 
@@ -27,6 +29,31 @@
                     <p>{{roomTypes.roomTypePrice}}</p>
                 </div>
             </div>
+            {{#if roomTypeDeletableStatus}}
+            <div class="deleteRoomType">
+                <form action="/hotel/{{hotelId}}/roomType/{{roomTypes.id}}" method="DELETE" id="deleteRoomType-form" class="new-form">
+                    <input type="hidden" name="hotelId" value="{{hotelId}}">
+                    <button type="submit" id="deleteRoomType-button">Delete</button>
+                </form>
+            </div>
+            {{/if}}
+            <div class="editRoomType">
+                <form action="/hotel/{{hotelId}}/roomType/{{roomTypes.id}}" method="PATCH" id="editRoomType-form" class="new-form">
+                    <label for="roomTypeName" id="roomTypeName-label">
+                        Room Type:
+                    </label>
+                    <input type="text" name="roomTypeName" id="roomTypeName">
+                    <label for="roomTypePrice" id="roomTypePrice-label">
+                        Room Price:
+                    </label>
+                    <input type="number" name="roomTypePrice" id="roomTypePrice">
+                    <label for="roomTypePictures" id="roomTypePictures-label">
+                        Room Pictures:
+                    </label>
+                    <input type="hidden" name="hotelId" value="{{hotelId}}">
+                    <button type="submit" id="editRoomType-button">Edit</button>
+                </form>
+            </div>
         </li>
         {{/each}}
     </ol>
@@ -40,11 +67,11 @@
                 Room Price:
             </label>
             <input type="number" name="roomTypePrice" id="roomTypePrice">
-            <select name="roomTypeInput" id="roomTypeInput">
-                {{#each roomTypes}}
-                <option value="{{roomTypes.typeName}}">{{roomTypes.typeName}}</option>
-                {{/each}}
-            </select>
+            <label for="roomTypePictures" id="roomTypePictures-label">
+                Room Pictures:
+            </label>
+            <input type="file" name="roomTypePictures" id="roomTypePictures">
+            <input type="hidden" name="hotelId" value="{{hotelId}}">
             <button type="submit" id="addNewRoom-button">Add</button>
         </form>
     </div>
