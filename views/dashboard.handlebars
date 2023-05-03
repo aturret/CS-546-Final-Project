@@ -1,0 +1,37 @@
+{{!--
+
+If the user is logged in , and 'GET /protected' endpoint is called, you will render this view based on the specs.
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+<div class="Avatar">
+    <img src="{{userAvatar}}">
+</div>
+<h2>{{userName}}</h2>
+<div class="information">
+    <div class="userIdentity"><p>Identity: {{userIdentity}}</p></div>
+    <div class="userFirstName"><p>First Name: {{userFirstName}}</p></div>
+    <div class="userLastName"><p>Last Name: {{userLastName}}</p></div>
+    <div class="userEmail"><p>Email: {{userEmail}}</p></div>
+    <div class="userPhone"><p>Phone: {{userPhone}}</p></div>
+</div>
+<div class="functionMenu">
+    <div class="functionItem"><a href="/order">My Orders</a></div>
+    {{#if (eq userIdentity "manager")}}
+    <div class="functionItem"><a href="/hotel">My Hotel</a></div>
+    {{/if}}
+    {{#if (eq userIdentity "admin")}}
+    <div class="functionItem"><a href="/admin">Admin</a></div>
+    {{/if}}
+    <div class="functionItem"><a href="/logout">Log Out</a></div>
+</div>
+
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+

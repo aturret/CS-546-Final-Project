@@ -1,0 +1,42 @@
+{{!--
+
+login form handlebar template
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+
+<p>Search for the best hotel you can have for your vacation!</p>
+<form action="/user/login" method="POST" id="login-form" class="new-form">
+    <label for="name" id="name-label">  
+        Hotel Name: 
+    </label>
+    <input type="email" name="name" id="name"></input>
+    <label for="state" id="state-label">  
+        State:
+    </label>
+    <select id="state" name="state">
+    </select>
+    <label for="city" id="city-label">  
+        City:
+    </label>
+    <input type="text" name="city" id="city"></input>
+    <label for="zipcode" id="zipcode-label">  
+        Zipcode:
+    </label>
+    <input type="text" name="zipcode" id="zipcode"></input>
+    <button type="submit" id="login-button">Search</button>
+</form>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+
+{{#if (eq user.identity "guest")}}
+<div class="new-user">
+    <p>You can <a href="/user/register">register</a> or <a href="/user/login">login</a> first.</p>
+</div>
+{{/if}}
