@@ -11,7 +11,7 @@ registration handelbars
 </div>
 {{/if}}
 
-<p>Please register your account.</p>
+<p>Please fill up this form and register your account.</p>
 <form action="/register" method="POST" id="registration-form" class="new-form">
     <label for="username" id="username-label">
         Username:
@@ -49,7 +49,7 @@ registration handelbars
 
     <button type="submit" id="register-button">Register</button>
 </form>
-<p class="error" id="client">{{errorMessage}}
-
+<p class="error" id="client">
+    {{errorMessage}}
 </p>
 <a href="/login">Already have an account? Click here to log-in!</a>

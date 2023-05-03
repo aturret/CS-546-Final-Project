@@ -1,7 +1,8 @@
 {{!--
 
 roomTypes: Please pass all roomTpyes when rendering this template.
-roomStatus: Please pass a roomStatus variable when rendering this template. You can add a new key-value pair to the roomTypes collection, or you can just calculate its availability and set it as a new variable.
+roomStatus: Please pass a roomStatus variable when rendering this template. You can add a new key-value pair to the
+roomTypes collection, or you can just calculate its availability and set it as a new variable.
 
 --}}
 
@@ -35,18 +36,19 @@ roomStatus: Please pass a roomStatus variable when rendering this template. You 
             <div class="editRoom">
                 <form action="/hotel/{{hotelId}}/room/{{rooms.roomId}}/edit" method="PATCH" id="editRoom-form"
                     class="new-form">
-                    <label for="roomNumberInput" id="roomNumberInput-label">
+                    <label id="roomNumberInput-label-{{rooms.roomId}}">
                         Room Number:
+                        <input type="text" name="roomNumberInput">
                     </label>
-                    <input type="text" name="roomNumberInput" id="roomNumberInput">
-                    <label for="roomTypeInput" id="roomTypeInput-label">
+                    <label id="roomTypeInput-label-{{rooms.roomId}}">
                         Room Type:
+                        <select name="roomTypeInput">
+                            {{#each roomTypes}}
+                            <option value="{{roomTypes.typeName}}">{{roomTypes.typeName}}</option>
+                            {{/each}}
+                        </select>
                     </label>
-                    <select name="roomTypeInput" id="roomTypeInput">
-                        {{#each roomTypes}}
-                        <option value="{{roomTypes.typeName}}">{{roomTypes.typeName}}</option>
-                        {{/each}}
-                    </select>
+
                     <button type="submit" id="editRoom-button">Edit</button>
                 </form>
             </div>
@@ -56,15 +58,14 @@ roomStatus: Please pass a roomStatus variable when rendering this template. You 
     </ol>
     <div class="addNewRoom">
         <form action="/hotel/{{hotelId}}/room/add" method="POST" id="addNewRoom-form" class="new-form">
-            <label for="roomNumberInput" id="roomNumberInput-label">
+            <label for="newRoomNumberInput" id="newRoomNumberInput-label">
                 Room Number:
             </label>
-            <input type="text" name="roomNumberInput" id="roomNumberInput">
-            <label for="roomTypeInput" id="roomTypeInput-label">
+            <input type="text" name="newRoomNumberInput" id="newRoomNumberInput">
+            <label for="newRoomTypeInput" id="newRoomTypeInput-label">
                 Room Type:
             </label>
-            <input type="text" name="roomTypeInput" id="roomTypeInput">
-            <select name="roomTypeInput" id="roomTypeInput">
+            <select name="newRoomTypeInput" id="newRoomTypeInput">
                 {{#each roomTypes}}
                 <option value="{{roomTypes.typeName}}">{{roomTypes.typeName}}</option>
                 {{/each}}
