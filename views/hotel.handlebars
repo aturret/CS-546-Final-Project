@@ -60,7 +60,7 @@ userHasReviewed: Please pass this boolean variable to the template to determine 
                 </button>
             </div>
             <div hidden="true" class="editReviewWindow">
-                <form action="/reviews/{{reviewId}}" method="PATCH">                    
+                <form action="/reviews/{{reviewId}}" method="PATCH">
                     <textarea name="reviewComment" placeholder="Comment">{{reviewComment}}</textarea>
                     <select name="reviewRating" id="reviewRating">
                         <option value="1">1</option>
@@ -73,7 +73,7 @@ userHasReviewed: Please pass this boolean variable to the template to determine 
                 </form>
             </div>
         </div>
-        {{#else}}        
+        {{#else}}
         <div class="addReview">
             <div class="addReviewButton">
                 <button class="addReview" onclick="addReview()">
@@ -101,7 +101,10 @@ userHasReviewed: Please pass this boolean variable to the template to determine 
             <li>
                 <div class="reviewItem">
                     <div class="reviewUserItem">
-                        <div class="reviewUserPhoto">{{reviews.userAvatar}}</div>
+                        <div class="reviewUserPhoto"><img src="{{reviews.userAvatar}}"></div>
+                        <div class="reviewUserName">
+                            <p>{{reviews.userName}}</p>
+                        </div>
                     </div>
                     <div class="reviewContentItem">
                         <div class="reviewTitle"><a href="/reviews/{{reviews.reviewId}}">{{reviews.reviewTitle}}</a>
