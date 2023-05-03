@@ -94,7 +94,7 @@ export function checkGuest(obj, flag)
     if (!obj || !Array.isArray(obj)) throw new CustomException("Object must exist and must be an object.", flag);
     for (let guest in obj){
         guest.firstName = checkString(guest.firstName, "First name")
-        guest.lastName = checkString(quest.lastName, "last name")
+        guest.lastName = checkString(guest.lastName, "last name")
     }
 
     return obj
