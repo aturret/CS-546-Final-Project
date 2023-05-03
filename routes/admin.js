@@ -41,9 +41,8 @@ router
     .get()
 
 router
-    .route('/admin/application')
+    .route('/application')
     .get(async (req, res) => {
-        //code here for GET
         try {
             const appList = admin.getAllApp();
             res.render('application', { appList: appList });
@@ -55,9 +54,8 @@ router
         });
     
 router
-    .route('/admin/application/:id')
+    .route('/application/:id')
     .get(async (req, res) => {
-        //code here for GET
         try {
         const id = helper.checkId(id, true);
         const app = admin.getApp(id);
