@@ -339,5 +339,23 @@ export async function voteReview(review_id, flag) {
 
 
 //TODO: create request. request document should have three field. id, user_id, hotel_id.
-export async function createRequest(username) {}
+export async function createRequest(username) {
+  username = helper.checkString(username, "username", true);
+  const tempAccount = await Account();
+  const tempRequest = await request();
+
+  const userInfo = await tempAccount.findOne({ username: username }, { _id: 1 });
+  if (userInfo === null) throw CustomException(`Could not find user with username ${username}`, true);
+
+  const newRequest = {
+    username: username,
+    status: "pending"
+  };
+
+  const requestInfo = await tempRequest.insertOne(newRequest);
+  if (requestInfo.insertedCount.n === 0)
+    throw CustomException(`Could not add the request.`, true);
+
+  return true;
+}
 
