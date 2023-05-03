@@ -14,7 +14,9 @@ reviewUserId: the id of the user who wrote the review
 {{/if}}
 <h2>{{reviewTitle}}</h2>
 <div class="hotelInfo">
-    <div class="hotelName"><p>{{hotelName}}</p></div>
+    <div class="hotelName">
+        <p>{{hotelName}}</p>
+    </div>
     <div class="hotelPhoto"><img src="{{hotelPhoto}}"></div>
     <div class="hotelRating">
         <p>Rating: {{hotelRating}}</p>
@@ -43,12 +45,20 @@ reviewUserId: the id of the user who wrote the review
                 <p>{{reviewComment}}</p>
             </div>
             {{#if (eq reviewUserId user.userId)}}
-            <div class="reviewEdit">
-                <button class="reviewEditButton">Edit</button>
-                <div hidden="true" class="reviewEditWindow">
+            <div class="editReview">
+                <button id="editReviewButton" onclick="editReview()">Edit</button>
+                <div hidden="true" id="editReviewWindow">
                     <form action="/reviews/{{reviewId}}" method="PATCH">
+                        <label for="reviewTitle">Title</label>
                         <input type="text" name="reviewTitle" placeholder="Review Title" value="{{reviewTitle}}">
-                        <input type="text" name="reviewRating" placeholder="Review Rating" value="{{reviewRating}}">
+                        <label for="reviewRating">Rating</label>
+                        <select name="reviewRating">
+                            <option value="1" {{#if (eq reviewRating 1)}}selected{{/if}}>1</option>
+                            <option value="2" {{#if (eq reviewRating 2)}}selected{{/if}}>2</option>
+                            <option value="3" {{#if (eq reviewRating 3)}}selected{{/if}}>3</option>
+                            <option value="4" {{#if (eq reviewRating 4)}}selected{{/if}}>4</option>
+                            <option value="5" {{#if (eq reviewRating 5)}}selected{{/if}}>5</option>
+                        <label for="reviewComment">Comment</label>
                         <textarea name="reviewComment" placeholder="Review Comment">{{reviewComment}}</textarea>
                         <input type="hidden" name="hotelId" value="{{hotelId}}">
                         <input type="hidden" name="reviewId" value="{{reviewId}}">
@@ -66,7 +76,7 @@ reviewUserId: the id of the user who wrote the review
                     <input type="hidden" name="reviewId" value="{{reviewId}}">
                     <button type="submit" name="reviewVote" value="upvote">Yes</button>
                     <button type="submit" name="reviewVote" value="downvote">No</button>
-                </form>                
+                </form>
             </div>
         </div>
         {{#if managerReply}}
@@ -76,7 +86,7 @@ reviewUserId: the id of the user who wrote the review
         {{/if}}
         {{#if (and (ne managerReply) (eq user.hotel hotelId))}}
         <div class="writeReply">
-            <button class="writeReplyButton">Write Reply</button>
+            <button class="writeReplyButton" onclick="writeReply()">Write Reply</button>
             <div hidden="true" class="writeReplyWindow">
                 <form action="/reviews/{{reviewId}}" method="PATCH">
                     <textarea name="managerReply" placeholder="Reply to this review"></textarea>

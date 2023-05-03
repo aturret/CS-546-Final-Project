@@ -1,41 +1,63 @@
 // In this file, you must perform all client-side validation for every single form input (and the role dropdown) on your pages. The constraints for those fields are the same as they are for the data functions and routes. Using client-side JS, you will intercept the form's submit event when the form is submitted and If there is an error in the user's input or they are missing fields, you will not allow the form to submit to the server and will display an error on the page to the user informing them of what was incorrect or missing.  You must do this for ALL fields for the register form as well as the login form. If the form being submitted has all valid data, then you will allow it to submit to the server for processing. Don't forget to check that password and confirm password match on the registration form!
 
 
+
 console.log('client-side JS loaded!');
 
 const forms = document.querySelectorAll('.my-form');
 const clientError = document.getElementById('client-error');
 const clientErrorDiv = document.getElementById('client');
 
+
 forms.forEach(form => {
+    console.log('hi');
     form.addEventListener('submit', async (event) => {
         const textInputs = document.querySelectorAll('input[type="text"]');
         const roomTypeInputs = document.querySelectorAll('select[class="roomType"]');
+        const hotelStateInputs = document.querySelectorAll('select[id="hotelState"]');
         const passwordInputs = document.querySelectorAll('input[type="password"]');
         const dateInputs = document.querySelectorAll('input[type="date"]');
         const emailInputs = document.querySelectorAll('input[type="email"]');
         const phoneInputs = document.querySelectorAll('input[class="phone"]');
+        const textareas = document.querySelectorAll('textarea');
         try {
-            textInputs.forEach(input => {
+            textInputs.forEach(input => {                
                 input.value = checkString(input.value, input.name, false);
             })
-            passwordInputs.forEach(input => {
+            roomTypeInputs.forEach(input => {
+                
+                input.value = checkString(input.value, input.name, false);
+            })
+            phoneInputs.forEach(input => {
+                console.log('hi');
+                input.value = checkPhone(input.value, false);
+            })
+            emailInputs.forEach(input => {
+                console.log('hi');
+                input.value = checkEmail(input.value, false);
+            })            
+            passwordInputs.forEach(input => {               
                 input.value = checkPassword(input.value, false);
             })
             dateInputs.forEach(input => {
+                console.log('hi');
                 input.value = checkDate(input.value, false);
             })
-            emailInputs.forEach(input => {
-                input.value = checkEmail(input.value, false);
+            textareas.forEach(input => {
+                console.log('hi');
+                input.value = checkString(input.value, input.name, false);
             })
-            phoneInputs.forEach(input => {
-                input.value = checkPhone(input.value, false);
-            })
+            
+            if (document.getElementById('confirmPasswordInput')) {
+                const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+                const PasswordInput = document.getElementById('passwordInput');
+                if (confirmPasswordInput.value !== PasswordInput.value) throw "Passwords do not match";
+            }
         }
         catch (e) {
-            e.preventDefault();
-            clientErrorDiv.style.display = 'block';
-            clientError.innerHTML = e.message;
+            event.preventDefault();
+            // clientErrorDiv.style.display = 'block';
+            clientError.innerHTML = e;
         }
     }
     )
@@ -47,49 +69,49 @@ forms.forEach(form => {
 
 
 
-
-
-
-function CustomException(message, flag) {
-    const error = new Error(message);
-
-    error.code = flag ? 400 : 404;
-    return error;
-}
-
-function checkString(s, key, flag){
-    if(!s || typeof s !== 'string' || s.trim().length === 0) throw new CustomException(`${key} must exist and must be a non empty string`, flag);
+function checkString(s, key){
+    if(!s || typeof s !== 'string' || s.trim().length === 0) throw `${key} must exist and must be a non empty string`;
     return s.trim();
 }
 
-function checkDate(date, flag) {
-    if (!date || typeof date !== "string" || date.trim().length === 0) throw new CustomException("releaseDate must exist and must be a non empty string.", flag);
-    if (!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw new CustomException("releaseDate must be a valid date.", flag);
+function checkDate(date) {
+    if (!date || typeof date !== "string" || date.trim().length === 0) throw "releaseDate must exist and must be a non empty string.";
+    if (!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw "releaseDate must be a valid date.";
     date = date.trim();
     let temp = +date.split("/")[-1];
     if (temp < 1900 || temp > 2023)
-        throw new CustomException("The year of release of the album must be between 1900 and 2024.", flag);
+        throw "The year of release of the album must be between 1900 and 2024.";
 
     return date
 }
-function checkEmail(email, flag) {
+function checkEmail(email) {
     email = email.trim()
-    if (!email || typeof email !== 'string') throw new CustomException("Email must exist and must be a string type", flag);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new CustomException("Invalid email address", flag)
+    if (!email || typeof email !== 'string') throw "Email must exist and must be a string type";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw "Invalid email address"
     return email
 }
-function checkPhone(n, flag)
+function checkPhone(n)
 {
     n = n.trim()
-    if(!n || typeof n !== 'string') throw new CustomException("Phone number must exist and must be a string type.", flag);
-    if(!/^\d{3}[-]?\d{3}[-]?\d{4}$/.test(n)) throw new CustomException("Cell phone number has to match the format. xxxxxxxxxxx, xxx-xxx-xxxxx or (xxx)xxx-xxxxx", flag)
+    // if(n.length === 0) throw "Phone number must exist and must be a string type.";
+    if(!n || typeof n !== 'string') throw "Phone number must exist and must be a string type.";
+    if(!/^\d{3}[-]?\d{3}[-]?\d{4}$/.test(n)) throw "Cell phone number has to match the format. xxxxxxxxxxx, xxx-xxx-xxxxx or (xxx)xxx-xxxxx"
     return n
 }
-function checkPassword(password, flag){
-    if(!password|| typeof password !== "string") throw new CustomException("Password must exist and must be a string.", flag);
-    if(!/\d/.test(password)) throw new CustomException("Password must contain at least one digit.", flag);
-    if(!/[a-z]/.test(password)) throw new CustomException("Password must contain nat least one letter.", flag)
-    if(password === password.toLowerCase()) throw new CustomException("Password must have at least one upper case letter.", flag);
+function checkPassword(password){
+    if(!password|| typeof password !== "string") throw "Password must exist and must be a string.";
+    if(!/\d/.test(password)) throw "Password must contain at least one digit.";
+    if(!/[a-z]/.test(password)) throw "Password must contain nat least one letter."
+    if(password === password.toLowerCase()) throw "Password must have at least one upper case letter.";
 
     return password.trim()
 }
+
+
+// function CustomException(message) {
+//     const error = new Error(message);
+
+//     error.code = flag ? 400 : 404;
+//     return error;
+// }
+

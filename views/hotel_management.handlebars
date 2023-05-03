@@ -27,7 +27,7 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
         </div>
     </div>
     <div class="edit">
-        <button id="editHotelButton">Edit Hotel Basic Info</button>
+        <button id="editHotelButton" onclick="editHotel()">Edit Hotel Basic Info</button>
         <div hidden="true" id="editHotelWindow">
             <form action="/hotel/{{hotelId}}" method="PATCH" id="editHotelForm" class="my-form">
                 <input type="hidden" name="hotelId" value="{{hotelId}}">
@@ -46,7 +46,6 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
                     <input type="email" name="hotelEmail" id="hotelEmail" value="{{hotelEmail}}">
                 </div>
                 <div class="hotelAddress">
-                    <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
                     <label for="hotelCity" id="hotelCity-label">
                         Hotel City:
                     </label>

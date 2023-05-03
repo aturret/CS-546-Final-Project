@@ -24,11 +24,14 @@ roomTypes: Please pass all roomTpyes when rendering this template.
             </div>
             {{#if (eq applications.applicationStatus "pending")}}
             <div class="approveApplication">
-                <form action="/admin/{{applications.applicationId}}/approve" method="PATCH">
+                <form action="/hotel/{{hotelId}}/application/{{applications.applicationId}}/approve" method="POST">
                     <input type="hidden" name="applicationId" value="{{applications.applicationId}}">
+                    <input type="hidden" name="applicationUserId" value="{{applications.applicationUserId}}">
                     <button type="submit">Approve</button>
+
                 </form>
             </div>
+            {{/if}}
         </li>
         {{/each}}
     </ol>

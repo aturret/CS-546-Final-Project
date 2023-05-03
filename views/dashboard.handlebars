@@ -14,18 +14,78 @@
 </div>
 <h2>{{userName}}</h2>
 <div class="information">
-    <div class="userIdentity"><p>Identity: {{userIdentity}}</p></div>
-    <div class="userFirstName"><p>First Name: {{userFirstName}}</p></div>
-    <div class="userLastName"><p>Last Name: {{userLastName}}</p></div>
-    <div class="userEmail"><p>Email: {{userEmail}}</p></div>
-    <div class="userPhone"><p>Phone: {{userPhone}}</p></div>
+    <div class="userIdentity">
+        <p>Identity: {{user.userIdentity}}</p>
+    </div>
+    <div class="userFirstName">
+        <p>First Name: {{userFirstName}}</p>
+    </div>
+    <div class="userLastName">
+        <p>Last Name: {{userLastName}}</p>
+    </div>
+    <div class="userEmail">
+        <p>Email: {{userEmail}}</p>
+    </div>
+    <div class="userPhone">
+        <p>Phone: {{userPhone}}</p>
+    </div>
 </div>
+{{#if (eq user.userIdentity "user")}}
+<div class="newApplication">
+    <button id="newHotelButton" onclick="newHotel()">Start applying</button>
+    <div id="newHotelWindow" hidden="true">
+        <form action="/hotel" method="POST">
+            <input type="hidden" name="hotelId" value="{{hotelId}}">
+            <label for="hotelName" id="hotelName-label">
+                Hotel Name:
+            </label>
+            <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
+            <label for="hotelPhoto" id="hotelPhoto-label">
+                Hotel Photo:
+            </label>
+            <input type="file" name="hotelPhoto" id="hotelPhoto" value="{{hotelPhoto}}">
+            <div class="hotelContact">
+                <label for="hotelPhone" id="hotelPhone-label">
+                    Hotel Phone:
+                </label>
+                <input type="text" name="hotelPhone" id="hotelPhone" value="{{hotelPhone}}">
+                <label for="hotelEmail" id="hotelEmail-label">
+                    Hotel Email:
+                </label>
+                <input type="email" name="hotelEmail" id="hotelEmail" value="{{hotelEmail}}">
+            </div>
+            <div class="hotelAddress">
+                <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
+                <label for="hotelCity" id="hotelCity-label">
+                    Hotel City:
+                </label>
+                <input type="text" name="hotelCity" id="hotelCity" value="{{hotelCity}}">
+                <label for="hotelStreet" id="hotelStreet-label">
+                    Hotel Street:
+                </label>
+                <input type="text" name="hotelStreet" id="hotelStreet" value="{{hotelStreet}}">
+                <label for="hotelState" id="hotelState-label">
+                    Hotel State:
+                </label>
+                <select id="hotelState" class="state">
+                </select>
+                <label for="hotelZipcode" id="hotelZipcode-label">
+                    Hotel Zip:
+                </label>
+                <input type="text" name="hotelZipcode" id="hotelZipcode" value="{{hotelZipcode}}">
+                <input type="hidden" name="userId" value="{{userId}}">
+                <button type="submit" id="newApplication">Apply for manager</button>
+        </form>
+    </div>
+
+</div>
+{{/if}}
 <div class="functionMenu">
     <div class="functionItem"><a href="/order">My Orders</a></div>
-    {{#if (eq userIdentity "manager")}}
+    {{#if (eq user.userIdentity "manager")}}
     <div class="functionItem"><a href="/hotel">My Hotel</a></div>
     {{/if}}
-    {{#if (eq userIdentity "admin")}}
+    {{#if (eq user.userIdentity "admin")}}
     <div class="functionItem"><a href="/admin">Admin</a></div>
     {{/if}}
     <div class="functionItem"><a href="/logout">Log Out</a></div>
@@ -34,4 +94,3 @@
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-

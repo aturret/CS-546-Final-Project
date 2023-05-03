@@ -2,13 +2,17 @@ const editReviewWindow = document.getElementById('editReviewWindow');
 const editReviewButton = document.getElementById('editReviewButton');
 const addReviewWindow = document.getElementById('addReviewWindow');
 const addReviewButton = document.getElementById('addReviewButton');
+const editHotelWindow = document.getElementById('editHotelWindow');
+const editHotelButton = document.getElementById('editHotelButton');
+const writeReplyWindow = document.getElementById('writeReplyWindow');
+const writeReplyButton = document.getElementById('writeReplyButton');
+const newHotelButton = document.getElementById('newHotelButton');
+const newHotelWindow = document.getElementById('newHotelWindow');
 
 
 function editReview() {
-    editReviewWindow.style.display = 'block';
     editReviewWindow.hidden = false;
     editReviewButton.style.display = 'none';
-    editReviewButton.hidden = true;
 }
 
 function addReview() {
@@ -31,3 +35,25 @@ function editRoomType(roomTypeId){
     editRoomWindow.style.display = 'block';
     editRoomWindow.hidden = false;
 }
+
+function editHotel(){
+    editHotelWindow.style.display = 'block';
+    editHotelWindow.hidden = false;
+    editHotelButton.style.display = 'none';
+    editHotelButton.hidden = true;
+}
+
+function writeReply(){
+    writeReplyWindow.style.display = 'block';
+    writeReplyWindow.hidden = false;
+    writeReplyButton.style.display = 'none';
+    writeReplyButton.hidden = true;
+}
+
+function newHotel(){
+    newHotelWindow.style.display = 'block';
+    newHotelWindow.hidden = false;
+    newHotelButton.style.display = 'none';
+    newHotelButton.hidden = true;
+}
+
