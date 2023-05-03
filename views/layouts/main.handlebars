@@ -25,22 +25,17 @@ There are four types of identities: "guest", "user", "manager", "admin".
                     {{#if (eq user.identity "guest")}}
                     <li><a href="/login">Login</a></li>
                     <li><a href="/register">Register</a></li>
-                    {{#else}}                    
-                    {{#if (eq user.identity "admin")}}
-                    <li><a href="/admin">Admin</a></li>
-                    {{/if}}
-                    {{#if (eq user.identity "manager")}}
-                    <li><a href="/hotel">Your Hotel</a></li>
-                    {{/if}}
-                    <li><a href="/order">Orders</a></li>
-                    <li><a href="/info">Info</a></li>
+                    {{#else}}                  
+                    <li><a href="/dashboard">Dashboard</a></li>
                     <li><a href="/logout">Logout</a></li>
                     {{/if}}
                 </ul>
         </header>
         {{{body}}}
     </main>
-
+    <script src="/public/js/validation.js"></script>
+    <script src="/public/js/newWindow.js"></script>
+    <script src="/public/js/states.js"></script>
 </body>
 
 </html>

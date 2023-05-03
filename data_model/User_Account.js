@@ -50,6 +50,16 @@ export async function create(...args) {
   return {message: "Create user successfully."};
 }
 
+export async function getAllUsers() {
+  const userCollection = await users();
+  let userList = await userCollection.find({}).toArray();
+  userList = userList.map((element) => {
+    element._id = element._id.toString();
+    return element;
+  });
+  return userList;
+}
+
 export async function getUser(username) {
   username = helper.checkString(username, "username", true);
 

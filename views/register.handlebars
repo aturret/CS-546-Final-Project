@@ -3,59 +3,53 @@
 registration handelbars
 
 --}}
-{{!-- <script src="../public/js/lab10.js"></script> --}}
+{{!--
+<script src="../public/js/lab10.js"></script> --}}
 {{#if error}}
 <div class="error">
     <p>Error code{{status_code}}: {{error}}</p>
 </div>
 {{/if}}
 
-<p>Please register your account.</p>
+<p>Please fill up this form and register your account.</p>
 <form action="/register" method="POST" id="registration-form" class="new-form">
-    <label for="username" id="username-label">  
+    <label for="username" id="username-label">
         Username:
     </label>
     <input type="text" name="username" id="username"></input>
 
-    <label for="firstNameInput" id="firstNameInput-label">  
+    <label for="firstNameInput" id="firstNameInput-label">
         First Name:
     </label>
     <input type="text" name="firstNameInput" id="firstNameInput"></input>
-    <label for="lastNameInput" id="lastNameInput-label">  
-        Last Name: 
+    <label for="lastNameInput" id="lastNameInput-label">
+        Last Name:
     </label>
     <input type="text" name="lastNameInput" id="lastNameInput"></input>
 
-    <label for="emailAddressInput" id="emailAddressInput-label">  
-        Email: 
+    <label for="emailAddressInput" id="emailAddressInput-label">
+        Email:
         <input type="email" name="emailAddressInput" id="emailAddressInput"></input>
     </label>
-    
-      <label>
+
+    <label>
         Phone:
         <input type="phone" name="phone" id="phone"></input>
     </label>
 
-    <label for="passwordInput" id="passwordInput-label">  
+    <label for="passwordInput" id="passwordInput-label">
         Password:
         <input type="password" name="passwordInput" id="passwordInput"></input>
     </label>
 
-    <label for="confirmPasswordInput" id="confirmPasswordInput-label">  
+    <label for="confirmPasswordInput" id="confirmPasswordInput-label">
         Confirm Password:
     </label>
     <input type="password" name="confirmPasswordInput" id="confirmPasswordInput"></input>
-    {{!-- For the select dropdown, you will have two options one that displays "Admin" with a value attribute of "admin" and one option that displays "User" with a value attribute of "user". --}}
-    <label for="roleInput" id="roleInput-label">  
-        Role:
-    </label>
-    <select name="roleInput" id="roleInput">
-        <option value="manager">Manager</option>
-        <option value="user">User</option>
-    </select>
+
     <button type="submit" id="register-button">Register</button>
 </form>
-<p class="error" id="client">{{errorMessage}}
-    
+<p class="error" id="client">
+    {{errorMessage}}
 </p>
 <a href="/login">Already have an account? Click here to log-in!</a>
