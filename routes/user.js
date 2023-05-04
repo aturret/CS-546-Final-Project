@@ -418,8 +418,39 @@ router.route("/add_review")
   }});
 
 //TODO: edit review
-
-
+router.route("/edit_review")
+.patch(isAuth, async (req, res) => {
+  try {
+  const review_id = ObjectId(helper.checkId(req.body.review_id, true));
+  const rating = req.body.rating;
+  const comment = req.body.comment;
+  const result = await userFuncs.editReview(review_id, rating, comment);
+  if (!result) throw new CustomException("Review not found", true);
+  req.flash(result);
+  return res.status(200).redirect(`/user/dashboard/${req.user.username}/bookings`);
+  } catch (e) {
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    const previousUrl = req.headers.referer || `/user/dashboard/${req.user.username}/bookings`;
+    res.redirect(previousUrl);
+  }
+})
 //TODO: delete review
+.delete(isAuth, async (req, res) => {
+  try {
+    const review_id = ObjectId(helper.checkId(req.body.review_id, true));
+    const result = await userFuncs.deleteReview(review_id);
+    if (!result) throw new CustomException("Review not found", true);
+    req.flash(result);
+    return res.status(200).redirect(`/user/dashboard/${req.user.username}/bookings`);
+  } catch (e) {
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    const previousUrl = req.headers.referer || `/user/dashboard/${req.user.username}/bookings`;
+    res.redirect(previousUrl);
+  }
+});
+
+
 
 export default router;

@@ -434,6 +434,22 @@ export async function updateReview(review_id, review, rating) {
   );
   if (reviewInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the review with id ${review_id}`, true);
 
+  //update hotel rating
+  const hotel_id = reviewInfo.hotel_id;
+  const tempHotel = await Hotel();
+  const hotel_reviews = await tempHotel.findOne({_id: ObjectId(hotel_id)}, {reviews: 1});
+  if (hotelInfo.reviews.length === 0) throw CustomException(`Could not find hotel with id ${hotel_id}`, true);
+  let sum = 0;
+  for (let i of hotel_reviews){
+    const tempReview = await tempReview.findOne({_id: ObjectId(i)}, {rating: 1});
+    sum += tempReview.rating;
+  }
+  let overallRating = sum / hotel_reviews.length;
+  overallRating = overallRating.toFixed(2);
+  overallRating = parseFloat(overallRating);
+  const updateHotel = await tempHotel.findOneUpdate({_id: ObjectId(hotel_id)}, {$set: {overall_rating: overallRating}}, {returnDocument: "after"});
+  if (updateHotel.lastErrorObject.n === 0) throw CustomException(`Could not update the hotel with id ${hotel_id}`, true);
+
   return {successMessage: "Review updated successfully."};
 }
 
@@ -461,6 +477,21 @@ export async function deleteReview(review_id) {
   const tempHotel = await Hotel();
   const hotelInfo = await tempHotel.findOneUpdate({_id: ObjectId(hotel_id)}, {$pull: {reviews: review_id}});
   if (hotelInfo.lastErrorObject.n === 0) throw CustomException(`Could not update hotel with id ${hotel_id}`, true);
+
+  //update hotel rating
+  const hotel_reviews = await tempHotel.findOne({_id: ObjectId(hotel_id)}, {reviews: 1});
+  if (hotelInfo.reviews.length === 0) throw CustomException(`Could not find hotel with id ${hotel_id}`, true);
+  let sum = 0;
+  for (let i of hotel_reviews){
+    const tempReview = await tempReview.findOne({_id: ObjectId(i)}, {rating: 1});
+    sum += tempReview.rating;
+  }
+  let overallRating = sum / hotel_reviews.length;
+  overallRating = overallRating.toFixed(2);
+  overallRating = parseFloat(overallRating);
+  const updateHotel = await tempHotel.findOneUpdate({_id: ObjectId(hotel_id)}, {$set: {overall_rating: overallRating}}, {returnDocument: "after"});
+  if (updateHotel.lastErrorObject.n === 0) throw CustomException(`Could not update the hotel with id ${hotel_id}`, true);
+
 
   //delete review for order
   const tempOrder = await Order();
