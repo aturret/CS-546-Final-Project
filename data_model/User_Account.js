@@ -34,7 +34,7 @@ export async function create(...args) {
   user.phone = args[5]? helper.checkNumber(args[5], true): args[5];
   args[6] = helper.checkPassword(args[6], true);
   user.email = helper.checkEmail(args[7], true);
-  user.hotels = [];
+  user.hotel_id = "";
   user.orders = {};
 
   user.password = await bcrypt.hash(args[6], saltRounds);
@@ -93,6 +93,61 @@ export async function updateUser(username, set) {
   if (userInfo.lastErrorObject.n === 0)
     throw CustomException(`Could not update the document with id ${id}`, true);
   return userInfo;
+}
+
+//delete account
+export async function deleteAccount(username) {
+
+  const username = helper.checkString(username, "username", true);
+  const tempAccount = await Account();
+
+  //get orders
+  const info = await tempAccount.find({username: username}, {orders: 1, Identity: 1, hotel_id: 1});
+
+  //delete orders
+  const reviews = [];
+  const tempOrder = await Order();
+  const tempRoom = await Room();
+  let find_result = undefined;
+  let temp_room = undefined;
+  for (let i of info.orders)
+  {
+    find_result = await tempOrder.findOne({order_id: i}, {review: 1, hotel_id: 1, room_id: 1})
+    if(!find_result) throw CustomException(`Could not find order with order_id ${i}`, true);
+
+    //update room
+    temp_room = await tempRoom.updateOne({_id: find_result.room_id}, {$pull: {order: i}});
+    if(temp_room.modifiedCount === 0) throw CustomException(`Could not delete order with order_id ${i}`, true);
+
+    reviews.push(find_result.review);
+
+    //delete order
+    await tempOrder.deleteOne({order_id: i});
+  }
+
+  //delete reviews
+  const tempHotel = await Hotel();
+  let update_info = undefined;
+  for (let i of reviews)
+  {
+    update_info = await tempHotel.updateOne({_id: i.hotel_id}, {$pull: {review: i.review}});
+    if(update_info.modifiedCount === 0) throw CustomException(`Could not delete review with review_id ${i.review}`, true);
+  }
+
+  //update hotel if manager
+  if(info.Identity === "manager")
+  {
+    const tempHotel = await Hotel();
+    const update_info = await tempHotel.updateOne({_id: info.hotel_id}, {$pull: {manager: username}});
+    if(update_info.modifiedCount === 0) throw CustomException(`Could not delete manager with username ${username}`, true);
+  }
+
+  //delete user
+  const delete_info = await tempAccount.deleteOne({username: username});
+  if(delete_info.deletedCount === 0) throw CustomException(`Could not delete user with username ${username}`, true);
+
+  return {message: "Delete user successfully."};
+
 }
 
 //TODO: add delete orders
@@ -336,6 +391,38 @@ export async function voteReview(review_id, flag) {
   return true;
 }
 
+//delete review for user and review only
+export async function deleteReview(review_id) {
+  review_id = helper.checkId(review_id, true);
+
+  const tempReview = await Review();
+  const reviewInfo = await tempReview.findOne(
+    { _id: ObjectId(review_id) }
+  );
+  if (reviewInfo === null) throw CustomException(`Could not find review with id ${review_id}`, true);
+  
+  const user_id = reviewInfo.user_id;
+  //delete review from user
+  const tempAccount = await Account();
+  const userInfo = await tempAccount.findOneUpdate({_id: ObjectId(user_id)}, {$pull: {reviews: review_id}});
+  if (userInfo.lastErrorObject.n === 0) throw CustomException(`Could not update user with id ${user_id}`, true);
+
+  //delete review from hotel
+  const hotel_id = reviewInfo.hotel_id;
+  const tempHotel = await Hotel();
+  const hotelInfo = await tempHotel.findOneUpdate({_id: ObjectId(hotel_id)}, {$pull: {reviews: review_id}});
+  if (hotelInfo.lastErrorObject.n === 0) throw CustomException(`Could not update hotel with id ${hotel_id}`, true);
+
+  //delete review for order
+  const tempOrder = await Order();
+  const orderInfo = await tempOrder.findOneUpdate({review: review_id}, {$set: {review: ""}});
+  if (orderInfo.lastErrorObject.n === 0) throw CustomException(`Could not update order with id ${order_id}`, true);
+
+  const deleteInfo = await tempReview.deleteOne({ _id: ObjectId(review_id) });
+  if (deleteInfo.deletedCount.n === 0) throw CustomException(`Could not delete review with id ${review_id}`, true);
+
+  return {message: "Review deleted."};
+}
 
 
 //TODO: create request. request document should have three field. id, user_id, hotel_id.
@@ -358,4 +445,5 @@ export async function createRequest(username) {
 
   return true;
 }
+
 

@@ -3,6 +3,7 @@ import express, { Router } from "express";
 import passport from "passport";
 import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
+import * as hotelFuncs from "../data_model/Hotel_Data.js";
 import * as helper from "../helper.js";
 import isAuth from "./user.js";
 
@@ -149,11 +150,13 @@ router
         const hotel_phone = req.body.hotel_phone;
         const hotel_email = req.body.hotel_email;
         const hotel_picture = req.body.hotel_picture;
+        const facilities = req.body.facilities;
         const manager = req.body.manager;
+        const rooms = req.body.rooms;
         const roomType = req.body.roomType;
         const review = req.body.review;
 
-        const result = await userFuncs.editHotel(
+        const result = await hotelFuncs.updateHotel(
           hotel_id,
           hotel_name,
           hotel_street,
@@ -163,6 +166,8 @@ router
           hotel_phone,
           hotel_email,
           hotel_picture,
+          rooms,
+          facilities,
           manager,
           roomType,
           review

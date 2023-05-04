@@ -8,6 +8,8 @@ import { request } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
+import { Review } from "../Mongo_Connections/mongoCollections.js";
+import * as userFuncs from "./User_Account.js";
 
 export async function getAllHotels() {
   const hotelCollection = await Hotel();
@@ -81,24 +83,23 @@ export async function updateHotel(...args) {
   updateHotel.picture = args[8]
     ? args[8].map((web) => helper.checkWebsite(web, false))
     : undefined;
-  updateHotel.rooms = [];
+  updateHotel.rooms = args[9] ? args[9].map((room) => helper.checkId(room, false)) : [];
   if (args[8] && Array.isArray(args[8])) {
-    updateHotel.facilities = args[8].map((facility) =>
-      helper.checkString(facility, "facility", false)
-    );
+    updateHotel.facilities = args[8] ? args[8].map((facility) =>
+      helper.checkString(facility, "facility", false)) : [];
   } else if (!args[8]) {
     updateHotel.facilities = [];
   } else {
     throw CustomException("Invalid facilities.", true);
   }
-  updateHotel.managers = args[9]
-    ? args[9].map((manager) => helper.checkId(manager, false))
+  updateHotel.managers = args[10]
+    ? args[10].map((manager) => helper.checkId(manager, false))
     : [];
-  updateHotel.roomTypes = args[10]
-    ? args[10].map((roomType) => helper.checkString(roomType, false))
+  updateHotel.roomTypes = args[11]
+    ? args[11].map((roomType) => helper.checkString(roomType, false))
     : [];
-  updateHotel.reviews = args[11]
-    ? args[11].map((reviews) => helper.checkString(reviews, false))
+  updateHotel.reviews = args[12]
+    ? args[12].map((reviews) => helper.checkString(reviews, false))
     : [];
 
   const tempHotel = await Hotel();
@@ -112,6 +113,46 @@ export async function updateHotel(...args) {
 
   return { message: `Hotel with id ${hotel_id} updated successfully.` };
 }
+//delete hotel
+export async function deleteHotel(id) {
+    id = helper.checkId(id, true);
+    const tempHotel = await Hotel();
+
+    const temp = await tempHotel.findOne({ _id: new ObjectId(id) }, {reviews: 1, room_types: 1, rooms: 1});
+
+    if (temp.deletedCount === 0)  throw CustomException(`Delete hotel with id ${id} failed.`, true);
+
+    //delete reviews
+    let delete_review_info = undefined;
+    for (let i = 0; i < temp.reviews.length; i++) {
+        delete_review_info = await userFuncs.deleteReview(temp.reviews[i]);
+        if (delete_review_info.deletedCount === 0) throw CustomException(`Delete review with id ${temp.reviews[i]} failed.`, true);
+    }
+    
+    //delete rooms
+    const roomCollection = await Room();
+    const result_room = await roomCollection.deleteMany({ _id: { $in: temp.rooms } });
+
+    //delete room types
+    const roomType = await RoomType();
+    const result_roomType = await roomType.deleteMany({ _id: { $in: temp.room_types } });
+
+    //TODO: delete orders
+    const orderCollection = await Order();
+    const result_order = await orderCollection.deleteMany({ hotel_id: id });
+
+
+    //delete Hotel
+    const deleteInfo = await tempHotel.deleteOne({ _id: new ObjectId(id) });
+    if (deleteInfo.deletedCount === 0)
+        throw CustomException(`Delete hotel with id ${id} failed.`, true);
+
+
+    return { message: `Hotel with id ${id} deleted successfully.` };
+}
+
+
+
 
 export async function hotelSearch(name, city, state, zipCode) {
   const hotelCollection = await Hotel();
