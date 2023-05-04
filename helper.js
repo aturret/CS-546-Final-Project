@@ -100,8 +100,8 @@ export function checkGuest(obj, flag)
 {
     if (!obj || !Array.isArray(obj)) throw new CustomException("Object must exist and must be an object.", flag);
     for (let guest in obj){
-        guest.firstName = checkString(guest.firstName, "First name")
-        guest.lastName = checkString(quest.lastName, "last name")
+        guest.firstName = checkNameString(guest.firstName, "First name", true)
+        guest.lastName = checkNameString(quest.lastName, "last name", true)
     }
 
     return obj
@@ -128,4 +128,10 @@ export function checkNameString(strVal, key, flag) {
     if (/\d/.test(strVal)) throw CustomException(`Error: ${key} cannot contain numbers`, flag);
     if (strVal.length < 2 || strVal.length > 25) throw CustomException(`Error: ${key} must be between 2 and 25 characters`, flag);
     return strVal;
+}
+
+export function checkUserName(username, flag) {
+    username = username.trim();
+    if (/\s/.test(username)) throw CustomException("Error: Username cannot contain spaces", flag);
+    return username;
 }

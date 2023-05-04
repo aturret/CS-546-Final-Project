@@ -380,5 +380,46 @@ async (req, res) => {
 });
 
 
+/*-----------------------------------------Review------------------------------------------------------*/
+//dont know if needed. Get all review for a user
+router.route("/dashboard/:username/reviews")
+.get(isAuth, async (req, res) => {
+  try{
+    const username = helper.checkUserName(req.params.username, true)
+    const reviews = await userFuncs.getReview(username)
+    if (!reviews) throw new CustomException("Review not found", true);
+    return res.status(200).render("review", {review: reviews})
+  }
+  catch (e) {
+    if (!e.code) {
+      req.session.status = 500;
+    } else {
+      req.session.status = e.code;
+    }
+    req.session.errorMessage = e.message;
+    res.redirect(`/user/dashboard/${req.user.username}/bookings`);
+}});
+//add review
+router.route("/add_review")
+.post(isAuth, async (req, res) => {
+  try { 
+    const rating = req.body.rating
+    const comment = req.body.comment
+    const review_id = helper.checkId(req.body.review_id, true)
+    const result = await userFuncs.addReview(review_id, rating, comment)
+    if (!result) throw new CustomException("Review not found", true);
+    req.flash(result);
+    return res.status(200).redirect(`/user/dashboard/${req.user.username}/bookings`);
+  } catch (e) {
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    const previousUrl = req.headers.referer || `/user/dashboard/${req.user.username}/bookings`;
+    res.redirect(previousUrl);
+  }});
+
+//TODO: edit review
+
+
+//TODO: delete review
 
 export default router;

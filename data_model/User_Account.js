@@ -11,11 +11,12 @@ import bcrypt from "bcryptjs";
 import { CustomException } from "../helper.js";
 const saltRounds = 12;
 
+/*-------------------------User Account-------------------------*/
 const refInfo = {
   username: helper.checkString.bind(null, undefined, "username", true),
   avatar: helper.checkWebsite.bind(null, undefined, true),
-  firstName: helper.checkString.bind(null, undefined, "first name", true),
-  lastName: helper.checkString.bind(null, undefined, "last name", true),
+  firstName: helper.checkNameString.bind(null, undefined, "first name", true),
+  lastName: helper.checkNameString.bind(null, undefined, "last name", true),
   phone: helper.checkPhone.bind(null, undefined, true),
   password: helper.checkPassword.bind(null, undefined, true),
   email: helper.checkEmail.bind(null, undefined, true),
@@ -75,7 +76,7 @@ export async function getUser(username) {
   // return false;
 }
 
-//TODO: update user info
+//FINISHED: update user info
 export async function updateUser(username, set) {
   if (typeof set !== "object" || Array.isArray(set) || set === "null")
     throw CustomException("invalid update input", true);
@@ -150,6 +151,8 @@ export async function deleteAccount(username) {
 
 }
 
+
+/*----------------------------------------  order  ----------------------------------------*/
 //TODO: add delete orders
 //get order for user.  return order details
 /*
@@ -293,7 +296,31 @@ export async function deleteOrder(order_id) {
   return orderInfo;
 }
 
+
+/*----------------------------------------  review  ----------------------------------------*/
 //TODO: add review  to hotel
+
+//get review for username
+export async function getReview(username) {
+  username = helper.checkString(username, "username", true);
+  const tempAccount = await Account();
+  const tempReview = await Review();
+  const tempOrder = await Order();
+
+  const orders = await tempAccount.find({ username: username }, { orders: 1});
+  if (!orders) throw CustomException(`Could not find orders with username ${username}`, true);
+  let reviews_id = [];
+
+  for (let i = 0; i < orders.length; i++) {
+    reviews_id.push(orders[i].review);
+  }
+
+  const reviews = await tempReview.find({ _id: { $in: reviews_id } }).toArray();
+  if (!reviews) throw CustomException(`Could not find reviews with username ${username}`, true);
+
+  return reviews;
+}
+
 export async function addReview(order_id, hotel_id, user_id, review, rating) {
   //rating is 1-5 stars
   const tempOrder = await Order();
@@ -356,7 +383,9 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
     const tempReview = await tempReview.findOne({_id: ObjectId(newHotel.reviews[i])}, {rating: 1});
     sum += tempReview.rating;
   }
-  const overallRating = sum / newHotel.reviews.length;
+  let overallRating = sum / newHotel.reviews.length;
+  overallRating = overallRating.toFixed(2);
+  overallRating = parseFloat(overallRating);
   const updateHotel = await tempHotel.findOneUpdate({_id: ObjectId(hotel_id)}, {$set: {overall_rating: overallRating}}, {returnDocument: "after"});
 
   return true;
@@ -391,7 +420,27 @@ export async function voteReview(review_id, flag) {
   return true;
 }
 
-//delete review for user and review only
+//update review
+export async function updateReview(review_id, review, rating) {
+  review_id = helper.checkId(review_id, true);
+  review = helper.checkString(review, "review", true);
+  rating = helper.checkRating(rating, true);
+
+  const tempReview = await Review();
+  const reviewInfo = await tempReview.findOneUpdate(
+    { _id: ObjectId(review_id) },
+    { $set: { comment: review, rating: rating } },
+    { returnDocument: "after" }
+  );
+  if (reviewInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the review with id ${review_id}`, true);
+
+  return {successMessage: "Review updated successfully."};
+}
+
+
+
+
+//delete review
 export async function deleteReview(review_id) {
   review_id = helper.checkId(review_id, true);
 
@@ -424,7 +473,7 @@ export async function deleteReview(review_id) {
   return {message: "Review deleted."};
 }
 
-
+/*-----------------------------Request---------------------------------*/
 //TODO: create request. request document should have three field. id, user_id, hotel_id.
 export async function createRequest(username) {
   username = helper.checkString(username, "username", true);
@@ -445,5 +494,7 @@ export async function createRequest(username) {
 
   return true;
 }
+
+
 
 
