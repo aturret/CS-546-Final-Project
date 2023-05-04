@@ -151,23 +151,20 @@ export async function deleteHotel(id) {
     return { message: `Hotel with id ${id} deleted successfully.` };
 }
 
-
-
-
-export async function hotelSearch(name, city, state, zipCode) {
+export async function hotelSearch(...args) {
   const hotelCollection = await Hotel();
 
   let query = {};
-  name = helper.checkString(name, "hotel name", true);
+  const name = helper.checkString(args[0], "hotel name", true);
   query.name = { $regex: new RegExp(name, "i") };
 
-  city = helper.checkString(city, "city", true);
+  const city = helper.checkString(args[1], "city", true);
   query.city = { $regex: new RegExp(city, "i") };
 
-  state = helper.checkString(state, "state", true);
+  const state = helper.checkString(args[2], "state", true);
   query.state = { $regex: new RegExp(state, "i") };
 
-  zipCode = helper.checkZip(zipCode, true);
+  const zipCode = helper.checkZip(args[3], true);
   query.zipCode = { $regex: new RegExp(zipCode, "i") };
 
   let hotelList = await hotelCollection.find(query).toArray();
@@ -179,6 +176,7 @@ export async function hotelSearch(name, city, state, zipCode) {
   });
   return hotelList;
 }
+
 //room type
 export async function addRoomType(...args) {
   const hotel_id = helper.checkId(args[0], true);

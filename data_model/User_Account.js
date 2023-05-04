@@ -4,7 +4,7 @@ import { Order } from "../Mongo_Connections/mongoCollections.js";
 import { Room } from "../Mongo_Connections/mongoCollections.js";
 import { Hotel } from "../Mongo_Connections/mongoCollections.js";
 import { roomType } from "../Mongo_Connections/mongoCollections.js";
-import { request } from "../Mongo_Connections/mongoCollections.js";
+import { mgrReq } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import * as helper from "../helper.js";
 import bcrypt from "bcryptjs";
@@ -506,16 +506,30 @@ export async function deleteReview(review_id) {
 
 /*-----------------------------Request---------------------------------*/
 //TODO: create request. request document should have three field. id, user_id, hotel_id.
-export async function createRequest(username) {
+export async function createMgeReq(username, name, street, city, state, zip_code) {
   username = helper.checkString(username, "username", true);
   const tempAccount = await Account();
-  const tempRequest = await request();
+  const tempRequest = await mgrReq();
+  const tempHotel = await Hotel();
 
   const userInfo = await tempAccount.findOne({ username: username }, { _id: 1 });
   if (userInfo === null) throw CustomException(`Could not find user with username ${username}`, true);
 
+  const hotelInfo = await tempHotel.findOne(
+    {
+      name: name,
+      street: street,
+      city: city,
+      state: state,
+      zip_code: zip_code,
+    }, 
+    { _id: 1 });
+  if (hotelInfo === null) throw CustomException('Could not find the hotel', true);
+
   const newRequest = {
+    _id: new ObjectId(),
     username: username,
+    hotelId: hotelInfo._id,
     status: "pending"
   };
 
@@ -523,9 +537,5 @@ export async function createRequest(username) {
   if (requestInfo.insertedCount.n === 0)
     throw CustomException(`Could not add the request.`, true);
 
-  return true;
+  return { message: 'Request submit, wait for approval' };
 }
-
-
-
-
