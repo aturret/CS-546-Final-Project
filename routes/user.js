@@ -537,7 +537,7 @@ async (req, res) => {
 );
 //add room for the hotel, hotel mnr or admin only
 router
-  .route("/hotel_management/room")
+  .route("/hotel_management/:hotel_id/room")
   .get(
     (req, res, next) => {
       if (!req.isAuthenticated()) {
@@ -552,10 +552,20 @@ router
     },
     async (req, res) => {
       try {
-        const hotel = await hotelFuncs.getMgrHotel(req.user.username);
-        const hotel_id = hotel.hotel_id.toString();
+        const hotel_id = helper.checkId(req.params.hotel_id)
         const rooms = await hotelFuncs.getHotelRoom(hotel_id);
-
+        return res.status(200).render("rooms", rooms);
+      } catch (e) {
+        if (!e.code) {
+          req.session.status = 500;
+        } else {
+          req.session.status = e.code;
+        }
+        req.session.errorMessage = e.message;
+        res.redirect(`/user/dashboard/${req.user.username}/hotel_management`);
+      }
+    }
+  )
   .post(
     (req, res, next) => {
       if (!req.isAuthenticated()) {
