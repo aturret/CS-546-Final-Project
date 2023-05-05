@@ -166,7 +166,7 @@ export async function deleteAccount(username) {
         review: 1
 */
 //TODO: search hotel username order
-export async function searchOrder(username) {
+export async function searchOrder(userName, hotelName) {
 }
 
 export async function getOrder(username) {
