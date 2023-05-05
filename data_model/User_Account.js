@@ -165,6 +165,10 @@ export async function deleteAccount(username) {
         order_status: 1,
         review: 1
 */
+//TODO: search hotel username order
+export async function searchOrder(username) {
+}
+
 export async function getOrder(username) {
   username = helper.checkString(username, "username", true);
   const tempAccount = await Account();
@@ -236,7 +240,7 @@ export async function addOrder(...args) {
       `Could not update the account with id ${args.user_id}`,
       true
     );
-
+  
   //update room
   const tempRoom = await Room();
   const roomInfo = await tempRoom.findOneUpdate(
