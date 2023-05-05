@@ -1,4 +1,4 @@
-import {hotelReqs, mgrReqs} from '../config/mongoCollections.js';
+import {hotelReg, mgrReq} from '../Mongo_Connections/mongoCollections.js';
 import {ObjectId} from 'mongodb';
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";

@@ -2,7 +2,7 @@ import express from "express";
 import { Account } from "../Mongo_Connections/mongoCollections.js";
 import { Order } from "../Mongo_Connections/mongoCollections.js";
 import { Room } from "../Mongo_Connections/mongoCollections.js";
-import { Hotel } from "../Mongo_Connections/mongoCollections.js";
+import { hotelReg } from "../Mongo_Connections/mongoCollections.js";
 import { roomType } from "../Mongo_Connections/mongoCollections.js";
 import { mgrReq } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
@@ -99,7 +99,7 @@ export async function updateUser(username, set) {
 //delete account
 export async function deleteAccount(username) {
 
-  const username = helper.checkString(username, "username", true);
+  username = helper.checkString(username, "username", true);
   const tempAccount = await Account();
 
   //get orders
@@ -127,7 +127,7 @@ export async function deleteAccount(username) {
   }
 
   //delete reviews
-  const tempHotel = await Hotel();
+  const tempHotel = await hotelReg();
   let update_info = undefined;
   for (let i of reviews)
   {
@@ -138,7 +138,7 @@ export async function deleteAccount(username) {
   //update hotel if manager
   if(info.Identity === "manager")
   {
-    const tempHotel = await Hotel();
+    const tempHotel = await hotelReg();
     const update_info = await tempHotel.updateOne({_id: info.hotel_id}, {$pull: {manager: username}});
     if(update_info.modifiedCount === 0) throw CustomException(`Could not delete manager with username ${username}`, true);
   }
@@ -324,7 +324,7 @@ export async function getReview(username) {
 export async function addReview(order_id, hotel_id, user_id, review, rating) {
   //rating is 1-5 stars
   const tempOrder = await Order();
-  const tempHotel = await Hotel();
+  const tempHotel = await hotelReg();
   const tempReview = await Review();
 
   order_id = helper.checkId(order_id, true);
@@ -436,7 +436,7 @@ export async function updateReview(review_id, review, rating) {
 
   //update hotel rating
   const hotel_id = reviewInfo.hotel_id;
-  const tempHotel = await Hotel();
+  const tempHotel = await hotelReg();
   const hotel_reviews = await tempHotel.findOne({_id: ObjectId(hotel_id)}, {reviews: 1});
   if (hotelInfo.reviews.length === 0) throw CustomException(`Could not find hotel with id ${hotel_id}`, true);
   let sum = 0;
@@ -474,7 +474,7 @@ export async function deleteReview(review_id) {
 
   //delete review from hotel
   const hotel_id = reviewInfo.hotel_id;
-  const tempHotel = await Hotel();
+  const tempHotel = await hotelReg();
   const hotelInfo = await tempHotel.findOneUpdate({_id: ObjectId(hotel_id)}, {$pull: {reviews: review_id}});
   if (hotelInfo.lastErrorObject.n === 0) throw CustomException(`Could not update hotel with id ${hotel_id}`, true);
 
@@ -510,7 +510,7 @@ export async function createMgeReq(username, name, street, city, state, zip_code
   username = helper.checkString(username, "username", true);
   const tempAccount = await Account();
   const tempRequest = await mgrReq();
-  const tempHotel = await Hotel();
+  const tempHotel = await hotelReg();
 
   const userInfo = await tempAccount.findOne({ username: username }, { _id: 1 });
   if (userInfo === null) throw CustomException(`Could not find user with username ${username}`, true);

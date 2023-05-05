@@ -2,9 +2,9 @@
 import { Account } from "../Mongo_Connections/mongoCollections.js";
 import { Order } from "../Mongo_Connections/mongoCollections.js";
 import { Room } from "../Mongo_Connections/mongoCollections.js";
-import { Hotel } from "../Mongo_Connections/mongoCollections.js";
+import { hotelReg } from "../Mongo_Connections/mongoCollections.js";
 import { roomType } from "../Mongo_Connections/mongoCollections.js";
-import { request } from "../Mongo_Connections/mongoCollections.js";
+import { mgrReq } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
@@ -12,7 +12,7 @@ import { Review } from "../Mongo_Connections/mongoCollections.js";
 import * as userFuncs from "./User_Account.js";
 
 export async function getAllHotels() {
-  const hotelCollection = await Hotel();
+  const hotelCollection = await hotelReg();
   let hotelList = await hotelCollection.find({}).toArray();
   hotelList = hotelList.map((element) => {
     element._id = element._id.toString();
@@ -23,7 +23,7 @@ export async function getAllHotels() {
 
 export async function getHotel(id) {
   id = helper.checkId(id, true);
-  const hotelCollection = await Hotel();
+  const hotelCollection = await hotelReg();
 
   let hotel = await hotelCollection.find({ _id: new ObjectId(id) });
 
@@ -62,7 +62,7 @@ export async function addHotel(...args) {
     : undefined;
   newHotel.reviews = [];
 
-  const tempHotel = await Hotel();
+  const tempHotel = await hotelReg();
   const insertInfo = await tempHotel.insertOne(newHotel);
   if (insertInfo.insertedCount === 0)
     throw CustomException("Insert hotel failed.", true);
@@ -102,7 +102,7 @@ export async function updateHotel(...args) {
     ? args[12].map((reviews) => helper.checkString(reviews, false))
     : [];
 
-  const tempHotel = await Hotel();
+  const tempHotel = await hotelReg();
   const updateInfo = await tempHotel.findOneUpdate(
     { _id: hotel_id },
     { $set: updateHotel },
@@ -116,7 +116,7 @@ export async function updateHotel(...args) {
 //delete hotel
 export async function deleteHotel(id) {
     id = helper.checkId(id, true);
-    const tempHotel = await Hotel();
+    const tempHotel = await hotelReg();
 
     const temp = await tempHotel.findOne({ _id: new ObjectId(id) }, {reviews: 1, room_types: 1, rooms: 1});
 
@@ -152,7 +152,7 @@ export async function deleteHotel(id) {
 }
 
 export async function hotelSearch(...args) {
-  const hotelCollection = await Hotel();
+  const hotelCollection = await hotelReg();
 
   let query = {};
   const name = helper.checkString(args[0], "hotel name", true);
@@ -193,7 +193,7 @@ export async function addRoomType(...args) {
   };
 
   //avoid duplicate room type
-  const tempHotel = await Hotel();
+  const tempHotel = await hotelReg();
   const tempRoomType = await RoomType();
   const rv = await tempRoomType.findOne({ hotel_id: hotel_id, name: name });
   if (rv) throw CustomException(`Room type ${name} already exists.`, true);
@@ -232,7 +232,7 @@ export async function checkRoomAvailability(...args) {
   const order_id = helper.checkId(args[4], true);
 
   //check if hotel exists
-  const tempHotel = await Hotel();
+  const tempHotel = await hotelReg();
   const hotelInfo = await tempHotel.findOne({ _id: hotel_id });
   if (!hotelInfo)
     throw CustomException(`Hotel with id ${hotel_id} does not exist.`, true);
@@ -278,7 +278,7 @@ export async function addRoom(...args) {
     const order = {};
 
     //check if hotel exists
-    const tempHotel = await Hotel();
+    const tempHotel = await hotelReg();
     const hotelInfo = await tempHotel.findOne({ _id: hotel_id });
     if (!hotelInfo) throw CustomException(`Hotel with id ${hotel_id} does not exist.`, true);
 
