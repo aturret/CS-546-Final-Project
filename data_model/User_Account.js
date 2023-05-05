@@ -4,7 +4,7 @@ import { Order } from "../Mongo_Connections/mongoCollections.js";
 import { Room } from "../Mongo_Connections/mongoCollections.js";
 import { hotelReg } from "../Mongo_Connections/mongoCollections.js";
 import { roomType } from "../Mongo_Connections/mongoCollections.js";
-import { Request } from "../Mongo_Connections/mongoCollections.js";
+import { mgrReq } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import * as helper from "../helper.js";
 import bcrypt from "bcryptjs";
@@ -547,7 +547,7 @@ export async function createRequest(...args) {
   : undefined;
 
   const tempAccount = await Account();
-  const tempRequest = await Request();
+  const tempRequest = await mgrReq();
   const tempHotel = await hotelReg();
 
   const userInfo = await tempAccount.findOne({ _id: args[9] }, { _id: 1 });

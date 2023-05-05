@@ -1,4 +1,4 @@
-import {Request} from '../Mongo_Connections/mongoCollections.js';
+import {mgrReq} from '../Mongo_Connections/mongoCollections.js';
 import {ObjectId} from 'mongodb';
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
@@ -114,7 +114,7 @@ export async function reqApprove(reqId, response) {
   let request = getReq(reqId);
   if (request.status !== 'pending') throw CustomException(`The request with ID ${reqId} is already closed`);
   
-  const reqCollection = await Request();
+  const reqCollection = await mgrReq();
   if (!response) {
     const requestUpdateInfo = await reqCollection.findOneUpdate(
       { _id: new ObjectId(reqId) },

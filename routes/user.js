@@ -630,10 +630,10 @@ router.route("/dashboard/:username/order_history/:order_id/add_review")
   }});
 
 //TODO: edit review
-router.route("/edit_review")
+router.route("/dashboard/:username/order_history/:order_id/edit_review")
 .patch(isAuth, async (req, res) => {
   try {
-  const review_id = helper.checkId(req.body.review_id, true);
+  const review_id = helper.checkId(req.params.review_id, true);
   const rating = req.body.rating;
   const comment = req.body.comment;
   const result = await userFuncs.editReview(review_id, rating, comment);
