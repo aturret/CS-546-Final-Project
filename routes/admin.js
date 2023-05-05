@@ -130,6 +130,27 @@ router
     return res.redirect("/dashboard/hotels");
   }
 });
+
+router
+  .route('/dashboard/users')
+  .get(isAuth, async (req, res) => {
+    res.render('searchUser', {});
+  })
+  .post(isAuth, async (req, res) => {
+    try {
+      const username = helper.checkString(req.body.username, "username", true);
+      const user = userFuncs.getUser(username);
+      res.render('rearchUserResult', { user: user });
+    } catch (e) {
+      if (!e.code) {
+        req.session.status = 500;
+      } else {
+        req.session.status = e.code;
+      }
+      req.session.errorMessage = e.message;
+      return res.redirect("/dashboard/users");
+    }
+  });
     
 router
   .route('/dashboard/request/:id')
