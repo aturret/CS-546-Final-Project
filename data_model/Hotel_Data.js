@@ -32,6 +32,22 @@ export async function getHotel(id) {
   return hotel;
 }
 
+//get manager hotel
+export async function getMgrHotel(username) {
+  username = helper.checkString(username, "username", true);
+  const tempAccount = await Account();
+  const hotel = await tempAccount.findOne({ username: username }, { _id: 0, hotel: 1 });
+  if (!hotel) throw CustomException(`No hotel with username ${username}`, true);
+
+  //get hotel info
+  const hotelCollection = await hotelReg();
+  const hotelInfo = await hotelCollection.findOne({ _id: hotel.hotel});
+
+  if (!hotelInfo) throw CustomException(`No hotel with ID ${hotel.hotel}`, true);
+  hotelInfo._id = hotelInfo._id.toString();
+  return hotelInfo;
+}
+
 //need fix order for input
 export async function addHotel(...args) {
   const newHotel = {};
@@ -212,8 +228,8 @@ export async function getHotelReview(id) {
           _id: "$reviews._id",
           rating: "$reviews.rating",
           comment: "$reviews.comment",
-          upVote: "$reviews.upVote",
-          downVote: "$reviews.downVote",
+          upVote: "$reviews.upvote",
+          downVote: "$reviews.downvote",
           userAvatar: "$reviews.user.avatar"
         }
     }
