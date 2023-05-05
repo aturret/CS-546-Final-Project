@@ -1,0 +1,121 @@
+{{!--
+
+if cannot find a room fit the modified date, the server should return a 400 error
+order.guests should be the guests list of this order.
+Please assign a variable number as order.guests.number for each guest to render the guest input tags
+
+Please pass a number for the guest item to render the guest input and div tags.
+
+order has status: pending, completed, cancelled.
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+<h2>Search Result</h2>
+<div class="userOrders">
+    <div class="orderItem">
+        <div class="orderItemInfo">
+            <div class="hotelName"><a href="/hotel/{{hotelId}}">{{hotelName}}</a></div>
+            <div class="roomType">
+                <p>{{roomType}}</a></p>
+            </div>
+            <div class="orderPrice">
+                <p>{{orderPrice}}</p>
+            </div>
+            <div class="startDate">
+                <p>{{startDate}}</p>
+            </div>
+            <div class="endDate">
+                <p>{{endDate}}</p>
+            </div>
+            <div class="orderGuests">
+                <p>{{guest1.firstName}} {{guests1.lastName}}</p>
+                <p>{{guest2.firstName}} {{guests2.lastName}}</p>
+            </div>
+            <div class="orderStatus">
+                <p>{{status}}</p>
+            </div>
+        </div>
+        {{#if (eq status "pending")}}
+        <div class="editOrder">
+            <button class="editOrderButton" onclick="showEditOrderWindow()">Edit</button>
+            <div class="editOrderWindow" hidden="true">
+                <form action="/order/{{_id}}/edit" method="PATCH" id="editOrder-form" class="my-form">
+                    <div class="startDate">
+                        <input type="date" name="startDate" value="{{startDate}}">
+                        <label for="startDate">Start Date</label>
+                    </div>
+                    <div class="endDate">
+                        <input type="date" name="endDate" value="{{endDate}}">
+                        <label for="endDate">End Date</label>
+                    </div>
+                    <div class="orderGuests">
+                        {{#each guests}}
+                        <div class="guestItem" id="guest-1">
+                            <input type="text" name="guestFirstName-1">
+                            <label for="guestFirstName-1">Guest 1
+                                firstname</label>
+                            <input type="text" name="guestLastName-1">
+                            <label for="guestLastName-1">Guest 1
+                                lastname</label>
+                        </div>
+                        <div class="guestItem" id="guest-2">
+                            <input type="text" name="guestFirstName-2">
+                            <label for="guestFirstName-2">Guest 2
+                                firstname</label>
+                            <input type="text" name="guestLastName-2">
+                            <label for="guestLastName-2">Guest 2
+                                lastname</label>
+                        </div>
+                        {{/each}}
+                    </div>
+                    <button type="submit" class="editOrderButton">Edit</button>
+                </form>
+            </div>
+        </div>
+        <div class="cancelOrder">
+            <div class="cancelOrderWindow">
+                <form action="/order/{{orderId}}/cancel" method="PUT" id="cancelOrder-form" class="my-form">
+                    <button type="submit" class="cancelOrderButton">Cancel</button>
+                </form>
+            </div>
+        </div>
+        {{/if}}
+        {{#if (eq status "completed")}}
+        <div class="addReview">
+            <p>You have completed this order but had no reviews on it. Please write your review to give other tourists a
+                guide!</p>
+            <div class="addReviewButton">
+                <button id="addReviewButton" onclick="addReview()">
+                    Add Review
+                </button>
+            </div>
+            <div hidden="true" id="addReviewWindow">
+                <form action="/reviews" method="POST">
+                    <label for="reviewTitle">Title</label>
+                    <input type="text" name="reviewTitle" placeholder="Title">
+                    <label for="reviewComment">Comment</label>
+                    <textarea name="reviewComment" placeholder="Comment"></textarea>
+                    <label for="reviewRating">Rating</label>
+                    <select name="reviewRating" id="reviewRating">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+        {{/if}}
+    </div>
+
+</div>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>

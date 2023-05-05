@@ -18,27 +18,27 @@ You can add a new key-value pair to the roomTypes collection, or you can just ca
         <li>
             <div class="searchResultItem">
                 <div class="roomTypePictures">
-                    {{#each roomTypes.pictures}}
-                    <img src="{{roomTypes.pictures}}" alt="roomTypePicture">
+                    {{#each this.pictures}}
+                    <img src="{{this.pictures}}" alt="roomTypePicture">
                     {{/each}}
                 </div>
                 <div class="roomTypeName">
-                    <p>{{roomTypes.name}}</p>
+                    <p>{{this.name}}</p>
                 </div>                
                 <div class="roomTypePrice">
-                    <p>{{roomTypes.roomTypePrice}}</p>
+                    <p>{{this.roomTypePrice}}</p>
                 </div>
             </div>
             {{#if roomTypeDeletableStatus}}
             <div class="deleteRoomType">
-                <form action="/hotel/{{hotelId}}/roomType/{{roomTypes.id}}" method="DELETE" id="deleteRoomType-form" class="my-form">
+                <form action="/hotel/{{hotelId}}/roomType/{{this._id}}" method="DELETE" id="deleteRoomType-form" class="my-form">
                     <input type="hidden" name="hotelId" value="{{hotelId}}">
                     <button type="submit" id="deleteRoomType-button">Delete</button>
                 </form>
             </div>
             {{/if}}
             <div class="editRoomType">
-                <form action="/hotel/{{hotelId}}/roomType/{{roomTypes.id}}" method="PATCH" id="editRoomType-form" class="my-form">
+                <form action="/hotel/{{hotelId}}/roomType/{{this._id}}" method="PATCH" id="editRoomType-form" class="my-form">
                     <label for="roomTypeName" id="roomTypeName-label">
                         Room Type:
                     </label>

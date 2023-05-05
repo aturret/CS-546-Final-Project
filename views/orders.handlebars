@@ -16,7 +16,7 @@ order has status: pending, completed, cancelled.
 </div>
 {{/if}}
 <h2>Search Result</h2>
-<div class="searchResult">
+<div class="userOrders">
     <ol>
         {{#each order}}
         <li>
@@ -24,7 +24,7 @@ order has status: pending, completed, cancelled.
                 <div class="orderItemInfo">
                     <div class="hotelName"><a href="/hotel/{{hotelId}}">{{hotelName}}</a></div>
                     <div class="roomType">
-                        <p>{{roomType}}</p>
+                        <p><a href="/order/{{_id}}">{{roomType}}</a></p>
                     </div>
                     <div class="orderPrice">
                         <p>{{orderPrice}}</p>
@@ -35,62 +35,17 @@ order has status: pending, completed, cancelled.
                     <div class="endDate">
                         <p>{{endDate}}</p>
                     </div>
-                    <div class="orderGuests">
-                        {{#each guests}}
-                        <p>{{guests.number}}. {{guests.firstName}} {{guests.lastName}}</p>
-                        {{/each}}
+                    <div class="orderGuests">                        
+                        <p>{{guest1.firstName}} {{guests1.lastName}}</p>
+                        <p>{{guest2.firstName}} {{guests2.lastName}}</p>
                     </div>
                     <div class="orderStatus">
                         <p>{{status}}</p>
                     </div>
-                </div>
-                {{#if (eq status "pending")}}
-                <div class="editOrder">
-                    <button class="editOrderButton" onclick="showEditOrderWindow()">Edit</button>
-                    <div class="editOrderWindow" hidden="true">
-                        <form action="/order/{{_id}}/edit" method="PATCH" id="editOrder-form"
-                            class="my-form">
-                            <div class="startDate">
-                                <input type="date" name="startDate" value="{{startDate}}">
-                                <label for="startDate">Start Date</label>
-                            </div>
-                            <div class="endDate">
-                                <input type="date" name="endDate" value="{{endDate}}">
-                                <label for="endDate">End Date</label>
-                            </div>
-                            <div class="orderGuests">                            
-                            {{#each guests}}
-                            <div class="guestItem" id="guest-{{guests.number}}">
-                                <input type="text" name="guestFirstName-{{guests.number}}">
-                                <label for="guestFirstName-{{guests.number}}">Guest {{.guests.number}}
-                                    firstname</label>
-                                <input type="text" name="guestLastName-{{guests.number}}">
-                                <label for="guestLastName-{{guests.number}}">Guest {{guests.number}}
-                                    lastname</label>
-                                <button type="button" onclick="removeGuest({{guests.number}})">Remove</button>
-                            </div>
-                            {{/each}}
-                            <button type="button" onclick="addGuest()">Add Guest</button>
-                            </div>
-                            <button type="submit" class="editOrderButton">Edit</button>
-                        </form>
-                    </div>
-                </div>
-                <div class="cancelOrder">
-                    <div class="cancelOrderWindow">
-                        <form action="/order/{{orderId}}/cancel" method="PATCH" id="cancelOrder-form"
-                            class="my-form">
-                            <button type="submit" class="cancelOrderButton">Cancel</button>
-                        </form>
-                    </div>
-                </div>
-                {{/if}}
-                {{#if (eq status "completed")}}
-                <a href="/hotel/{{hotel}}">Have a review on it!</a>
-                {{/if}}
+                </div>             
             </div>
         </li>
-        {{/each}}
+       {{/each}}
     </ol>
 </div>
 <div class="error" id="client">

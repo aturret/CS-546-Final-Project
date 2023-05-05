@@ -1,0 +1,59 @@
+{{!--
+
+registration handelbars
+
+--}}
+{{!--
+<script src="../public/js/lab10.js"></script> --}}
+{{#if error}}
+<div class="error">
+    <p>Error code{{status_code}}: {{error}}</p>
+</div>
+{{/if}}
+<div class="searchUsers">
+    <h2>Search Users</h2>
+    <form action="/admin/account" method="GET" id="searchUsers-form" class="my-form">
+        <label for="username" id="username-label">
+            Search user by username:
+        </label>
+        <input type="text" name="username" id="username"></input>
+        <button type="submit" id="searchUsers-button">Search</button>
+    </form>
+</div>
+<div class="newUser">
+    <p>Create a new user.</p>
+    <form action="/admin/account" method="POST" id="registration-form" class="my-form">
+        <label for="username" id="username-label">
+            Username:
+        </label>
+        <input type="text" name="username" id="username"></input>
+        <label for="firstNameInput" id="firstNameInput-label">
+            First Name:
+        </label>
+        <input type="text" name="firstNameInput" id="firstNameInput"></input>
+        <label for="lastNameInput" id="lastNameInput-label">
+            Last Name:
+        </label>
+        <input type="text" name="lastNameInput" id="lastNameInput"></input>
+        <label for="emailAddressInput" id="emailAddressInput-label">
+            Email:
+            <input type="email" name="emailAddressInput" id="emailAddressInput"></input>
+        </label>
+        <label>
+            Phone:
+            <input type="phone" name="phone" id="phone"></input>
+        </label>
+        <label for="passwordInput" id="passwordInput-label">
+            Password:
+            <input type="password" name="passwordInput" id="passwordInput"></input>
+        </label>
+        <label for="confirmPasswordInput" id="confirmPasswordInput-label">
+            Confirm Password:
+        </label>
+        <input type="password" name="confirmPasswordInput" id="confirmPasswordInput"></input>
+        <button type="submit" id="register-button">Register</button>
+    </form>
+</div>
+<p class="error" id="client">
+    {{errorMessage}}
+</p>

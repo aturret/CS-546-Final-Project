@@ -1,0 +1,49 @@
+{{!--
+
+roomTypes: Please pass all roomTpyes when rendering this template.
+
+--}}
+
+{{#if error}}
+<div class="error">
+    <p>Error code {{statusCode}}: {{error}}</p>
+</div>
+{{/if}}
+<h2>Welcome, powerful admin.</h2>
+<div class="adminFunctions">
+    
+    <ol>
+        {{#each applications}}
+        <li>
+            <div class="applicationItem">
+                <div class="applicationName">
+                    <p>{{applications.applicationName}}</p>
+                </div>
+                <div class="applicationStatus">
+                    <p>{{applications.applicationStatus}}</p>
+                </div>
+            </div>
+            {{#if (eq applications.applicationStatus "pending")}}
+            <div class="approveApplication">
+                <form action="/hotel/{{hotelId}}/application/{{applications.applicationId}}/approve" method="POST">
+                    <input type="hidden" name="applicationId" value="{{applications.applicationId}}">
+                    <input type="hidden" name="applicationUserId" value="{{applications.applicationUserId}}">
+                    <button type="submit">Approve</button>
+                </form>
+            </div>
+            <div class="denyApplication">
+                <form action="/hotel/{{hotelId}}/application/{{applications.applicationId}}/reject" method="POST">
+                    <input type="hidden" name="applicationId" value="{{applications.applicationId}}">
+                    <input type="hidden" name="applicationUserId" value="{{applications.applicationUserId}}">
+                    <button type="submit">Deny</button>
+                </form>
+            {{/if}}
+        </li>
+        {{/each}}
+    </ol>
+
+</div>
+</div>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>

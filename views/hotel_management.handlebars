@@ -69,8 +69,19 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
         </div>
         <a href="/hotel/{{hotelId}}/room">Edit Hotel Rooms</a>
         <a href="/hotel/{{hotelId}}/roomType">Edit Hotel Rooms Types</a>
+        <a href="/hotel/{{hotelId}}/orders">Edit Hotel Reviews</a>
     </div>
-
+    {{if (eq user.userIdentity "admin")}}
+    <div class="delete">
+        <button id="deleteHotelButton" onclick="deleteHotel()">Delete Hotel</button>
+        <div hidden="true" id="deleteHotelWindow">
+            <form action="/hotel/{{hotelId}}" method="DELETE" id="deleteHotelForm" class="my-form">
+                <input type="hidden" name="hotelId" value="{{hotelId}}">
+                <button type="submit">Confirm Delete</button>
+            </form>
+        </div>
+    </div>
+    {{/if}}
 </div>
 <div class="error" id="client">
     <p id="client-error"></p>

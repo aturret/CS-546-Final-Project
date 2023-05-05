@@ -14,6 +14,11 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
     <p>Error code {{statusCode}}: {{error}}</p>
 </div>
 {{/if}}
+{{#if (or(eq user.hotelId hotelId)(eq user.identity "admin"))}}
+<div class="management">
+    <p><a href="/hotel/{{hotelId}}/hotel_management"></a></p>
+</div>
+{{/if}}
 <h2>{{hotelName}}</h2>
 <div class="hotelInfo">
     <div class="hotelBasicInfo">
@@ -78,7 +83,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
                 </form>
             </div>
         </div>
-        {{else}}        
+        {{else}}
         <div class="addReview">
             <div class="addReviewButton">
                 <button id="addReviewButton" onclick="addReview()">
@@ -111,7 +116,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
                     <div class="reviewUserItem">
                         <div class="reviewUserPhoto"><img src="{{userAvatar}}"></div>
                         <div class="reviewUserName">
-                            <p>{{reviews.userName}}</p>
+                            <p>{{this.userName}}</p>
                         </div>
                     </div>
                     <div class="reviewContentItem">

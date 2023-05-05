@@ -1,0 +1,26 @@
+{{!--
+
+registration handelbars
+
+--}}
+{{!--
+<script src="../public/js/lab10.js"></script> --}}
+{{#if error}}
+<div class="error">
+    <p>Error code{{status_code}}: {{error}}</p>
+</div>
+{{/if}}
+<div class="searchAccountResult">
+    {{#each accounts}}
+    <div class="searchAccountResultItem">
+        <div class="username"><p><a href="">{{this.username}}</a></p></div>
+        <div class="firstName"><p>{{this.firstName}}</p></div>
+        <div class="lastName"><p>{{this.lastName}}</p></div>
+        <div class="emailAddress"><p>{{this.emailAddress}}</p></div>
+        <div class="phone"><p>{{this.phone}}</p></div>
+    </div>
+    {{/each}}
+</div>
+<p class="error" id="client">
+    {{errorMessage}}
+</p>
