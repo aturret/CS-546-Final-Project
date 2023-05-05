@@ -40,22 +40,18 @@ router
   })
 
 router
-  .route('/account')
-  .get()
+  .route('/requests')
+  .get(isAdmin, async (req, res) => {
+    const reqList = adminFuncs.getAllReq();
+    res.render('requests', { reqList: reqList });
+  })
 
 router
-  .route('/dashboard/request')
-  .get(isAdmin, async (req, res) => {
-    const reqList = adminFuncs.getAllMgrReq();
-    res.render('request', { reqList: reqList });
-  });
-    
-router
-  .route('/dashboard/request/:id')
+  .route('/request/:requestId')
   .get(isAdmin, async (req, res) => {
     try {
-      const id = helper.checkId(req.params.id, "id", true);
-      const request = adminFuncs.getMgrReq(id);
+      const requestId = helper.checkId(req.params.requestId, true);
+      const request = adminFuncs.getReq(requestId);
       res.render('requestById', { request: request });
     } catch (e) {
       if (!e.code) {
@@ -64,15 +60,16 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      return res.redirect("/dashboard/request/:id");
+      return res.redirect("/request");
     }
   })
-  .put(isAdmin, async (req, res) => {
+  .post(isAdmin, async (req, res) => {
     try {
-      const id = helper.checkId(req.params.id, "id", true);
+      const requestId = helper.checkId(req.params.requestId, true);
       const response = req.body.response;
-      const message = adminFuncs.mgrReqApprove(id, response);
-      res.render('requestById', { message: message });
+      const message = adminFuncs.reqApprove(requestId, response);
+      const request = adminFuncs.getReq(requestId);
+      res.render('requestById', { request: request, message: message });
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -80,14 +77,14 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      return res.redirect("/dashboard/request/:id");
+      return res.redirect("/request/:requestId");
     }
   })
 
 router
-  .route('/dashboard/hotels')
+  .route('/hotels')
   .get(isAdmin, async (req, res) => {
-    res.render('adminHotelSearch', {});
+    res.render('landpage', {});
   })
   .post(isAdmin, async (req, res) => {
     const hotel_name = req.body.name;
@@ -101,24 +98,32 @@ router
     catch(e){
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      return res.redirect("/dashboard/hotels");
+      return res.redirect("hotels");
     }
   });
 
 router
-  .route('/dashboard/users')
+  .route('/account')
   .get(isAdmin, async (req, res) => {
     res.render('searchUser', {});
   })
+  .post(isAdmin, async (req, res) => {
+    try {
+      const username = helper.checkString(req.body.username, "username", true);
+      const user = userFuncs.getUser(username)
+      res.render('searchUserResult', { user: user });
+    } catch (e) {
+      
+    }
+  })
 
 router
-  .route('/dashboard/user/user_management')
+  .route('/account')
   .get(isAdmin, async (req, res) => {
     res.render('user_management', {});
   })
   .post(isAdmin, async (req, res) => {
     const user = req.body;
-    console.log(user);
     try {
       user.username = helper.checkString(user.username, "username", true);
       user.roleInput = helper
