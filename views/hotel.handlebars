@@ -45,7 +45,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
             <button type="submit">Search</button>
         </form>
     </div>
-    {{#else}}
+    {{else}}
     <div class="booking">
         <p>Please <a href="/register">log in</a> to book a room.</p>
     </div>
@@ -78,7 +78,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
                 </form>
             </div>
         </div>
-        {{#else}}
+        {{else}}        
         <div class="addReview">
             <div class="addReviewButton">
                 <button id="addReviewButton" onclick="addReview()">
@@ -109,32 +109,27 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
             <li>
                 <div class="reviewItem">
                     <div class="reviewUserItem">
-                        <div class="reviewUserPhoto"><img src="{{reviews.userAvatar}}"></div>
+                        <div class="reviewUserPhoto"><img src="{{userAvatar}}"></div>
                         <div class="reviewUserName">
                             <p>{{reviews.userName}}</p>
                         </div>
                     </div>
                     <div class="reviewContentItem">
-                        <div class="reviewTitle"><a href="/reviews/{{reviews.reviewId}}">{{reviews.reviewTitle}}</a>
+                        <div class="reviewTitle"><a href="/reviews/{{this._id}}">Edit this review</a>
                         </div>
                         <div class="reviewRating">
-                            <p>{{reviews.reviewRating}}</p>
+                            <p>{{this.rating}}</p>
                         </div>
                         <div class="reviewComment">
-                            <p>{{reviews.reviewComment}}</p>
+                            <p>{{this.comment}}</p>
                         </div>
                         <div class="reviewUpvote">
-                            <p>Upvote: {{reviews.reviewUpvote}}</p>
+                            <p>Upvote: {{this.upVote}}</p>
                         </div>
                         <div class="reviewDownvote">
-                            <p>Downvote: {{reviews.reviewDownvote}}</p>
+                            <p>Downvote: {{this.downVote}}</p>
                         </div>
                     </div>
-                    {{#if reviews.managerReply}}
-                    <div class="managerReply">
-                        <p>Manager reply: {{reviews.managerReply}}</p>
-                    </div>
-                    {{/if}}
                 </div>
             </li>
             {{/each}}

@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
-import {Order, Hotel, Room, roomType}from "../Mongo_Connections/mongoCollections.js";
+import {Order, hotelReg, Room, roomType}from "../Mongo_Connections/mongoCollections.js";
 const router = express.Router();
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
 
@@ -60,20 +60,16 @@ router
     console.log(user);
     try {
       user.username = helper.checkString(user.username, "username", true);
-      user.roleInput = helper
-        .checkString(user.roleInput, "identity", true)
-        .toLowerCase();
-      if (["manager", "user", "admin"].every((obj) => obj !== user.roleInput))
-        throw CustomException("Invalid identity.", true);
+      
       user.avatar = user.avatar
         ? helper.checkWebsite(user.avatar, true)
         : undefined;
-      user.firstNameInput = helper.checkString(
+      user.firstNameInput = helper.checkNameString(
         user.firstNameInput,
         "first name",
         true
       );
-      user.lastNameInput = helper.checkString(
+      user.lastNameInput = helper.checkNameString(
         user.lastNameInput,
         "last name",
         true
@@ -83,7 +79,7 @@ router
       user.emailAddressInput = helper.checkEmail(user.emailAddressInput, true);
 
       const newUser = await userFuncs.create(
-        user.roleInput,
+        'user',
         user.username,
         user.avatar,
         user.firstNameInput,
@@ -107,7 +103,7 @@ router
 
 router.route("/dashboard/:username").get(isAuth, async (req, res) => {
   try {
-    req.user.username = helper.checkString(req.user.username, true);
+    req.user.username = helper.checkString(req.user.username, "username", true);
     const user = await userFuncs.getUser(req.user.username);
     if (req.session && req.session.errorMessage) {
       user.errorMessage = req.session.errorMessage;
@@ -133,7 +129,7 @@ router
   .route("/dashboard/:username/check_password")
   .post(isAuth, async (req, res) => {
     try {
-      req.user.username = helper.checkString(req.user.username, true);
+      req.user.username = helper.checkString(req.user.username, "username", true);
       const user = await userFuncs.getUser(req.user.username);
       req.body.password = helper.checkPassword(req.body.password, true);
       let match = false;
@@ -161,19 +157,18 @@ router
   .route("/dashboard/:username/edit_info")
   .patch(isAuth, async (req, res) => {
     try {
-      req.user.username = helper.checkString(req.user.username, true);
       req.body.username = helper.checkString(
         req.body.username,
         "username",
         true
       );
       req.body.avatar = helper.checkWebsite(req.body.avatar, true);
-      req.body.firstName = helper.checkString(
+      req.body.firstName = helper.checkNameString(
         req.body.firstName,
         "first name",
         true
       );
-      req.body.lastName = helper.checkString(
+      req.body.lastName = helper.checkNameString(
         req.body.lastName,
         "last name",
         true
@@ -207,9 +202,24 @@ router
   .route("/dashboard/:username/upgrade")
   .post(isAuth, async (req, res) => {
     try {
-      req.user.username = helper.checkString(req.user.username, true);
-      const request = await userFuncs.createRequest(req.user.username);
-      req.flash("success_msg", "Your request has been sent to admin");
+      req.user.username = helper.checkString(req.user.username, "username", true);
+      req.user.name = helper.checkString(req.user.name, "name", true);
+      req.user.street = helper.checkString(req.user.street, "street", true);
+      req.user.city = helper.checkString(req.user.city, "city", true);
+      req.user.state = helper.checkString(req.user.state, "state", true);
+      req.user.zip_code = helper.checkZip(req.user.zip_code, "zip_code", true);
+
+      const args = [
+        req.user.username,
+        req.user.name,
+        req.user.street,
+        req.user.city,
+        req.user.state,
+        req.user.zip_code
+      ];
+
+      const requestMessage = await userFuncs.createMgeReq(args);
+      req.flash(requestMessage);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
       if (!e.code) {
@@ -379,6 +389,79 @@ async (req, res) => {
     res.redirect(`/user/dashboard/${req.user.username}/bookings`);
   }
 });
+
+
+/*-----------------------------------------Review------------------------------------------------------*/
+//dont know if needed. Get all review for a user
+router.route("/dashboard/:username/reviews")
+.get(isAuth, async (req, res) => {
+  try{
+    const username = helper.checkUserName(req.params.username, true)
+    const reviews = await userFuncs.getReview(username)
+    if (!reviews) throw new CustomException("Review not found", true);
+    return res.status(200).render("review", {review: reviews})
+  }
+  catch (e) {
+    if (!e.code) {
+      req.session.status = 500;
+    } else {
+      req.session.status = e.code;
+    }
+    req.session.errorMessage = e.message;
+    res.redirect(`/user/dashboard/${req.user.username}/bookings`);
+}});
+//add review
+router.route("/add_review")
+.post(isAuth, async (req, res) => {
+  try { 
+    const rating = req.body.rating
+    const comment = req.body.comment
+    const review_id = helper.checkId(req.body.review_id, true)
+    const result = await userFuncs.addReview(review_id, rating, comment)
+    if (!result) throw new CustomException("Review not found", true);
+    req.flash(result);
+    return res.status(200).redirect(`/user/dashboard/${req.user.username}/bookings`);
+  } catch (e) {
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    const previousUrl = req.headers.referer || `/user/dashboard/${req.user.username}/bookings`;
+    res.redirect(previousUrl);
+  }});
+
+//TODO: edit review
+router.route("/edit_review")
+.patch(isAuth, async (req, res) => {
+  try {
+  const review_id = ObjectId(helper.checkId(req.body.review_id, true));
+  const rating = req.body.rating;
+  const comment = req.body.comment;
+  const result = await userFuncs.editReview(review_id, rating, comment);
+  if (!result) throw new CustomException("Review not found", true);
+  req.flash(result);
+  return res.status(200).redirect(`/user/dashboard/${req.user.username}/bookings`);
+  } catch (e) {
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    const previousUrl = req.headers.referer || `/user/dashboard/${req.user.username}/bookings`;
+    res.redirect(previousUrl);
+  }
+})
+//TODO: delete review
+.delete(isAuth, async (req, res) => {
+  try {
+    const review_id = ObjectId(helper.checkId(req.body.review_id, true));
+    const result = await userFuncs.deleteReview(review_id);
+    if (!result) throw new CustomException("Review not found", true);
+    req.flash(result);
+    return res.status(200).redirect(`/user/dashboard/${req.user.username}/bookings`);
+  } catch (e) {
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    const previousUrl = req.headers.referer || `/user/dashboard/${req.user.username}/bookings`;
+    res.redirect(previousUrl);
+  }
+});
+
 
 
 export default router;

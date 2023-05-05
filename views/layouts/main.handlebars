@@ -25,7 +25,7 @@ There are four types of identities: "guest", "user", "manager", "admin".
                     {{#if (eq user.identity "guest")}}
                     <li><a href="/login">Login</a></li>
                     <li><a href="/register">Register</a></li>
-                    {{#else}}                  
+                    {{else}}                  
                     <li><a href="/dashboard">Dashboard</a></li>
                     <li><a href="/logout">Logout</a></li>
                     {{/if}}
