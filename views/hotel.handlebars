@@ -31,21 +31,20 @@ userHasReviewed: Please pass this boolean variable to the template to determine 
     </div>
     {{#if hotelRoom}}
     <div class="hotelRoom">
-        <p>{{remainingHotelRooms}} rooms for this hotel are available, click the button to book now!</p>
         <div class="roomsInfo">
             <ul>
                 {{#each roomType}}
                 <li>
                     <div class="roomItem">
-                        <div class="roomPhoto"><img src="{{roomPhoto}}"></div>
+                        <div class="roomPhoto"><img src="{{this.pictures}}"></div>
                         <div class="roomInfo">
                             <div class="roomTypeName">
-                                <p>{{roomTypeName}}</p>
+                                <p>{{this.name}}</p>
                             </div>
                             <div class="roomPrice">
-                                <p>Price: {{roomPrice}}</p>
+                                <p>Price: {{this.price}}</p>
                             </div>
-                            <div class="roomBook"><a href="{{hotelId}}/{{roomTypeId}}">Book</a></div>
+                            <div class="roomBook"><a href="{{hotelId}}/{{this._id}}">Book</a></div>
                         </div>
                     </div>
                 </li>
@@ -65,15 +64,15 @@ userHasReviewed: Please pass this boolean variable to the template to determine 
         <li>
             <div class="reviewItem">
                 <div class="reviewUserItem">
-                    <div class="reviewUserPhoto">{{userAvatar}}</div>
+                    <div class="reviewUserPhoto">{{this.userAvatar}}</div>
                 </div>
                 <div class="reviewContentItem">
-                    <div class="reviewTitle"><a href="/reviews/{{reviewId}}">{{reviewTitle}}</a></div>
+                    <div class="reviewTitle"><a href="/reviews/{{this._id}}"></a></div>
                     <div class="reviewRating">
-                        <p>{{reviewRating}}</p>
+                        <p>{{this.rating}}</p>
                     </div>
                     <div class="reviewComment">
-                        <p>{{reviewComment}}</p>
+                        <p>{{this.comment}}</p>
                     </div>
                 </div>
                 {{#if managerReply}}
@@ -135,7 +134,7 @@ userHasReviewed: Please pass this boolean variable to the template to determine 
             <button type="submit">Search</button>
         </form>
     </div>
-    {{#else}}
+    {{else}}
     <div class="booking">
         <p>Please <a href="/register">log in</a> to book a room.</p>
     </div>
@@ -164,7 +163,7 @@ userHasReviewed: Please pass this boolean variable to the template to determine 
                 </form>
             </div>
         </div>
-        {{#else}}        
+        {{else}}        
         <div class="addReview">
             <div class="addReviewButton">
                 <button class="addReview" onclick="addReview()">
@@ -192,22 +191,22 @@ userHasReviewed: Please pass this boolean variable to the template to determine 
             <li>
                 <div class="reviewItem">
                     <div class="reviewUserItem">
-                        <div class="reviewUserPhoto">{{reviews.userAvatar}}</div>
+                        <div class="reviewUserPhoto">{{userAvatar}}</div>
                     </div>
                     <div class="reviewContentItem">
-                        <div class="reviewTitle"><a href="/reviews/{{reviews.reviewId}}">{{reviews.reviewTitle}}</a>
+                        <div class="reviewTitle"><a href="/reviews/{{this._id}}">Edit this review</a>
                         </div>
                         <div class="reviewRating">
-                            <p>{{reviews.reviewRating}}</p>
+                            <p>{{this.rating}}</p>
                         </div>
                         <div class="reviewComment">
-                            <p>{{reviews.reviewComment}}</p>
+                            <p>{{this.comment}}</p>
                         </div>
                         <div class="reviewUpvote">
-                            <p>Upvote: {{reviews.reviewUpvote}}</p>
+                            <p>Upvote: {{this.upVote}}</p>
                         </div>
                         <div class="reviewDownvote">
-                            <p>Downvote: {{reviews.reviewDownvote}}</p>
+                            <p>Downvote: {{this.downVote}}</p>
                         </div>
                     </div>
                     {{#if managerReply}}

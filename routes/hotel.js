@@ -57,7 +57,32 @@ router
 
     //TODO: get hotel information
     //get hotel information
-    const hotelInfo = await hotelFuncs.getHotel();
+    try{
+      const hotel = await hotelFuncs.getHotel(hotel_id);
+      const hotelInfo = {};
+      hotelInfo.hotelId = hotel.hotel_id;
+      hotelInfo.hotelName = hotel.hotel_name;
+      hotelInfo.hotelPhoto = hotel.pictures;
+      hotelInfo.hotelRating = hotel.rating;
+      hotelInfo.hotelAddress = hotel.address + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip;
+      hotelInfo.hotelPhone = hotel.phone;
+      hotelInfo.hotelEmail = hotel.email;
+      hotelInfo.roomType = hotel.room_type;
+      //get hotel room
+      const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
+      hotelInfo.roomType = roomTypes;
+
+      //get hotel review
+      const reviews = await hotelFuncs.getHotelReview(hotel_id);
+      hotelInfo.reviews = reviews;
+      if (errorMessage)
+      {
+        hotelInfo.errorMessage = errorMessage;
+        return res.status(status).render("hotel", hotelInfo);
+      };
+      return res.status(status).render("hotel", hotelInfo);
+    }
+
 
     if (errorMessage) return res.status(status).render("hotel", { errorMessage: errorMessage });
     return res.status(status).render("hotelDetail");
