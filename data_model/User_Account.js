@@ -88,7 +88,7 @@ export async function updateUser(username, set) {
   }
   const userInfo = await tempAccount.findOneUpdate(
     { username: username },
-    { $set, set },
+    { $set: set },
     { returnDocument: "after" }
   );
   if (userInfo.lastErrorObject.n === 0)
@@ -559,7 +559,7 @@ export async function createRequest(...args) {
       street: args[1],
       city: args[2],
       state: args[3],
-      zip_code: args[4]
+      zip_code: args[4],
     }, 
     { _id: 1 });
   if (hotelInfo !== null) throw CustomException('Hotel exist', true);

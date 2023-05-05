@@ -82,27 +82,6 @@ router
   })
 
 router
-  .route('/hotels')
-  .get(isAdmin, async (req, res) => {
-    res.render('landpage', {});
-  })
-  .post(isAdmin, async (req, res) => {
-    const hotel_name = req.body.name;
-    const hotel_city = req.body.city;
-    const hotel_state = req.body.state;
-    const hotel_zip = req.body.zip;
-    try{
-      const result = await hotelFuncs.searchHotel(hotel_name, hotel_city, hotel_state, hotel_zip);
-      return res.render("searchHotelResult", { hotels: result });
-    }
-    catch(e){
-      req.session.status = e.code ? e.code : 500;
-      req.session.errorMessage = e.message;
-      return res.redirect("hotels");
-    }
-  });
-
-router
   .route('/account')
   .get(isAdmin, async (req, res) => {
     res.render('searchUser', {});
@@ -113,7 +92,13 @@ router
       const user = userFuncs.getUser(username)
       res.render('searchUserResult', { user: user });
     } catch (e) {
-      
+      if (!e.code) {
+        req.session.status = 500;
+      } else {
+        req.session.status = e.code;
+      }
+      req.session.errorMessage = e.message;
+      return res.redirect("/account");
     }
   })
 
@@ -123,40 +108,42 @@ router
     res.render('user_management', {});
   })
   .post(isAdmin, async (req, res) => {
-    const user = req.body;
+    const input = req.body;
     try {
-      user.username = helper.checkString(user.username, "username", true);
-      user.roleInput = helper
-        .checkRole(user.roleInput, "identity", true)
+      input.username = helper.checkString(input.username, "username", true);
+      input.roleInput = helper
+        .checkRole(input.roleInput, "identity", true)
         .toLowerCase();
-      if (["manager", "user", "admin"].every((obj) => obj !== user.roleInput))
+      if (["manager", "user", "admin"].every((obj) => obj !== input.roleInput))
         throw CustomException("Invalid identity.", true);
-      user.avatar = user.avatar
-        ? helper.checkWebsite(user.avatar, true)
+        input.avatar = input.avatar
+        ? helper.checkWebsite(input.avatar, true)
         : undefined;
-      user.firstNameInput = helper.checkNameString(
-        user.firstNameInput,
+        input.firstNameInput = helper.checkNameString(
+          input.firstNameInput,
         "first name",
         true
       );
-      user.lastNameInput = helper.checkNameString(
-        user.lastNameInput,
+      input.lastNameInput = helper.checkNameString(
+        input.lastNameInput,
         "last name",
         true
       );
-      user.phone = user.phone ? helper.checkPhone(user.phone, true) : undefined;
-      user.passwordInput = helper.checkPassword(user.passwordInput, true);
-      user.emailAddressInput = helper.checkEmail(user.emailAddressInput, true);
-
+      input.phone = input.phone ? helper.checkPhone(input.phone, true) : undefined;
+      input.passwordInput = helper.checkPassword(input.passwordInput, true);
+      input.emailAddressInput = helper.checkEmail(input.emailAddressInput, true);
+      
+      
+        
       const newUser = await userFuncs.create(
-        user.roleInput,
-        user.username,
-        user.avatar,
-        user.firstNameInput,
-        user.lastNameInput,
-        user.phone,
-        user.passwordInput,
-        user.emailAddressInput
+        input.roleInput,
+        input.username,
+        input.avatar,
+        input.firstNameInput,
+        input.lastNameInput,
+        input.phone,
+        input.passwordInput,
+        input.emailAddressInput
       );
 
       return res.redirect("/dashboard/user/user_management");
@@ -169,44 +156,8 @@ router
       req.session.errorMessage = e.message;
       return res.redirect("/dashboard/users");
     }
-  });
-
-router
-  .route('/dashboard/users/:username')
-  .get(isAdmin, async (req, res) => {
-    try {
-      const username = helper.checkString(req.params.username, "username", true);
-      const user = userFuncs.getUser(username);
-      res.render('rearchUserResult', { user: user });
-    } catch (e) {
-      if (!e.code) {
-        req.session.status = 500;
-      } else {
-        req.session.status = e.code;
-      }
-      req.session.errorMessage = e.message;
-      return res.redirect("/admin/dashboard/users");
-    }
   })
-
-router
-  .route('/dashboard/users/:username/update')
-  .get(isAdmin, async (req, res) => {
-    try {
-      const username = helper.checkString(req.params.username, "username", true);
-      const user = userFuncs.getUser(username);
-      res.render('updateUser', { user: user });
-    } catch (e) {
-      if (!e.code) {
-        req.session.status = 500;
-      } else {
-        req.session.status = e.code;
-      }
-      req.session.errorMessage = e.message;
-      return res.redirect("/admin/dashboard/users");
-    }
-  })
-  .patch(isAdmin, async (req, res) => {
+  .put(isAdmin, async (req, res) => {
     try {
       if (["manager", "user", "admin"].every((obj) => obj !== req.body.identity))
         throw CustomException("Invalid identity.", true);
@@ -242,24 +193,6 @@ router
 
       const updatedUser = await userFuncs.updateUser(req.user.username, set);
       return res.redirect(`/user/dashboard/${req.user.username}`);
-    } catch (e) {
-      if (!e.code) {
-        req.session.status = 500;
-      } else {
-        req.session.status = e.code;
-      }
-      req.session.errorMessage = e.message;
-      return res.redirect("/admin/dashboard/users");
-    }
-  })
-
-router
-  .route('/dashboard/users/:username/delete')
-  .get(isAdmin, async (req, res) => {
-    try {
-      const username = helper.checkString(req.params.username, "username", true);
-      const user = userFuncs.getUser(username);
-      res.render('deleteAccount', { user: user });
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
