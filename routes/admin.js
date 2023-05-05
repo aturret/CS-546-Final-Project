@@ -42,7 +42,7 @@ router
 router
   .route('/requests')
   .get(isAdmin, async (req, res) => {
-    const reqList = adminFuncs.getAllReq();
+    const reqList = await adminFuncs.getAllReq();
     res.render('requests', { reqList: reqList });
   })
 
@@ -51,7 +51,7 @@ router
   .get(isAdmin, async (req, res) => {
     try {
       const requestId = helper.checkId(req.params.requestId, true);
-      const request = adminFuncs.getReq(requestId);
+      const request = await adminFuncs.getReq(requestId);
       res.render('requestById', { request: request });
     } catch (e) {
       if (!e.code) {
@@ -67,9 +67,9 @@ router
     try {
       const requestId = helper.checkId(req.params.requestId, true);
       const response = req.body.response;
-      const message = adminFuncs.reqApprove(requestId, response);
-      const request = adminFuncs.getReq(requestId);
-      res.render('requestById', { request: request, message: message });
+      const message = await adminFuncs.reqApprove(requestId, response);
+      req.flash(message);
+      return res.redirect("/request");
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -89,7 +89,7 @@ router
   .post(isAdmin, async (req, res) => {
     try {
       const username = helper.checkString(req.body.username, "username", true);
-      const user = userFuncs.getUser(username)
+      const user = await userFuncs.getUser(username)
       res.render('searchUserResult', { user: user });
     } catch (e) {
       if (!e.code) {
@@ -108,6 +108,8 @@ router
     res.render('user_management', {});
   })
   .post(isAdmin, async (req, res) => {
+    const mgrName = req.user.username;
+
     const input = req.body;
     try {
       input.username = helper.checkString(input.username, "username", true);
@@ -116,11 +118,11 @@ router
         .toLowerCase();
       if (["manager", "user", "admin"].every((obj) => obj !== input.roleInput))
         throw CustomException("Invalid identity.", true);
-        input.avatar = input.avatar
+      input.avatar = input.avatar
         ? helper.checkWebsite(input.avatar, true)
         : undefined;
-        input.firstNameInput = helper.checkNameString(
-          input.firstNameInput,
+      input.firstNameInput = helper.checkNameString(
+        input.firstNameInput,
         "first name",
         true
       );
@@ -133,10 +135,8 @@ router
       input.passwordInput = helper.checkPassword(input.passwordInput, true);
       input.emailAddressInput = helper.checkEmail(input.emailAddressInput, true);
       
-      
-        
-      const newUser = await userFuncs.create(
-        input.roleInput,
+      const args = [
+        'user',
         input.username,
         input.avatar,
         input.firstNameInput,
@@ -144,9 +144,25 @@ router
         input.phone,
         input.passwordInput,
         input.emailAddressInput
-      );
+      ]
 
-      return res.redirect("/dashboard/user/user_management");
+      const newUserMessage = await userFuncs.create(args);
+
+      if (input.roleInput === 'manager') {
+        const hotel = {};
+        hotel.name = helper.checkString(input.name, "hotel name", true);
+        hotel.street = helper.checkString(input.street, "street", true);
+        hotel.city = helper.checkString(input.city, "city", true);
+        hotel.state = helper.checkString(input.state, "state", true);
+        hotel.zip_code = helper.checkZip(input.zip_code, true);
+
+        const addMgrMessage = await adminFuncs.addMgr(mgrName, input.username, hotel);
+        req.flash(addMgrMessage);
+        return res.redirect("/admin/account");
+      }
+
+      req.flash(newUserMessage);
+      return res.redirect("/admin/account");
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -206,7 +222,7 @@ router
   .delete(isAdmin, async (req, res) => {
     try {
       const username = helper.checkString(req.params.username, "username", true);
-      const deleteMessage = userFuncs.deleteAccount(username);
+      const deleteMessage = await userFuncs.deleteAccount(username);
       req.flash(deleteMessage)
       res.redirect("/admin/dashboard/users");
     } catch (e) {
