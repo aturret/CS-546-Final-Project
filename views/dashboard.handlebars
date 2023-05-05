@@ -6,35 +6,35 @@
 
 {{#if error}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <div class="Avatar">
-    <img src="{{userAvatar}}">
+    <img src="{{avatar}}" alt="thumbnail not available">
 </div>
-<h2>{{userName}}</h2>
+<h2>{{username}}</h2>
 <div class="information">
     <div class="userIdentity">
-        <p>Identity: {{user.userIdentity}}</p>
+        <p>Identity: {{identity}}</p>
     </div>
     <div class="userFirstName">
-        <p>First Name: {{userFirstName}}</p>
+        <p>First Name: {{firstName}}</p>
     </div>
     <div class="userLastName">
-        <p>Last Name: {{userLastName}}</p>
+        <p>Last Name: {{lastName}}</p>
     </div>
     <div class="userEmail">
-        <p>Email: {{userEmail}}</p>
+        <p>Email: {{email}}</p>
     </div>
     <div class="userPhone">
-        <p>Phone: {{userPhone}}</p>
+        <p>Phone: {{phone}}</p>
     </div>
 </div>
-{{#if (eq user.userIdentity "user")}}
+{{#if (eq user.identity "user")}}
 <div class="newApplication">
     <button id="newHotelButton" onclick="newHotel()">Start Hotel Registration</button>
     <div id="newHotelWindow" hidden="true">
-        <form action="/hotel" method="POST">
+        <form action="/user/dashboard/{{username}}/upgrade" method="POST">
             
             <label for="hotelName" id="hotelName-label">
                 Hotel Name:
@@ -43,7 +43,7 @@
             <label for="hotelPhoto" id="hotelPhoto-label">
                 Hotel Photo:
             </label>
-            <input type="file" name="hotelPhoto" id="hotelPhoto" value="{{hotelPhoto}}">
+            <input type="text" name="hotelPhoto" id="hotelPhoto" value="{{hotelPhoto}}">
             <div class="hotelContact">
                 <label for="hotelPhone" id="hotelPhone-label">
                     Hotel Phone:
@@ -73,7 +73,7 @@
                     Hotel Zip:
                 </label>
                 <input type="text" name="hotelZipcode" id="hotelZipcode" value="{{hotelZipcode}}">
-                <input type="hidden" name="userId" value="{{userId}}">
+                <input type="hidden" name="userId" value="{{_id}}">
                 <button type="submit" id="newApplication">Apply for a new hotel</button>
         </form>
     </div>
@@ -82,10 +82,10 @@
 {{/if}}
 <div class="functionMenu">
     <div class="functionItem"><a href="/order">My Orders</a></div>
-    {{#if (eq user.userIdentity "manager")}}
+    {{#if (eq user.identity "manager")}}
     <div class="functionItem"><a href="/hotel">My Hotel</a></div>
     {{/if}}
-    {{#if (eq user.userIdentity "admin")}}
+    {{#if (eq user.identity "admin")}}
     <div class="functionItem"><a href="/admin">Admin</a></div>
     {{/if}}
     <div class="functionItem"><a href="/logout">Log Out</a></div>

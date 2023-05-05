@@ -66,6 +66,9 @@ export async function getUser(username) {
 
   const tempAccount = await Account();
   const user = await tempAccount.findOne({ username: username });
+  if (!user) throw CustomException(`Could not find user with username ${username}`, true);
+
+  user._id = user._id.toString();
   return user;
   // let authenticate_result = false
   // authenticate_result = await bcrypt.compare(password, refPassword)
@@ -565,7 +568,6 @@ export async function createRequest(...args) {
   if (hotelInfo !== null) throw CustomException('Hotel exist', true);
 
   const newRequest = {
-    _id: new ObjectId(),
     username: userInfo.username,
     args: args,
     status: "pending"
@@ -576,4 +578,15 @@ export async function createRequest(...args) {
     throw CustomException(`Could not add the request.`, true);
 
   return { message: 'Request submit, wait for approval' };
+}
+
+//get request by username
+export async function getRequest(username) {
+  username = helper.checkString(username, "username", true);
+
+  const tempRequest = await mgrReq();
+  const requestInfo = await tempRequest.findOne({username: username});
+  if (requestInfo !== null) return false;
+
+  return true
 }
