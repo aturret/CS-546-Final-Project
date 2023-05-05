@@ -166,7 +166,19 @@ export async function deleteAccount(username) {
         review: 1
 */
 //TODO: search hotel username order
-export async function searchOrder(userName, hotelName) {
+export async function searchOrder(userName, hotel_id) {
+  userName = helper.checkString(userName, "username", true);
+  hotel_id = ObjectId(helper.checkId(hotel_id, true));
+  const tempAccount = await Account();
+
+  const user_id = tempAccount({username: userName}, {_id: 1});
+  if(!user_id) throw CustomException(`Could not find user with username ${userName}`, true);
+  
+  const tempOrder = await Order();
+  const orders = tempOrder.find({user_id: user_id, hotel_id: hotel_id}).toArray();
+  if(!orders) throw CustomException(`Could not find order with username ${userName} and hotel_id ${hotel_id}`, true);
+
+  return orders
 }
 
 export async function getOrder(username) {
