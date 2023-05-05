@@ -1,4 +1,4 @@
-import {mgrReqs} from '../Mongo_Connections/mongoCollections.js';
+import {Request} from '../Mongo_Connections/mongoCollections.js';
 import {ObjectId} from 'mongodb';
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
@@ -15,7 +15,7 @@ import * as userFuncs from "./User_Account.js";
 //   return reqList;
 // }
 
-export async function getAllMgrReq() {
+export async function getAllReq() {
   const mgrReqCollection = await mgrReqs();
   let reqList = await mgrReqCollection.find({}).toArray();
   reqList = reqList.map((element) => {
@@ -37,7 +37,7 @@ export async function getAllMgrReq() {
 //   return req;
 // }
 
-export async function getMgrReq(id) {
+export async function getReq(id) {
   id = helper.checkId(id, true);
 
   const mgrReqCollection = await mgrReqs();
@@ -75,30 +75,34 @@ export async function getMgrReq(id) {
 //   return { message: newHotelMessage + " Request approve" };
 // }
 
-export async function mgrReqApprove(id, response) {
-  let req = getMgrReq(id);
-  if (req.status !== 'pending') throw CustomException(`The request with ID ${id} is already closed`);
+export async function reqApprove(reqId, response) {
+  reqId = helper.checkId(reqId, true);
+  let request = getReq(reqId);
+  if (request.status !== 'pending') throw CustomException(`The request with ID ${reqId} is already closed`);
   
-  const mgrReqCollection = await mgrReqs();
+  const reqCollection = await Request();
   if (!response) {
-    const requestUpdateInfo = await mgrReqCollection.findOneUpdate(
-      { _id: new ObjectId(id) },
+    const requestUpdateInfo = await reqCollection.findOneUpdate(
+      { _id: new ObjectId(reqId) },
       { $set: { status: 'reject' } },
       { returnDocument: "after" }
     );
-    if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with id ${review_id}`, true);
+    if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with id ${reqId}`, true);
     return {message: "Request reject"};
   }
 
-  const newMgrMessage = userFuncs.updateUser(req.username, {
-    identity: 'manager'
-  })
+  const newMgrMessage = userFuncs.updateUser(
+    request.username, 
+    { identity: 'manager' }
+  )
 
-  const requestUpdateInfo = await mgrReqCollection.findOneUpdate(
-    { _id: ObjectId(id) },
+  const newHotelMessage = hotelFuncs.addHotel(request.args);
+
+  const requestUpdateInfo = await reqCollection.findOneUpdate(
+    { _id: ObjectId(reqId) },
     { $set: { status: 'approve' } },
     { returnDocument: "after" }
   );
-  if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with id ${review_id}`, true);
-  return { message: "Upgrate user to manager successfully. Request approve" };
+  if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with reqId ${reqId}`, true);
+  return { message: "Request approve. Add new hotel and upgrate user to manager successfully" };
 }

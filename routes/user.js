@@ -125,37 +125,22 @@ router.route("/dashboard/:username").get(isAuth, async (req, res) => {
 });
 
 //TODO: get route for dashboard/:username/order_history
-
-
-
-
-// require authentication for editing personal info
-router
-  .route("/dashboard/:username/check_password")
-  .post(isAuth, async (req, res) => {
-    try {
-      req.user.username = helper.checkString(req.user.username, "username", true);
-      const user = await userFuncs.getUser(req.user.username);
-      req.body.password = helper.checkPassword(req.body.password, true);
-      let match = false;
-      match = await bcrypt.compare(req.body.password, user.password);
-      if (match) {
-        return res.render("update_info", { username: req.user.username });
-      } else {
-        res.session.status = 403;
-        res.session.errorMessage = "Wrong password";
-        return res.redirect(`/user/dashboard/${req.user.username}`);
-      }
-    } catch (e) {
-      if (!e.code) {
-        req.session.status = 500;
-      } else {
-        req.session.status = e.code;
-      }
-      req.session.errorMessage = e.message;
-      res.redirect(`/user/dashboard/${req.user.username}`);
+router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) => {
+  try {
+    const username = helper.checkString(req.params.username, "username", true);
+    const user = await userFuncs.getUser(req.user.username);
+    const orders = await userFuncs.getOrder(username);
+    return res.status(200).render("order_history", { user: user, orders: orders });
+  } catch (e) {
+    if (!e.code) {
+      req.session.status = 500;
+    } else {
+      req.session.status = e.code;
     }
-  });
+    req.session.errorMessage = e.message;
+    return res.redirect("/user/register");
+  }
+});
 
 //TODO: ask which implementation is better
 router
@@ -429,9 +414,91 @@ router.route("/dashboard/:username/hotel_management").get(
       res.redirect(`/user/dashboard/${req.user.username}`);
     }
   }
+)
+.put(
+  (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.redirect("/user/login");
+    }
+    if (req.user && req.user.identity === "user") {
+      req.flash("You are not allow to access this page");
+      return res.redirect("/user/dashboard");
+    }
+    next();
+  },
+  async (req, res) => {
+    try {
+      const hotel_id = req.body.hotel_id;
+      const hotel_name = req.body.hotel_name;
+      const hotel_street = req.body.hotel_street;
+      const hotel_city = req.body.hotel_city;
+      const hotel_state = req.body.hotel_state;
+      const hotel_zip = req.body.hotel_zip;
+      const hotel_phone = req.body.hotel_phone;
+      const hotel_email = req.body.hotel_email;
+      const hotel_picture = req.body.hotel_picture;
+      const facilities = req.body.facilities;
+      const manager = req.body.manager;
+      const rooms = req.body.rooms;
+      const roomType = req.body.roomType;
+      const reviews = req.body.reviews;
+
+      const result = await hotelFuncs.updateHotel(
+        hotel_id,
+        hotel_name,
+        hotel_street,
+        hotel_city,
+        hotel_state,
+        hotel_zip,
+        hotel_phone,
+        hotel_email,
+        hotel_picture,
+        rooms,
+        facilities,
+        manager,
+        roomType,
+        reviews
+      );
+      req.flash(result);
+      return res.redirect(200).redirect("/hotel_management");
+    } catch (e) {
+      e.code = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      res.redirect("/hotel_management");
+    }
+  }
 );
 //add room type for the hotel, hotel mnr or admin only
-router.route("/hotel_management/add_room_type").post(
+router.route("/dashboard/:username/hotel_management/:hotel_id/room_type")
+.get((req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/user/login");
+  }
+  if (req.user && req.user.identity === "user") {
+    req.flash("You are not allow to access this page");
+    return res.redirect("/user/dashboard");
+  }
+  next();
+},
+async (req, res) => {
+  try {
+    const hotel_id = helper.checkId(req.params.hotel_id);
+    const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
+    return res.status(200).render("roomsTypes", roomTypes);
+  } catch (e) {
+    //customized error are thrown. if e.code exist its a customized error. Otherwise, its a server error.
+    if (!e.code) {
+      req.session.status = 500;
+    } else {
+      req.session.status = e.code;
+    }
+    req.session.errorMessage = e.message;
+    res.redirect(`/user/dashboard/${req.user.username}/hotel_management`);
+  }
+
+}
+)
+.post(
   (req, res, next) => {
     if (!req.isAuthenticated()) {
       return res.redirect("/user/login");
@@ -459,7 +526,7 @@ router.route("/hotel_management/add_room_type").post(
         rooms
       );
       req.flash({ successMessage: "Room type added successfully" });
-      return res.redirect(200).redirect("/hotel_management");
+      return res.redirect(200).redirect("/user/dashboard/:username/hotel_management/room_type");
     } catch (e) {
       e.code = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -469,7 +536,35 @@ router.route("/hotel_management/add_room_type").post(
 );
 //add room for the hotel, hotel mnr or admin only
 router
-  .route("/hotel_management/add_room")
+  .route("/hotel_management/:hotel_id/room")
+  .get(
+    (req, res, next) => {
+      if (!req.isAuthenticated()) {
+        return res.redirect("/user/login");
+      }
+      if (req.user && req.user.identity === "user") {
+        res.session.status = 403;
+        res.session.errorMessage = "You are not allow to access this page";
+        return res.redirect(`/user/dashboard/${req.user.username}`);
+      }
+      next();
+    },
+    async (req, res) => {
+      try {
+        const hotel_id = helper.checkId(req.params.hotel_id)
+        const rooms = await hotelFuncs.getHotelRoom(hotel_id);
+        return res.status(200).render("rooms", rooms);
+      } catch (e) {
+        if (!e.code) {
+          req.session.status = 500;
+        } else {
+          req.session.status = e.code;
+        }
+        req.session.errorMessage = e.message;
+        res.redirect(`/user/dashboard/${req.user.username}/hotel_management`);
+      }
+    }
+  )
   .post(
     (req, res, next) => {
       if (!req.isAuthenticated()) {
@@ -495,62 +590,7 @@ router
         res.redirect("/hotel_management");
       }
     }
-  )
-  //TODO: edit hotel information
-  .put(
-    (req, res, next) => {
-      if (!req.isAuthenticated()) {
-        return res.redirect("/user/login");
-      }
-      if (req.user && req.user.identity === "user") {
-        req.flash("You are not allow to access this page");
-        return res.redirect("/user/dashboard");
-      }
-      next();
-    },
-    async (req, res) => {
-      try {
-        const hotel_id = req.body.hotel_id;
-        const hotel_name = req.body.hotel_name;
-        const hotel_street = req.body.hotel_street;
-        const hotel_city = req.body.hotel_city;
-        const hotel_state = req.body.hotel_state;
-        const hotel_zip = req.body.hotel_zip;
-        const hotel_phone = req.body.hotel_phone;
-        const hotel_email = req.body.hotel_email;
-        const hotel_picture = req.body.hotel_picture;
-        const facilities = req.body.facilities;
-        const manager = req.body.manager;
-        const rooms = req.body.rooms;
-        const roomType = req.body.roomType;
-        const reviews = req.body.reviews;
-
-        const result = await hotelFuncs.updateHotel(
-          hotel_id,
-          hotel_name,
-          hotel_street,
-          hotel_city,
-          hotel_state,
-          hotel_zip,
-          hotel_phone,
-          hotel_email,
-          hotel_picture,
-          rooms,
-          facilities,
-          manager,
-          roomType,
-          reviews
-        );
-        req.flash(result);
-        return res.redirect(200).redirect("/hotel_management");
-      } catch (e) {
-        e.code = e.code ? e.code : 500;
-        req.session.errorMessage = e.message;
-        res.redirect("/hotel_management");
-      }
-    }
   );
-
 
 /*-----------------------------------------Review------------------------------------------------------*/
 //dont know if needed. Get all review for a user
@@ -572,13 +612,13 @@ router.route("/dashboard/:username/reviews")
     res.redirect(`/user/dashboard/${req.user.username}/bookings`);
 }});
 //add review
-router.route("/add_review")
+router.route("/dashboard/:username/order_history/:order_id/add_review")
 .post(isAuth, async (req, res) => {
   try { 
     const rating = req.body.rating
     const comment = req.body.comment
-    const review_id = helper.checkId(req.body.review_id, true)
-    const result = await userFuncs.addReview(review_id, rating, comment)
+    const order_id = helper.checkId(req.params.order_id, true)
+    const result = await userFuncs.addReview(order_id, rating, comment)
     if (!result) throw new CustomException("Review not found", true);
     req.flash(result);
     return res.status(200).redirect(`/user/dashboard/${req.user.username}/bookings`);
@@ -593,7 +633,7 @@ router.route("/add_review")
 router.route("/edit_review")
 .patch(isAuth, async (req, res) => {
   try {
-  const review_id = ObjectId(helper.checkId(req.body.review_id, true));
+  const review_id = helper.checkId(req.body.review_id, true);
   const rating = req.body.rating;
   const comment = req.body.comment;
   const result = await userFuncs.editReview(review_id, rating, comment);
@@ -610,7 +650,7 @@ router.route("/edit_review")
 //TODO: delete review
 .delete(isAuth, async (req, res) => {
   try {
-    const review_id = ObjectId(helper.checkId(req.body.review_id, true));
+    const review_id = helper.checkId(req.body.review_id, true);
     const result = await userFuncs.deleteReview(review_id);
     if (!result) throw new CustomException("Review not found", true);
     req.flash(result);
@@ -625,4 +665,39 @@ router.route("/edit_review")
 
 
 
+
+// require authentication for editing personal info
+/*router
+  .route("/dashboard/:username/check_password")
+  .post(isAuth, async (req, res) => {
+    try {
+      req.user.username = helper.checkString(req.user.username, "username", true);
+      const user = await userFuncs.getUser(req.user.username);
+      req.body.password = helper.checkPassword(req.body.password, true);
+      let match = false;
+      match = await bcrypt.compare(req.body.password, user.password);
+      if (match) {
+        return res.render("update_info", { username: req.user.username });
+      } else {
+        res.session.status = 403;
+        res.session.errorMessage = "Wrong password";
+        return res.redirect(`/user/dashboard/${req.user.username}`);
+      }
+    } catch (e) {
+      if (!e.code) {
+        req.session.status = 500;
+      } else {
+        req.session.status = e.code;
+      }
+      req.session.errorMessage = e.message;
+      res.redirect(`/user/dashboard/${req.user.username}`);
+    }
+  });
+  */
+
+
+
+
 export default router;
+
+

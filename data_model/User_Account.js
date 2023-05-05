@@ -4,7 +4,7 @@ import { Order } from "../Mongo_Connections/mongoCollections.js";
 import { Room } from "../Mongo_Connections/mongoCollections.js";
 import { hotelReg } from "../Mongo_Connections/mongoCollections.js";
 import { roomType } from "../Mongo_Connections/mongoCollections.js";
-import { mgrReq } from "../Mongo_Connections/mongoCollections.js";
+import { Request } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import * as helper from "../helper.js";
 import bcrypt from "bcryptjs";
@@ -166,7 +166,19 @@ export async function deleteAccount(username) {
         review: 1
 */
 //TODO: search hotel username order
-export async function searchOrder(username) {
+export async function searchOrder(userName, hotel_id) {
+  userName = helper.checkString(userName, "username", true);
+  hotel_id = ObjectId(helper.checkId(hotel_id, true));
+  const tempAccount = await Account();
+
+  const user_id = tempAccount({username: userName}, {_id: 1});
+  if(!user_id) throw CustomException(`Could not find user with username ${userName}`, true);
+  
+  const tempOrder = await Order();
+  const orders = tempOrder.find({user_id: user_id, hotel_id: hotel_id}).toArray();
+  if(!orders) throw CustomException(`Could not find order with username ${userName} and hotel_id ${hotel_id}`, true);
+
+  return orders
 }
 
 export async function getOrder(username) {
@@ -510,36 +522,52 @@ export async function deleteReview(review_id) {
 
 /*-----------------------------Request---------------------------------*/
 //TODO: create request. request document should have three field. id, user_id, hotel_id.
-export async function createMgeReq(...args) {
-  const username = helper.checkString(args[0], "username", true);
-  const name = helper.checkString(args[1], "name", true);
-  const street = helper.checkString(args[2], "street", true);
-  const city = helper.checkString(args[3], "city", true);
-  const state = helper.checkString(args[4], "state", true);
-  const zip_code = helper.checkZip(args[5], "zip_code", true);
+export async function createRequest(...args) {
+  args[0] = helper.checkString(args[0], "hotel name", true);
+  args[1] = helper.checkString(args[1], "street", true);
+  args[2] = helper.checkString(args[2], "city", true);
+  args[3] = helper.checkString(args[3], "state", true);
+  args[4] = helper.checkZip(args[4], true);
+  args[5] = helper.checkPhone(args[5], true);
+  args[6] = helper.checkEmail(args[6], true);
+  args[7] = args[7]
+    ? args[7].map((web) => helper.checkWebsite(web, true))
+    : [];
+  if (args[8] && Array.isArray(args[8])) {
+    args[8] = args[8].map((facility) =>
+      helper.checkString(facility, "facility", true)
+    );
+  } else if (!args[8]) {
+    args[8] = [];
+  } else {
+    throw CustomException("Invalid facilities.", true);
+  }
+  args[9] = args[9]
+  ? args[9].map((manager) => helper.checkId(manager, true))
+  : undefined;
 
   const tempAccount = await Account();
-  const tempRequest = await mgrReq();
+  const tempRequest = await Request();
   const tempHotel = await hotelReg();
 
-  const userInfo = await tempAccount.findOne({ username: username }, { _id: 1 });
+  const userInfo = await tempAccount.findOne({ _id: args[9] }, { _id: 1 });
   if (userInfo === null) throw CustomException(`Could not find user with username ${username}`, true);
 
   const hotelInfo = await tempHotel.findOne(
     {
-      name: name,
-      street: street,
-      city: city,
-      state: state,
-      zip_code: zip_code,
+      name: args[0],
+      street: args[1],
+      city: args[2],
+      state: args[3],
+      zip_code: args[4]
     }, 
     { _id: 1 });
-  if (hotelInfo === null) throw CustomException('Could not find the hotel', true);
+  if (hotelInfo !== null) throw CustomException('Hotel exist', true);
 
   const newRequest = {
     _id: new ObjectId(),
-    username: username,
-    hotelId: hotelInfo._id,
+    username: userInfo.username,
+    args: args,
     status: "pending"
   };
 
