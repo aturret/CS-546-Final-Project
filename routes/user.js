@@ -469,7 +469,7 @@ router.route("/dashboard/:username/hotel_management").get(
   }
 );
 //add room type for the hotel, hotel mnr or admin only
-router.route("/dashboard/:username/hotel_management/room_type")
+router.route("/dashboard/:username/hotel_management/:hotel_id/room_type")
 .get((req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.redirect("/user/login");
@@ -482,8 +482,7 @@ router.route("/dashboard/:username/hotel_management/room_type")
 },
 async (req, res) => {
   try {
-    const hotel = await hotelFuncs.getMgrHotel(req.user.username);
-    const hotel_id = ObjectId(hotel.hotel_id);
+    const hotel_id = helper.checkId(req.params.hotel_id);
     const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
     return res.status(200).render("roomsTypes", roomTypes);
   } catch (e) {

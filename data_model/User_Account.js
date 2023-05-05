@@ -559,12 +559,7 @@ export async function createRequest(...args) {
       street: args[1],
       city: args[2],
       state: args[3],
-      zip_code: args[4],
-      phone: args[5],
-      email: args[6],
-      pictures: args[7],
-      facilities: args[8],
-      manager: args[9]
+      zip_code: args[4]
     }, 
     { _id: 1 });
   if (hotelInfo !== null) throw CustomException('Hotel exist', true);
