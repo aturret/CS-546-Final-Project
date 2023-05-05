@@ -86,9 +86,10 @@ export async function addMgr(mgrName, userName, hotelId) {
   const mgrInfo = await tempAccount.findOne({ username: mgrName }, { _id: 1 });
   if (mgrInfo === null) throw CustomException(`Could not find user with username ${mgrName}`, true);
   if (mgrInfo.identity === 'user') throw CustomException(`User ${mgrName} is not a manager, could not add another manager`, true);
-
+  
   const userInfo = await tempAccount.findOne({ username: userName }, { _id: 1 });
   if (userInfo === null) throw CustomException(`Could not find user with username ${userName}`, true);
+  if (userInfo.identity !== 'user') throw CustomException(`User ${userName} is not a user, could not upgrade`, true);
 
   const hotelInfo = await tempHotel.findOne({ _id: Object(hotelId) }, { _id: 1 });
   if (hotelInfo === null) throw CustomException(`Could not find hotel with ID ${hotelId}`, true);

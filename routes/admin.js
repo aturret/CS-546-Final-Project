@@ -108,8 +108,6 @@ router
     res.render('user_management', {});
   })
   .post(isAdmin, async (req, res) => {
-    const mgrName = req.user.username;
-
     const input = req.body;
     try {
       input.username = helper.checkString(input.username, "username", true);
@@ -206,8 +204,21 @@ router
         password: req.body.password,
         email: req.body.email
       };
-
       const updatedUser = await userFuncs.updateUser(req.user.username, set);
+
+      if (req.body.roleInput === 'manager') {
+        const hotel = {};
+        hotel.name = helper.checkString(req.body.name, "hotel name", true);
+        hotel.street = helper.checkString(req.body.street, "street", true);
+        hotel.city = helper.checkString(req.body.city, "city", true);
+        hotel.state = helper.checkString(req.body.state, "state", true);
+        hotel.zip_code = helper.checkZip(req.body.zip_code, true);
+
+        const addMgrMessage = await adminFuncs.addMgr(req.user.username, req.body.username, hotel);
+        req.flash(addMgrMessage);
+        return res.redirect("/admin/account");
+      }
+      req.flash('Update sucessfully');
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
       if (!e.code) {
