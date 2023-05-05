@@ -60,11 +60,7 @@ router
     console.log(user);
     try {
       user.username = helper.checkString(user.username, "username", true);
-      user.roleInput = helper
-        .checkRole(user.roleInput, "identity", true)
-        .toLowerCase();
-      if (["manager", "user", "admin"].every((obj) => obj !== user.roleInput))
-        throw CustomException("Invalid identity.", true);
+      
       user.avatar = user.avatar
         ? helper.checkWebsite(user.avatar, true)
         : undefined;
@@ -83,7 +79,7 @@ router
       user.emailAddressInput = helper.checkEmail(user.emailAddressInput, true);
 
       const newUser = await userFuncs.create(
-        user.roleInput,
+        'user',
         user.username,
         user.avatar,
         user.firstNameInput,
@@ -207,8 +203,23 @@ router
   .post(isAuth, async (req, res) => {
     try {
       req.user.username = helper.checkString(req.user.username, "username", true);
-      const request = await userFuncs.createRequest(req.user.username);
-      req.flash("success_msg", "Your request has been sent to admin");
+      req.user.name = helper.checkString(req.user.name, "name", true);
+      req.user.street = helper.checkString(req.user.street, "street", true);
+      req.user.city = helper.checkString(req.user.city, "city", true);
+      req.user.state = helper.checkString(req.user.state, "state", true);
+      req.user.zip_code = helper.checkZip(req.user.zip_code, "zip_code", true);
+
+      const args = [
+        req.user.username,
+        req.user.name,
+        req.user.street,
+        req.user.city,
+        req.user.state,
+        req.user.zip_code
+      ];
+
+      const requestMessage = await userFuncs.createMgeReq(args);
+      req.flash(requestMessage);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
       if (!e.code) {

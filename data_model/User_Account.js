@@ -51,15 +51,15 @@ export async function create(...args) {
   return {message: "Create user successfully."};
 }
 
-export async function getAllUsers() {
-  const userCollection = await users();
-  let userList = await userCollection.find({}).toArray();
-  userList = userList.map((element) => {
-    element._id = element._id.toString();
-    return element;
-  });
-  return userList;
-}
+// export async function getAllUsers() {
+//   const userCollection = await users();
+//   let userList = await userCollection.find({}).toArray();
+//   userList = userList.map((element) => {
+//     element._id = element._id.toString();
+//     return element;
+//   });
+//   return userList;
+// }
 
 export async function getUser(username) {
   username = helper.checkString(username, "username", true);
@@ -506,8 +506,14 @@ export async function deleteReview(review_id) {
 
 /*-----------------------------Request---------------------------------*/
 //TODO: create request. request document should have three field. id, user_id, hotel_id.
-export async function createMgeReq(username, name, street, city, state, zip_code) {
-  username = helper.checkString(username, "username", true);
+export async function createMgeReq(...args) {
+  const username = helper.checkString(args[0], "username", true);
+  const name = helper.checkString(args[1], "name", true);
+  const street = helper.checkString(args[2], "street", true);
+  const city = helper.checkString(args[3], "city", true);
+  const state = helper.checkString(args[4], "state", true);
+  const zip_code = helper.checkZip(args[5], "zip_code", true);
+
   const tempAccount = await Account();
   const tempRequest = await mgrReq();
   const tempHotel = await hotelReg();

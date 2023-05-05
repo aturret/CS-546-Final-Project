@@ -27,7 +27,6 @@ router
   })
   //search hotel
   .post(async (req, res) => {
-    //error handling, rendering for error page as well
     const hotel_name = req.body.name;
     const hotel_city = req.body.city;
     const hotel_state = req.body.state;

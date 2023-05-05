@@ -1,8 +1,8 @@
-import {hotelReg, mgrReq} from '../Mongo_Connections/mongoCollections.js';
+import {mgrReqs} from '../Mongo_Connections/mongoCollections.js';
 import {ObjectId} from 'mongodb';
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
-import * as hotelData from "./Hotel_Data.js";
+import * as hotelFuncs from "./Hotel_Data.js";
 import * as userFuncs from "./User_Account.js";
 
 // export async function getAllHotelReq() {
