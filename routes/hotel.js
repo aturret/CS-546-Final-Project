@@ -12,19 +12,61 @@ const router = express.Router();
 //TODO: Hotel searching main page
 router
   .route("/")
-  .get((req, res) => {})
-  .post((req, res) => {
+  .get((req, res) => {
+    const errorMessage = req.session && req.session.errorMessage || null;
+    const status = req.session && req.session.status || 200;
+    if (req.session) {
+      req.session.status = null;
+      req.session.errorMessage = null;
+    }
+    else req.session = {};
+
+
+    if (errorMessage) return res.status(status).render("landpage", { errorMessage: errorMessage });
+    return res.status(status).render("landpage");
+  })
+  //search hotel
+  .post(async (req, res) => {
     //error handling, rendering for error page as well
+    const hotel_name = req.body.name;
+    const hotel_city = req.body.city;
+    const hotel_state = req.body.state;
+    const hotel_zip = req.body.zip;
+    try{
+      const result = await hotelFuncs.searchHotel(hotel_name, hotel_city, hotel_state, hotel_zip);
+      return res.status(200).render("searchHotelResult", { hotels: result });
+    }
+    catch(e){
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      return res.redirect("/");
+    }
   });
 
 //TODO: Hotel detail page
 router
-  .route("/:hotel_name")
-  .get((req, res) => {})
+  .route("/hotel/:hotel_id")
+  .get(async (req, res) => {
+    const hotel_id = req.params.hotel_id;
+    const errorMessage = req.session && req.session.errorMessage || null;
+    const status = req.session && req.session.status || 200;
+    if (req.session) {
+      req.session.status = null;
+      req.session.errorMessage = null;
+    }
+    else req.session = {};
+
+    //TODO: get hotel information
+    //get hotel information
+    const hotelInfo = await hotelFuncs.getHotel();
+
+    if (errorMessage) return res.status(status).render("hotel", { errorMessage: errorMessage });
+    return res.status(status).render("hotelDetail");
+  })
   .post(isAuth, (req, res) => {});
 
 //TODO: Room detail page
-router.route("/:hotel_name/:room_id").get((req, res) => {});
+router.route("/hotel/:hotel_name/:room_id").get((req, res) => {});
 
 //TODO: load hotel information for the manager
 router.route("/hotel_management").get(

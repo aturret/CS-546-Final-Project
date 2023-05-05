@@ -168,13 +168,48 @@ export async function hotelSearch(...args) {
   query.zipCode = { $regex: new RegExp(zipCode, "i") };
 
   let hotelList = await hotelCollection.find(query).toArray();
-  if (!hotelList) throw [404, "Hotel not found"];
+  if (!hotelList) throw CustomException("Hotel not found", false);
 
   hotelList = hotelList.map((element) => {
     element._id = element._id.toString();
     return element;
   });
   return hotelList;
+}
+
+//get hotel review
+export async function getHotelReview(id) {
+  id = ObjectId(helper.checkId(id, true));
+  const tempHotel = await hotelReg();
+
+  const reviewInfo = tempHotel.aggregate([
+    {$match: {_id: ObjectId(id)}},
+    {$lookup: {
+      from: "reviews",
+      localField: "reviews",
+      foreignField: "_id",
+      as: "reviews"
+    }},
+    {$unwind: "$reviews"},
+    {
+      $lookup: {
+        from: "users",
+        localField: "reviews.user_id",
+        foreignField: "_id",
+        as: "reviews.user"
+      }
+    },
+    {
+        $project: {
+          _id: "$reviews._id",
+          rating: "$reviews.rating",
+          comment: "$reviews.comment",
+          userPhoto: "$reviews.user.photo"
+        }
+    }
+  ])
+  if (!reviewInfo) throw CustomException("Hotel not found", false);
+  return reviewInfo;
 }
 
 //room type
