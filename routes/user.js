@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
-import {Order, Hotel, Room, roomType}from "../Mongo_Connections/mongoCollections.js";
+import {Order, hotelReg, Room, roomType}from "../Mongo_Connections/mongoCollections.js";
 const router = express.Router();
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
 
