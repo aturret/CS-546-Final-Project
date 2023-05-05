@@ -10,8 +10,8 @@ registration handelbars
     <p>Error code{{status_code}}: {{error}}</p>
 </div>
 {{/if}}
-<div class="searchUsers">
-    <h2>Search Users</h2>
+<div class="searchUser">
+    <h2>Search User</h2>
     <form action="/admin/account" method="GET" id="searchUsers-form" class="my-form">
         <label for="username" id="username-label">
             Search user by username:
@@ -20,6 +20,25 @@ registration handelbars
         <button type="submit" id="searchUsers-button">Search</button>
     </form>
 </div>
+{{#if searchedUser}}
+<div class="searchedUser">
+    <div class="userInfo">
+        <p>Search result:</p>
+        <div class="searchedUserResult">
+            <p>Username: {{searchedUser.username}}</p>
+            <p>First Name: {{searchedUser.firstName}}</p>
+            <p>Last Name: {{searchedUser.lastName}}</p>
+            <p>Email: {{searchedUser.email}}</p>
+            <p>Phone: {{searchedUser.phone}}</p>
+            <p>Identity: {{searchedUser.identity}}</p>
+        </div>
+    </div>
+    <div class="editUser">
+        <button id="editUserButton"></button>
+    </div>
+    <div class="deleteUser"></div>
+</div>
+{{/if}}
 <div class="newUser">
     <p>Create a new user.</p>
     <form action="/admin/account" method="POST" id="registration-form" class="my-form">

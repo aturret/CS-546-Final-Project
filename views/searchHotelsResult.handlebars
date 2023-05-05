@@ -12,20 +12,28 @@ hotelPrice: might be the lowest price or average price. I think lowest is better
 {{/if}}
 <h2>Search Result</h2>
 <div class="searchResult">
-<ol>
-    {{#each hotels}}
-    <li>
-    <div class="searchResultItem">
-        <div class="hotelName"><a href="/hotel/{{this.hotelId}}">{{this.hotelName}}</a></div>
-        <div class="hotelPicture"><img src="{{this.hotelPicture}}"></div>
-        <div class="hotelReviewNumber"><p>{{this.hotelReviewNumber}}</p></div>
-        <div class="hotelRating"><p>{{this.hotelRating}}</p></div>
-        <div class="hotelAddress"><p>{{this.hotelAddress}}</p></div>
-        <div class="hotelPrice"><p>{{this.hotelPrice}}</p></div>
-    </div>
-    </li>
-    {{/each}}
-</ol>
+    <ol>
+        {{#each hotels}}
+        <li>
+            <div class="searchResultItem">
+                <div class="hotelName"><a href="/hotel/{{this.hotelId}}">{{this.hotelName}}</a></div>
+                <div class="hotelPicture"><img src="{{this.hotelPicture}}"></div>
+                <div class="hotelReviewNumber">
+                    <p>Review number: {{this.hotelReviewNumber}}</p>
+                </div>
+                <div class="hotelRating">
+                    <p>Overall Rating: {{this.hotelRating}}</p>
+                </div>
+                <div class="hotelAddress">
+                    <p>Address: {{this.hotelAddress}}</p>
+                </div>
+                <div class="hotelPrice">
+                    <p>Up from {{this.hotelPrice}}</p>
+                </div>
+            </div>
+        </li>
+        {{/each}}
+    </ol>
 </div>
 <div class="error" id="client">
     <p id="client-error"></p>

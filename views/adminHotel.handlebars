@@ -9,31 +9,9 @@
     <p>Error code {{statusCode}}: {{error}}</p>
 </div>
 {{/if}}
-<div class="Avatar">
-    <img src="{{userAvatar}}">
-</div>
-<h2>{{userName}}</h2>
-<div class="information">
-    <div class="userIdentity">
-        <p>Identity: {{user.userIdentity}}</p>
-    </div>
-    <div class="userFirstName">
-        <p>First Name: {{userFirstName}}</p>
-    </div>
-    <div class="userLastName">
-        <p>Last Name: {{userLastName}}</p>
-    </div>
-    <div class="userEmail">
-        <p>Email: {{userEmail}}</p>
-    </div>
-    <div class="userPhone">
-        <p>Phone: {{userPhone}}</p>
-    </div>
-</div>
-{{#if (eq user.userIdentity "user")}}
-<div class="newApplication">
-    <button id="newHotelButton" onclick="newHotel()">Start Hotel Registration</button>
-    <div id="newHotelWindow" hidden="true">
+
+<div class="newHotel">
+    <div id="newHotelWindow">
         <form action="/hotel" method="POST">
             
             <label for="hotelName" id="hotelName-label">
@@ -73,23 +51,11 @@
                     Hotel Zip:
                 </label>
                 <input type="text" name="hotelZipcode" id="hotelZipcode" value="{{hotelZipcode}}">
-                <input type="hidden" name="userId" value="{{userId}}">
-                <button type="submit" id="newApplication">Apply for a new hotel</button>
+                <button type="submit" id="newApplication">Create the hotel</button>
         </form>
     </div>
+</div>
 
-</div>
-{{/if}}
-<div class="functionMenu">
-    <div class="functionItem"><a href="/order">My Orders</a></div>
-    {{#if (eq user.userIdentity "manager")}}
-    <div class="functionItem"><a href="/hotel">My Hotel</a></div>
-    {{/if}}
-    {{#if (eq user.userIdentity "admin")}}
-    <div class="functionItem"><a href="/admin">Admin</a></div>
-    {{/if}}
-    <div class="functionItem"><a href="/logout">Log Out</a></div>
-</div>
 
 <div class="error" id="client">
     <p id="client-error"></p>
