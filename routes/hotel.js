@@ -75,17 +75,13 @@ router
       //get hotel review
       const reviews = await hotelFuncs.getHotelReview(hotel_id);
       hotelInfo.reviews = reviews;
-      if (errorMessage)
-      {
-        hotelInfo.errorMessage = errorMessage;
-        return res.status(status).render("hotel", hotelInfo);
-      };
       return res.status(status).render("hotel", hotelInfo);
     }
-
-
-    if (errorMessage) return res.status(status).render("hotel", { errorMessage: errorMessage });
-    return res.status(status).render("hotelDetail");
+    catch(e){
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      return res.redirect("/");
+    }
   })
   .post(isAuth, (req, res) => {});
 
