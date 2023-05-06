@@ -65,7 +65,7 @@ router
     const hotel_state = req.body.state;
     const hotel_zip = req.body.zip;
     try{
-      const result = await hotelFuncs.searchHotel(hotel_name, hotel_city, hotel_state, hotel_zip);
+      const result = await hotelFuncs.hotelSearch(hotel_name, hotel_city, hotel_state, hotel_zip);
       return res.status(200).render("searchHotelResult", { hotels: result });
     }
     catch(e){

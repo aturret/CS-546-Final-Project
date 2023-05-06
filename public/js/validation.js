@@ -20,8 +20,10 @@ forms.forEach(form => {
         const emailInputs = document.querySelectorAll('input[type="email"]');
         const phoneInputs = document.querySelectorAll('input[class="phone"]');
         const textareas = document.querySelectorAll('textarea');
+        const picInputs = document.querySelectorAll('input[type="file"]');
         try {
-            textInputs.forEach(input => {                
+            textInputs.forEach(input => {
+                console.log('text checking');             
                 input.value = checkString(input.value, input.name, false);
             })
             roomTypeInputs.forEach(input => {
@@ -47,10 +49,16 @@ forms.forEach(form => {
                 console.log('hi');
                 input.value = checkString(input.value, input.name, false);
             })
+            picInputs.forEach(input => {
+                const file = input.files[0];
+                if (!file) throw "No file selected";
+                if (!file.type.startsWith('image/')) throw "Picture file must be an image";
+                input.value = file.name;
+            })
             
-            if (document.getElementById('confirmPasswordInput')) {
-                const confirmPasswordInput = document.getElementById('confirmPasswordInput');
-                const PasswordInput = document.getElementById('passwordInput');
+            if (document.getElementById('confirmPasswordInput')) {    
+                const confirmPasswordInput = document.getElementsByClassName('confirmPasswordInput')[0];
+                const PasswordInput = document.getElementsByClassName('PasswordInput')[0];
                 if (confirmPasswordInput.value !== PasswordInput.value) throw "Passwords do not match";
             }
         }

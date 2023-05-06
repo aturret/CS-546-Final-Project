@@ -6,9 +6,9 @@ roomTypes collection, or you can just calculate its availability and set it as a
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <h2>The room {{roomNumber}}</h2>
@@ -42,7 +42,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
             </label>
             <label id="roomTypeInput-label">
                 Room Type:
-                <select name="roomTypeInput">
+                <select name="roomTypeInput" id="roomTypeInput">
                     {{#each roomTypes}}
                     <option value="{{typeName}}">{{typeName}}</option>
                     {{/each}}

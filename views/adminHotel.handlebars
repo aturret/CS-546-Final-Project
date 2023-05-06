@@ -4,9 +4,9 @@
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{errorMessage}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 
@@ -14,49 +14,48 @@
     <div id="newHotelWindow">
         <form action="/admin/createHotel" method="POST">
             
-            <label for="hotelName" id="hotelName-label">
+            <label for="hotelNameInput" id="hotelNameInput-label">
                 Hotel Name:
             </label>
-            <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
+            <input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
 
-            <label for="hotelPhoto" id="hotelPhoto-label">
+            <label for="hotelPhotoInput" id="hotelPhotoInput-label">
                 Hotel Photo:
             </label>
-            <input type="file" name="hotelPhoto" id="hotelPhoto" value="{{hotelPhoto}}">
+            <input type="file" name="hotelPhotoInput" id="hotelPhotoInput" value="{{hotelPhoto}}">
 
             <div class="hotelContact">
-                <label for="hotelPhone" id="hotelPhone-label">
+                <label for="hotelPhoneInput" id="hotelPhoneInput-label">
                     Hotel Phone:
                 </label>
-                <input type="text" name="hotelPhone" id="hotelPhone" value="{{hotelPhone}}">
+                <input type="text" name="hotelPhoneInput" id="hotelPhoneInput" value="{{hotelPhone}}">
 
-                <label for="hotelEmail" id="hotelEmail-label">
+                <label for="hotelEmailInput" id="hotelEmailInput-label">
                     Hotel Email:
                 </label>
-                <input type="email" name="hotelEmail" id="hotelEmail" value="{{hotelEmail}}">
+                <input type="email" name="hotelEmailInput" id="hotelEmailInput" value="{{hotelEmail}}">
             </div>
 
             <div class="hotelAddress">
-                <label for="hotelCity" id="hotelCity-label">
+                <label for="hotelCityInput" id="hotelCityInput-label">
                     Hotel City:
                 </label>
-                <input type="text" name="hotelCity" id="hotelCity" value="{{hotelCity}}">
+                <input type="text" name="hotelCityInput" id="hotelCityInput" value="{{hotelCity}}">
 
-                <label for="hotelStreet" id="hotelStreet-label">
+                <label for="hotelStreetInput" id="hotelStreetInput-label">
                     Hotel Street:
                 </label>
-                <input type="text" name="hotelStreet" id="hotelStreet" value="{{hotelStreet}}">
+                <input type="text" name="hotelStreetInput" id="hotelStreetInput" value="{{hotelStreet}}">
 
-                <label for="hotelState" id="hotelState-label">
+                <label for="hotelStateInput" id="hotelStateInput-label">
                     Hotel State:
                 </label>
-                <select id="hotelState" class="state">
+                <select id="hotelStateInput" class="state" name="hotelStateInput">
                 </select>
-
-                <label for="hotelZipcode" id="hotelZipcode-label">
+                <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
                     Hotel Zip:
                 </label>
-                <input type="text" name="hotelZipcode" id="hotelZipcode" value="{{hotelZipcode}}">
+                <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput" value="{{hotelZipcode}}">
 
                 <button type="submit" id="newApplication">Create hotel</button>
             </div>

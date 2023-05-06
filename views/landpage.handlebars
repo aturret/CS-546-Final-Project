@@ -4,31 +4,31 @@ login form handlebar template
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 
 <p>Search for the best hotel you can have for your vacation!</p>
 <form action="/" method="POST" id="login-form" class="my-form">
-    <label for="name" id="name-label">  
+    <label for="hotalNameInput" id="hotalNameInput-label">  
         Hotel Name: 
     </label>
-    <input type="email" name="name" id="name">
-    <label for="state" id="state-label">  
+    <input type="text" name="hotalNameInput" id="hotalNameInput">
+    <label for="hotelState" id="hotelState-label">  
         State:
     </label>
-    <select id="state" name="state">
+    <select id="hotelStateInput" name="hotelStateInput" class="state">
     </select>
-    <label for="city" id="city-label">  
+    <label for="hotelCity" id="hotelCity-label">  
         City:
     </label>
-    <input type="text" name="city" id="city">
-    <label for="zipcode" id="zipcode-label">  
+    <input type="text" name="hotelCityInput" id="hotelCityInput">
+    <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">  
         Zipcode:
     </label>
-    <input type="text" name="zipcode" id="zipcode">
+    <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput">
     <button type="submit" id="login-button">Search</button>
 </form>
 <div class="error" id="client">

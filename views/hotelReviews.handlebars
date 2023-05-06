@@ -1,0 +1,93 @@
+{{!--
+
+What this page needs:
+hotel information
+review information
+reviewUserId: the id of the user who wrote the review
+
+--}}
+
+{{#if errorMessage}}
+<div class="error">
+    <p>Error code {{status}}: {{errorMessage}}</p>
+</div>
+{{/if}}
+
+<h2>{{hotel.name}}'s all reviews</h2>
+<div class="hotelInfo">
+    <div class="hotelName">
+        <p>{{hotelName}}</p>
+    </div>
+    <div class="hotelPhoto"><img src="{{hotelPhoto}}"></div>
+    <div class="hotelRating">
+        <p>Rating: {{hotelRating}}</p>
+    </div>
+
+    <div class="hotelIntro">
+        <div class="hotelAddress">
+            <p>Address: {{hotelAddress}}</p>
+        </div>
+        <div class="hotelContacts">
+            <p>Contacts: Phone: {{hotelPhone}} Email: {{hotelEmail}}</p>
+        </div>
+    </div>
+</div>
+<div class="reviewOperations box">
+    <div class="reviewResult left">
+        <h3>All Reviews</h3>
+        {{#each hotelReviews}}
+        <div class="reviewItem box">
+            <div class="reviewUserItem left">
+                <div class="reviewUserPhoto">{{userAvatar}}</div>
+            </div>
+            <div class="reviewContentItem right">
+                <div class="reviewTitle"><a href="/reviews/{{reviewId}}">{{reviewTitle}}</a></div>
+                <div class="reviewRating">
+                    <p>{{reviewRating}}</p>
+                </div>
+                <div class="reviewComment">
+                    <p>{{comment}}</p>
+                </div>
+                <div class="reviewVotes">
+                    <p>Upvote: {{upVote}}</p>
+                    <p>Downvote: {{downVote}}</p>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    <div class="addReview">
+        <h3>Add a new review</h3>
+        <form action="/hotel/{{hotelId}}/review" method="POST" id="registration-form" class="my-form">
+            <input type="hidden" name="hotelId" value="{{hotelId}}">
+            <label for="reviewUsernameInput" id="reviewUsernameInput-label">
+                Username:
+            </label>
+            <input type="text" name="reviewUsernameInput" id="reviewUsernameInput">
+            <label for="orderIdInput" id="orderIdInput-label">
+                Order ID:
+            </label>
+            <input type="text" name="orderIdInput" id="orderIdInput">
+            <label for="ratingInput" id="ratingInput-label">
+                Review Rating:
+            </label>
+            <select name="ratingInput" id="ratingInput">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <label for="reviewInput" id="reviewInput-label">
+                Review Comment:
+            </label>
+            <textarea name="reviewInput" id="reviewInput" cols="30" rows="10"></textarea>
+            <button type="submit">Submit</button>
+        </form>        
+    </div>
+
+</div>
+<div class="error" id="client">
+    <p id="client-error"></p>
+</div>
+<a href="/register">Click here to register!</a>
