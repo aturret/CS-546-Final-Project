@@ -1,7 +1,10 @@
-import { Account } from "./Mongo_Connections/mongoCollections.js";
+import { Account, Room, mgrReq, Review, hotelReg, Order} from "./Mongo_Connections/mongoCollections.js";
 import * as helper from "./helper.js";
 import * as userFuncs from "./data_model/User_Account.js";
 import faker from "faker";
+import moment from "moment";
+import bcrypt from "bcryptjs";
+
 
 const admin = {
     username: "admin",

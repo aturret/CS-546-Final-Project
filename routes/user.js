@@ -406,7 +406,8 @@ router.route("/dashboard/:username/hotel_management").get(
       return res.redirect("/user/login");
     }
     if (req.user && req.user.identity === "user") {
-      req.flash("You are not allow to access this page");
+      req.session.status = 403;
+      req.session.errorMessage = "You are not allow to access this page";
       return res.redirect("/user/dashboard");
     }
     next();
@@ -435,12 +436,13 @@ router.route("/dashboard/:username/hotel_management").get(
   }
 )
 .put(
-  (req, res, next) => {
+  (req, res, next) =>  (req, res, next) => {
     if (!req.isAuthenticated()) {
       return res.redirect("/user/login");
     }
     if (req.user && req.user.identity === "user") {
-      req.flash("You are not allow to access this page");
+      req.session.status = 403;
+      req.session.errorMessage = "You are not allow to access this page";
       return res.redirect("/user/dashboard");
     }
     next();
@@ -523,7 +525,8 @@ async (req, res) => {
       return res.redirect("/user/login");
     }
     if (req.user && req.user.identity === "user") {
-      req.flash("You are not allow to access this page");
+      req.session.status = 403;
+      req.session.errorMessage = "You are not allow to access this page";
       return res.redirect("/user/dashboard");
     }
     next();
@@ -552,7 +555,69 @@ async (req, res) => {
       res.redirect("/hotel_management");
     }
   }
+)
+router.route("/dashboard/:username/hotel_management/:hotel_id/room_type/:type_id")
+.patch( (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.redirect("/user/login");
+    }
+    if (req.user && req.user.identity === "user") {
+      req.session.status = 403;
+      req.session.errorMessage = "You are not allow to access this page";
+      return res.redirect("/user/dashboard");
+    }
+    next();
+  },
+async (req, res) => {
+  try {
+    const hotel_id = req.params.hotel_id;
+    const type_id = req.params.room_type;
+    const room_type = req.params.room_type;
+    const room_price = req.body.room_price;
+    const room_picture = req.body.room_picture;
+
+    const result = await hotelFuncs.updateRoomType(type_id, hotel_id, room_type, room_price, room_picture);
+    req.flash({ successMessage: "Room type updated successfully" });
+    return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
+  }
+  catch (e) {
+    e.code = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    res.redirect("/hotel_management");
+  }
+}
+)
+//TODO: delete room type
+.delete((req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/user/login");
+  }
+  if (req.user && req.user.identity === "user") {
+    req.session.status = 403;
+    req.session.errorMessage = "You are not allow to access this page";
+    return res.redirect("/user/dashboard");
+  }
+  next();
+},
+async (req, res) => {
+  try {
+    const hotel_id = req.params.hotel_id;
+    const type_id = req.params.room_type;
+    const result = await hotelFuncs.deleteRoomType(type_id, hotel_id);
+    req.flash({ successMessage: "Room type deleted successfully" });
+    return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
+  }
+  catch (e) {
+    e.code = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    return res.redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
+  }
+}
 );
+
+
+
+
 //add room for the hotel, hotel mnr or admin only
 router
   .route("/hotel_management/:hotel_id/room")
@@ -590,8 +655,9 @@ router
         return res.redirect("/user/login");
       }
       if (req.user && req.user.identity === "user") {
-        req.flash("You are not allow to access this page");
-        return res.redirect("/user/dashboard");
+        req.session.status = 403;
+        req.session.errorMessage = "You are not allow to access this page";
+        return res.redirect(`/user/dashboard/${req.user.username}/hotel_management`);
       }
       next();
     },
@@ -609,8 +675,64 @@ router
         res.redirect("/hotel_management");
       }
     }
-  );
+  )
+  //TODO: delete room
+router.route("/user/dashboard/:username/hotel_management/:hotel_id/room/:room_id")
+  .delete((req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.redirect("/user/login");
+    }
+    if (req.user && req.user.identity === "user") {
+      req.session.status = 403;
+      req.session.errorMessage = "You are not allow to access this page";
+      return res.redirect(`/user/dashboard/${req.user.username}/hotel_management/${hotel_id}/room`);
+    }
+    next();
+  },
+  async (req, res) => {
+    try {
+      const hotel_id = req.params.hotel_id;
+      const room_id = req.params.room_id;
+      const result = await hotelFuncs.deleteRoom(room_id, hotel_id);
+      req.flash({ successMessage: "Room deleted successfully" });
+      return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
+    }
+    catch (e) {
+      e.code = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      return res.redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
+    }
+  }
+  )
+  .patch((req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.redirect("/user/login");
+    }
+    if (req.user && req.user.identity === "user") {
+      req.session.status = 403;
+      req.session.errorMessage = "You are not allow to access this page";
+      return res.redirect(`/user/dashboard/${req.user.username}/hotel_management/${hotel_id}/room`);
+    }
+    next();
+  },
+  async (req, res) => {
+    try {
+      const hotel_id = req.params.hotel_id;
+      const room_id = req.params.room_id;
+      const result = await hotelFuncs.updateRoom(room_id, hotel_id);
+      req.flash({ successMessage: "Room updated successfully" });
+      return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
+    }
+    catch (e) {
+      e.code = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      return res.redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
+    }
+  }
+  )
 
+
+  //TODO: update room
 /*-----------------------------------------Review------------------------------------------------------*/
 //dont know if needed. Get all review for a user
 router.route("/dashboard/:username/reviews")
@@ -718,5 +840,3 @@ router.route("/dashboard/:username/order_history/:order_id/edit_review")
 
 
 export default router;
-
-

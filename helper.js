@@ -217,7 +217,7 @@ export function* randomRoomGenerator(i){
     }
 }
 
-export function* randomOrderGenerator(){
+export function* randomOrderGenerator(i){
     for (let i of ref)
     {
         const checkin_date = "2023/05/01"

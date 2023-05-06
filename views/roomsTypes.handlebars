@@ -31,14 +31,14 @@ You can add a new key-value pair to the roomTypes collection, or you can just ca
             </div>
             {{#if roomTypeDeletableStatus}}
             <div class="deleteRoomType">
-                <form action="/hotel/{{hotelId}}/roomType/{{this._id}}" method="DELETE" id="deleteRoomType-form" class="my-form">
+                <form action="/user/dashboard/{{username}}/hotel/{{hotelId}}/roomType/{{this._id}}" method="DELETE" id="deleteRoomType-form" class="my-form">
                     <input type="hidden" name="hotelId" value="{{hotelId}}">
                     <button type="submit" id="deleteRoomType-button">Delete</button>
                 </form>
             </div>
             {{/if}}
             <div class="editRoomType">
-                <form action="/hotel/{{hotelId}}/roomType/{{this._id}}" method="PATCH" id="editRoomType-form" class="my-form">
+                <form action="/user/dashboard/{{username}}/hotel/{{hotelId}}/roomType/{{this._id}}" method="PATCH" id="editRoomType-form" class="my-form">
                     <label for="roomTypeName" id="roomTypeName-label">
                         Room Type:
                     </label>
@@ -58,7 +58,7 @@ You can add a new key-value pair to the roomTypes collection, or you can just ca
         {{/each}}
     </ol>
     <div class="addNewRoomType">
-        <form action="/hotel/{{hotelId}}/roomType" method="POST" id="addNewRoom-form" class="my-form">
+        <form action="/user/dashboard/{{username}}/hotel_management/{{hotelId}}/roomType" method="POST" id="addNewRoom-form" class="my-form">
             <label for="newRoomTypeName" id="newRoomTypeName-label">
                 Room Type:
             </label>
