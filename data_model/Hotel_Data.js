@@ -418,20 +418,20 @@ export async function getHotelRoomType(id) {
 //check room availability
 export async function checkRoomAvailability(...args) {
   const hotel_id = new ObjectId(helper.checkId(args[0], true));
-  const room_id = helper.checkId(args[1], "room type", true);
+  const room_id = new ObjectId(helper.checkId(args[1], "room type", true));
   const checkin_date = moment(helper.checkDate(args[2], true), "YYYY-MM-DD");
   const checkout_date = moment(helper.checkDate(args[3], true), "YYYY-MM-DD");
-  const order_id = helper.checkId(args[4], true);
+  const order_id = new ObjectId(helper.checkId(args[4], true));
 
   //check if hotel exists
   const tempHotel = await hotelReg();
   const hotelInfo = await tempHotel.findOne({ _id: hotel_id });
   if (!hotelInfo)
-    throw CustomException(`Hotel with id ${hotel_id} does not exist.`, true);
+    throw CustomException(`Hotel with id ${hotel_id.toString()} does not exist.`, true);
 
   //check if room is avaliable
   const tempRoom = await Room();
-  const room_orders = Room.findOne({ _id: room_id }, { orders: 1 });
+  const room_orders = tempRoom.findOne({ _id: room_id }, { orders: 1 });
 
   if (!room_orders) throw CustomException(`Room does not exist.`, true);
   //if the target room has no orders return the true.
@@ -440,6 +440,7 @@ export async function checkRoomAvailability(...args) {
   room_orders.orders = room_orders.orders.map((order) => new ObjectId(order));
 
   //get all orders' checkin findOneAndUpdate checkout date
+  let temp = [];
   temp.push(
     await tempOrder.find(
       { _id: { $in: room_orders.orders } },
