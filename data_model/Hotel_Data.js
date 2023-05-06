@@ -64,17 +64,17 @@ export async function addHotel(...args) {
   newHotel.rooms = [];
   newHotel.room_types = [];
   newHotel.overall_rating = 0;
-  if (args[7] && Array.isArray(args[7])) {
+  if (args[8] && Array.isArray(args[8])) {
     newHotel.facilities = args[7].map((facility) =>
       helper.checkString(facility, "facility", true)
     );
-  } else if (!args[7]) {
+  } else if (!args[8]) {
     newHotel.facilities = [];
   } else {
     throw CustomException("Invalid facilities.", true);
   }
-  newHotel.managers = args[8]
-    ? args[8].map((manager) => helper.checkId(manager, true))
+  newHotel.managers = args[9]
+    ? args[9].map((manager) => helper.checkId(manager, true))
     : undefined;
   newHotel.reviews = [];
 

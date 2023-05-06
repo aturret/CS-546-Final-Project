@@ -6,52 +6,60 @@
 
 {{#if error}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{statusCode}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 
 <div class="newHotel">
     <div id="newHotelWindow">
-        <form action="/hotel" method="POST">
+        <form action="/admin/createHotel" method="POST">
             
             <label for="hotelName" id="hotelName-label">
                 Hotel Name:
             </label>
             <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
+
             <label for="hotelPhoto" id="hotelPhoto-label">
                 Hotel Photo:
             </label>
             <input type="file" name="hotelPhoto" id="hotelPhoto" value="{{hotelPhoto}}">
+
             <div class="hotelContact">
                 <label for="hotelPhone" id="hotelPhone-label">
                     Hotel Phone:
                 </label>
                 <input type="text" name="hotelPhone" id="hotelPhone" value="{{hotelPhone}}">
+
                 <label for="hotelEmail" id="hotelEmail-label">
                     Hotel Email:
                 </label>
                 <input type="email" name="hotelEmail" id="hotelEmail" value="{{hotelEmail}}">
             </div>
+
             <div class="hotelAddress">
-                <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
                 <label for="hotelCity" id="hotelCity-label">
                     Hotel City:
                 </label>
                 <input type="text" name="hotelCity" id="hotelCity" value="{{hotelCity}}">
+
                 <label for="hotelStreet" id="hotelStreet-label">
                     Hotel Street:
                 </label>
                 <input type="text" name="hotelStreet" id="hotelStreet" value="{{hotelStreet}}">
+
                 <label for="hotelState" id="hotelState-label">
                     Hotel State:
                 </label>
                 <select id="hotelState" class="state">
                 </select>
+
                 <label for="hotelZipcode" id="hotelZipcode-label">
                     Hotel Zip:
                 </label>
                 <input type="text" name="hotelZipcode" id="hotelZipcode" value="{{hotelZipcode}}">
-                <button type="submit" id="newApplication">Create the hotel</button>
+
+                <button type="submit" id="newApplication">Create hotel</button>
+            </div>
         </form>
     </div>
 </div>
