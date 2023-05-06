@@ -10,7 +10,6 @@ import { ObjectId } from "mongodb";
 import * as helper from "../helper.js";
 import bcrypt from "bcryptjs";
 import { CustomException } from "../helper.js";
-import { getMgrHotel } from "./Hotel_Data.js";
 const saltRounds = 12;
 
 /*-------------------------User Account-------------------------*/

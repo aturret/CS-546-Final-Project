@@ -32,7 +32,7 @@ export async function getHotel(id) {
   return hotel;
 }
 
-// //get manager hotel
+//get manager hotel
 // export async function getMgrHotel(username) {
 //   username = helper.checkString(username, "username", true);
 //   const tempAccount = await Account();
@@ -49,27 +49,27 @@ export async function getHotel(id) {
 // }
 
 //get hotel manager
-// export async function getHotelMgr(hotelId) {
-//   hotelId = helper.checkId(hotelId, true);
-//   const tempHotel = await hotelReg();
-//   const hotel = await tempHotel.findOne({ hotelId: ObjectId(hotelId) }, { _id: 0, managers: 1 });
-//   if (!hotel) throw CustomException(`No hotel with username ${username}`, true);
+export async function getHotelMgr(hotelId) {
+  hotelId = helper.checkId(hotelId, true);
+  const tempHotel = await hotelReg();
+  const hotel = await tempHotel.findOne({ hotelId: ObjectId(hotelId) }, { _id: 0, managers: 1 });
+  if (!hotel) throw CustomException(`No hotel with username ${username}`, true);
 
-//   let mgrInfoList = []
-//   const tempAccount = await Account();
-//   hotel.managers.forEach(mgrId => {
-//     const mgrInfo = await tempAccount.findOne({ _id: mgrId }, { _id: 0, username: 1 });
-//     mgrInfoList.push({
-//       _id: mgrId,
-//       username: mgrInfo.username
-//     });
-//     if (!mgrInfo) throw
-//   });
+  let mgrInfoList = []
+  const tempAccount = await Account();
+  hotel.managers.forEach(async mgrId => {
+    const mgrInfo = await tempAccount.findOne({ _id: mgrId }, { _id: 0, username: 1 });
+    mgrInfoList.push({
+      _id: mgrId,
+      username: mgrInfo.username
+    });
+    if (!mgrInfo) throw "No manager with ID " + mgrId;
+  });
 
-//   if (!hotelInfo) throw CustomException(`No hotel with ID ${hotel.hotel}`, true);
-//   hotelInfo._id = hotelInfo._id.toString();
-//   return hotelInfo;
-// }
+  if (!hotelInfo) throw CustomException(`No hotel with ID ${hotel.hotel}`, true);
+  hotelInfo._id = hotelInfo._id.toString();
+  return hotelInfo;
+}
 
 //need fix order for input
 export async function addHotel(...args) {
@@ -388,7 +388,7 @@ export async function getHotelRoom(id) {
   const tempHotel = await hotelReg();
   const tempRoom = await Room();
 
-  const room_ids = await hotelReg.findOne({_id: id}, {rooms: 1});
+  const room_ids = await tempHotel.findOne({_id: id}, {rooms: 1});
   const roomInfo = await tempRoom.find({_id: {$in: room_ids}}).toArray();
   if (!roomInfo) throw CustomException("Hotel not found", false);
   return roomInfo;
@@ -417,17 +417,10 @@ export async function getHotelRoomType(id) {
 
 //check room availability
 export async function checkRoomAvailability(...args) {
-  const hotel_id = new ObjectId(helper.checkId(args[0], true));
-  const room_id = new ObjectId(helper.checkId(args[1], "room type", true));
-  const checkin_date = moment(helper.checkDate(args[2], true), "YYYY-MM-DD");
-  const checkout_date = moment(helper.checkDate(args[3], true), "YYYY-MM-DD");
-  const order_id = new ObjectId(helper.checkId(args[4], true));
-
-  //check if hotel exists
-  const tempHotel = await hotelReg();
-  const hotelInfo = await tempHotel.findOne({ _id: hotel_id });
-  if (!hotelInfo)
-    throw CustomException(`Hotel with id ${hotel_id.toString()} does not exist.`, true);
+  const room_id = new ObjectId(helper.checkId(args[0], "room type", true));
+  const checkin_date = moment(helper.checkDate(args[1], true), "YYYY-MM-DD");
+  const checkout_date = moment(helper.checkDate(args[2], true), "YYYY-MM-DD");
+  const order_id = new ObjectId(helper.checkId(args[3], true));
 
   //check if room is avaliable
   const tempRoom = await Room();
@@ -484,7 +477,7 @@ export async function addRoom(...args) {
         hotel_id: hotel_id,
         room_number: room_number,
         room_type: room_type,
-        order: order
+        orders: order
     };
 
     //check if room exists
@@ -610,4 +603,70 @@ export async function updateRoom(hotel_id, room_id, typeNme, roomNum) {
   if (rv.modifiedCount === 0) throw CustomException(`Could not update the room.`, true);
 
   return {message: `Room ${roomNum} updated successfully.`};
+}
+
+
+//TODO: get room
+export async function checkRoomAvailabilityOrder(...args) {
+  const hotel_id = new ObjectId(helper.checkId(args[0], "hotel id", true));
+  const checkin_date = moment(helper.checkDate(args[1], true), "YYYY-MM-DD");
+  const checkout_date = moment(helper.checkDate(args[2], true), "YYYY-MM-DD");
+  const returnInfo = new Set();
+  //get all room
+  const tempHotel = await hotelReg();
+  const roomInfo = await tempHotel.findOne({ _id: hotel_id }, {_id : 0, rooms: 1});
+  const roomsId = [];
+  for (let i of roomInfo.rooms) {
+    roomsId.push(i.map(obj => new ObjectId(obj)));
+  }
+  //find orders of rooms
+  const tempRoom = await Room();
+  let roomsOrders = [];
+  for (let i of roomsId) {
+    roomsOrders.push(tempRoom.find({ _id: {$in: roomInfo} }, { orders: 1 }).toArray());
+  }
+
+  if (!roomsOrders) throw CustomException(`Room does not exist.`, true);
+  //if the target room has no orders return the true.
+  //[{[]}, {[]}, {[]}]
+  let ordersPerRoom = []; // [[], [], []]
+  let roomAvailable = new Set();
+  for (let i of roomsOrders) {
+    if (i.orders.length === 0) roomAvailable.add(i._id);
+    ordersPerRoom.push(i.orders.map((order) => new ObjectId(order)));
+  }
+
+  //get all orders' checkin findOneAndUpdate checkout date
+  let temp = [];
+  for (let i of roomsOrders){
+      temp.push(
+          await tempOrder.find(
+            { _id: { $in: i.orders } },
+            { _id: 0, checkin_date: 1, checkout_date: 1, status: 1 }
+          )
+        );
+    if (
+      temp.every(
+        (order) =>
+          order.status === "canceled" ||
+          checkin_date.isAfter(moment(order.checkout_date, "YYYY/MM/DD")) ||
+          checkout_date.isBefore(moment(order.checkin_date, "YYYY/MM/DD"))
+      )
+    )
+    {
+      roomAvailable.add(i._id);
+    }
+
+    //get room type
+    const tempRoomType = await RoomType();
+    for (let i of roomAvailable) {
+      const roomTypeInfo = await tempRoomType.find({ hotel_id: hotel_id, rooms: {$elemMatch: i}});
+      returnInfo.add(roomTypeInfo.name);
+    }
+    if(!returnInfo) throw CustomException(`No room available.`, true);
+    return returnInfo;
+  }
+
+  //get all orders' checkin findOneAndUpdate checkout date
+
 }

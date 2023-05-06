@@ -380,7 +380,7 @@ async (req, res) => {
     const order_price = price * (moment(checkout_date, "YYYY/MM/DD").diff(moment(checkin_date, "YYYY/MM/DD"), 'days'))
 
 
-    if (!await hotelFuncs.checkRoomAvailability(hotel_id, room_id, checkin_date, checkout_date, order_id, status)) throw new CustomException("Room not available", true);
+    if (!await hotelFuncs.checkRoomAvailability(room_id, checkin_date, checkout_date, order_id, status)) throw new CustomException("Room not available", true);
     if(!room_id) throw new CustomException(`No available ${room_type}`, true);
 
     const message = await userFuncs.updateOrder(order_id, checkin_date, checkout_date, guest, order_price);
