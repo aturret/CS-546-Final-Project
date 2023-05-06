@@ -48,7 +48,11 @@ reviewUserId: the id of the user who wrote the review
             <div class="editReview">
                 <button id="editReviewButton" onclick="editReview()">Edit</button>
                 <div hidden="true" id="editReviewWindow">
-                    <form action="/reviews/{{reviewId}}" method="PATCH">
+                    {{#if (eq user.identity "admin")}}
+                    <form action="/hotel/{{hotel._id}}/hotelManagement/review" method="PUT">
+                    {{else}}
+                    <form action="/reviews/{{reviewId}}" method="PUT">
+                    {{/if}}
                         <label for="reviewTitle">Title</label>
                         <input type="text" name="reviewTitle" placeholder="Review Title" value="{{reviewTitle}}">
                         <label for="reviewRating">Rating</label>
@@ -65,6 +69,17 @@ reviewUserId: the id of the user who wrote the review
                             <button type="submit">Submit</button>
                     </form>
                 </div>
+            </div>
+            <div class="deleteReview">
+                {{#if (eq user.identity "admin")}}
+                <form action="/hotel/{{hotel._id}}/hotelManagement/review" method="DELETE">
+                {{else}}
+                <form action="/reviews/{{reviewId}}" method="DELETE">
+                {{/if}}
+                    <input type="hidden" name="hotelIdInput" value="{{hotelId}}">
+                    <input type="hidden" name="reviewIdInput" value="{{reviewId}}">
+                    <button type="submit">Delete</button>
+                </form>
             </div>
             {{/if}}
             <div class="reviewVotes">

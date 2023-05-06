@@ -8,7 +8,16 @@ const writeReplyWindow = document.getElementById('writeReplyWindow');
 const writeReplyButton = document.getElementById('writeReplyButton');
 const newHotelButton = document.getElementById('newHotelButton');
 const newHotelWindow = document.getElementById('newHotelWindow');
+const editRoomTypeButton = document.getElementById('editRoomTypeButton');
+const editRoomTypeWindow = document.getElementById('editRoomTypeWindow');
 
+
+function editRoomType(){
+    editRoomTypeWindow.style.display = 'block';
+    editRoomTypeWindow.hidden = false;
+    editRoomTypeButton.style.display = 'none';
+    editRoomTypeButton.hidden = true;
+}
 
 function editReview() {
     editReviewWindow.hidden = false;

@@ -30,56 +30,56 @@ new variable.
                     <p>{{this.roomTypePrice}}</p>
                 </div>
             </div>
-            {{#if roomTypeDeletableStatus}}
             <div class="deleteRoomType">
-                <form action="/user/dashboard/{{username}}/hotel/{{hotelId}}/roomType/{{this._id}}" method="DELETE"
+                <form action="/hotel/{{hotelId}}/hotelManagement/roomType/{{this._id}}" method="DELETE"
                     id="deleteRoomType-form" class="my-form">
                     <input type="hidden" name="hotelId" value="{{hotelId}}">
-                    <button type="submit" id="deleteRoomType-button">Delete</button>
+                    <button type="submit" id="deleteRoomType-button" class="delete">Delete</button>
                 </form>
             </div>
-            {{/if}}
             <div class="editRoomType">
-                <form action="/user/dashboard/{{username}}/hotel/{{hotelId}}/roomType/{{this._id}}" method="PATCH"
-                    id="editRoomType-form" class="my-form">
-                    <label for="roomTypeName" id="roomTypeName-label">
-                        Room Type:
-                    </label>
-                    <input type="text" name="roomTypeName" id="roomTypeName">
-                    <label for="roomTypePrice" id="roomTypePrice-label">
-                        Room Price:
-                    </label>
-                    <input type="number" name="roomTypePrice" id="roomTypePrice">
-                    <label for="roomTypePictures" id="roomTypePictures-label">
-                        Room Pictures:
-                    </label>
-                    <input type="hidden" name="hotelId" value="{{hotelId}}">
-                    <button type="submit" id="editRoomType-button">Edit</button>
-                </form>
+                <button id="editRoomTypeButton">Edit</button>
+                <div hidden="true" id="editRoomTypeWindow">
+                    <form action="/hotel/{{hotelId}}/hotelManagement/roomType/{{this._id}}" method="PATCH"
+                        id="editRoomType-form" class="my-form">
+                        <label for="roomTypeName" id="roomTypeName-label">
+                            Room Type:
+                        </label>
+                        <input type="text" name="roomTypeName" id="roomTypeName">
+                        <label for="roomTypePrice" id="roomTypePrice-label">
+                            Room Price:
+                        </label>
+                        <input type="number" name="roomTypePrice" id="roomTypePrice">
+                        <label for="roomTypePictures" id="roomTypePictures-label">
+                            Room Pictures:
+                        </label>
+                        <input type="hidden" name="hotelId" value="{{hotelId}}">
+                        <button type="submit" id="editRoomType-button">Edit</button>
+                    </form>
+                </div>
             </div>
         </li>
         {{/each}}
     </ol>
 </div>
-    <div class="addNewRoomType right">
-        <form action="/user/dashboard/{{username}}/hotel_management/{{hotelId}}/roomType" method="POST"
-            id="addNewRoom-form" class="my-form">
-            <label for="newRoomTypeName" id="newRoomTypeName-label">
-                Room Type:
-            </label>
-            <input type="text" name="newRoomTypeName" id="newRoomTypeName">
-            <label for="newRoomTypePrice" id="newRoomTypePrice-label">
-                Room Price:
-            </label>
-            <input type="number" name="newRoomTypePrice" id="newRoomTypePrice">
-            <label for="newRoomTypePictures" id="newRoomTypePictures-label">
-                Room Pictures:
-            </label>
-            <input type="file" name="newRoomTypePictures" id="newRoomTypePictures">
-            <input type="hidden" name="hotelId" value="{{hotelId}}">
-            <button type="submit" id="addNewRoom-button">Add</button>
-        </form>
-    </div>
+<div class="addNewRoomType right">
+    <form action="/hotel/{{hotelId}}/hotel_management/roomType" method="POST" id="addNewRoom-form" class="my-form">
+        <label for="newRoomTypeName" id="newRoomTypeName-label">
+            Room Type:
+        </label>
+        <input type="text" name="newRoomTypeName" id="newRoomTypeName">
+        <label for="newRoomTypePrice" id="newRoomTypePrice-label">
+            Room Price:
+        </label>
+        <input type="number" name="newRoomTypePrice" id="newRoomTypePrice">
+        <label for="newRoomTypePictures" id="newRoomTypePictures-label">
+            Room Pictures:
+        </label>
+        <input type="file" name="newRoomTypePictures" id="newRoomTypePictures">
+        <input type="hidden" name="hotelId" value="{{hotelId}}">
+        <button type="submit" id="addNewRoom-button">Add</button>
+    </form>
+</div>
 
 <div class="error" id="client">
     <p id="client-error"></p>
