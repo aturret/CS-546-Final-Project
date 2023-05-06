@@ -83,6 +83,30 @@ header {
   justify-content: center;
   align-items: center;
 } */
+.adminFunctions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+.adminFunctions div {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: green;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.adminFunctions div:hover {
+  background-color: darkgreen;
+  cursor: pointer;
+}
 
 
 .error{
