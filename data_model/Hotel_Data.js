@@ -708,7 +708,7 @@ export async function addOrderByRoomType(...args) {
         )
       )
       {
-        return i._id;
+        return i._id.toString();
       }
     }
   }
