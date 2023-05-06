@@ -26,27 +26,22 @@ forms.forEach(form => {
                 console.log('text checking');             
                 input.value = checkString(input.value, input.name, false);
             })
-            roomTypeInputs.forEach(input => {
-                
+            roomTypeInputs.forEach(input => {                
                 input.value = checkString(input.value, input.name, false);
             })
-            phoneInputs.forEach(input => {
-                console.log('hi');
+            phoneInputs.forEach(input => {                
                 input.value = checkPhone(input.value, false);
             })
-            emailInputs.forEach(input => {
-                console.log('hi');
+            emailInputs.forEach(input => {                
                 input.value = checkEmail(input.value, false);
             })            
             passwordInputs.forEach(input => {               
                 input.value = checkPassword(input.value, false);
             })
-            dateInputs.forEach(input => {
-                console.log('hi');
+            dateInputs.forEach(input => {                
                 input.value = checkDate(input.value, false);
             })
-            textareas.forEach(input => {
-                console.log('hi');
+            textareas.forEach(input => {                
                 input.value = checkString(input.value, input.name, false);
             })
             picInputs.forEach(input => {
@@ -54,8 +49,7 @@ forms.forEach(form => {
                 if (!file) throw "No file selected";
                 if (!file.type.startsWith('image/')) throw "Picture file must be an image";
                 input.value = file.name;
-            })
-            
+            })            
             if (document.getElementById('confirmPasswordInput')) {    
                 const confirmPasswordInput = document.getElementsByClassName('confirmPasswordInput')[0];
                 const PasswordInput = document.getElementsByClassName('PasswordInput')[0];
@@ -64,7 +58,6 @@ forms.forEach(form => {
         }
         catch (e) {
             event.preventDefault();
-            // clientErrorDiv.style.display = 'block';
             clientError.innerHTML = e;
         }
     }
