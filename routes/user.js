@@ -219,6 +219,7 @@ router
       const email = helper.checkEmail(req.user.email, true);
       const phone = helper.checkPhone(req.user.phone, true);
 
+
       const street = helper.checkString(req.user.hotelStreet, "street", true);
       const city = helper.checkString(req.user.hotelCity, "city", true);
       const state = helper.checkString(req.user.hotelState, "state", true);
