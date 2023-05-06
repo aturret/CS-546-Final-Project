@@ -182,9 +182,9 @@ router
   .post(isAuth, async (req, res) => {
     try {
       const roomTypeId = helper.checkId(req.body.roomTypeIdInput, true);
+
       const hotelId = helper.checkId(req.params.hotelId, true);
       const userId = helper.checkId(req.body.userIdInput, true);
-      const roomId = hotelFuncs;
 
       const hotel = await hotelFuncs.getHotel(hotelId);
       const hotelName = hotel.name;
@@ -195,6 +195,8 @@ router
       const guest1LastName = helper.checkString(req.params.guest1LastNameInput, true);
       const guest2FisrtName = helper.checkString(req.params.guest2FisrtNameInput, true);
       const guest2LastName = helper.checkString(req.params.guest2LastNameInput, true);
+
+      const roomId = hotelFuncs.addOrderByRoomType(roomTypeId, checkin, checkout); 
 
       const guests = [
         {
@@ -207,7 +209,9 @@ router
         }
       ];
 
-      const price = helper.checkPrice(req.params.priceInput, true);
+      const roomType = await hotelFuncs.getHotelRoomType(roomTypeId);
+      const days = moment(checkout).diff(moment(checkin), 'days');
+      const price = roomType.price * days;
       const status = 'pending';
 
       const args = [hotelId, userId, roomId, hotelName, checkin, checkout, guests, price, status];
