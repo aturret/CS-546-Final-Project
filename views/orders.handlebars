@@ -16,81 +16,37 @@ order has status: pending, completed, cancelled.
 </div>
 {{/if}}
 <h2>Search Result</h2>
-<div class="searchResult">
+<div class="userOrders">
     <ol>
         {{#each order}}
         <li>
             <div class="orderItem">
                 <div class="orderItemInfo">
-                    <div class="hotelName"><a href="/hotel/{{order.hotelId}}">{{order.hotelName}}</a></div>
+                    <div class="hotelName"><a href="/hotel/{{hotelId}}">{{hotelName}}</a></div>
                     <div class="roomType">
-                        <p>{{order.roomType}}</p>
+                        <p><a href="/order/{{_id}}">{{roomType}}</a></p>
                     </div>
                     <div class="orderPrice">
-                        <p>{{order.orderPrice}}</p>
+                        <p>{{orderPrice}}</p>
                     </div>
                     <div class="startDate">
-                        <p>{{order.startDate}}</p>
+                        <p>{{startDate}}</p>
                     </div>
                     <div class="endDate">
-                        <p>{{order.endDate}}</p>
+                        <p>{{endDate}}</p>
                     </div>
                     <div class="orderGuests">
-                        {{#each order.guests}}
-                        <p>{{order.guests.number}}. {{order.guests.firstName}} {{order.guests.lastName}}</p>
-                        {{/each}}
+                        <p>Guests:</p>                        
+                        <p>{{guest1.firstName}} {{guests1.lastName}}</p>
+                        <p>{{guest2.firstName}} {{guests2.lastName}}</p>
                     </div>
                     <div class="orderStatus">
-                        <p>{{order.status}}</p>
+                        <p>Current Status: {{status}}</p>
                     </div>
-                </div>
-                {{#if (eq order.status "pending")}}
-                <div class="editOrder">
-                    <button class="editOrderButton" onclick="showEditOrderWindow()">Edit</button>
-                    <div class="editOrderWindow" hidden="true">
-                        <form action="/order/{{order.orderId}}/edit" method="PATCH" id="editOrder-form"
-                            class="my-form">
-                            <div class="startDate">
-                                <input type="date" name="startDate" value="{{order.startDate}}">
-                                <label for="startDate">Start Date</label>
-                            </div>
-                            <div class="endDate">
-                                <input type="date" name="endDate" value="{{order.endDate}}">
-                                <label for="endDate">End Date</label>
-                            </div>
-                            <div class="orderGuests">                            
-                            {{#ecah order.guests}}
-                            <div class="guestItem" id="guest-{{order.guests.number}}">
-                                <input type="text" name="guestFirstName-{{order.guests.number}}">
-                                <label for="guestFirstName-{{order.guests.number}}">Guest {{order.guests.number}}
-                                    firstname</label>
-                                <input type="text" name="guestLastName-{{order.guests.number}}">
-                                <label for="guestLastName-{{order.guests.number}}">Guest {{order.guests.number}}
-                                    lastname</label>
-                                <button type="button" onclick="removeGuest({{order.guests.number}})">Remove</button>
-                            </div>
-                            {{/each}}
-                            <button type="button" onclick="addGuest()">Add Guest</button>
-                            </div>
-                            <button type="submit" class="editOrderButton">Edit</button>
-                        </form>
-                    </div>
-                </div>
-                <div class="cancelOrder">
-                    <div class="cancelOrderWindow">
-                        <form action="/order/{{order.orderId}}/cancel" method="PATCH" id="cancelOrder-form"
-                            class="my-form">
-                            <button type="submit" class="cancelOrderButton">Cancel</button>
-                        </form>
-                    </div>
-                </div>
-                {{/if}}
-                {{#if (eq order.status "completed")}}
-                <a href="/hotel/{{hotel}}">Have a review on it!</a>
-                {{/if}}
+                </div>             
             </div>
         </li>
-        {{/each}}
+       {{/each}}
     </ol>
 </div>
 <div class="error" id="client">

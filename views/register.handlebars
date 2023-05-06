@@ -5,51 +5,51 @@ registration handelbars
 --}}
 {{!--
 <script src="../public/js/lab10.js"></script> --}}
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code{{status_code}}: {{error}}</p>
+    <p>Error code{{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 
 <p>Please fill up this form and register your account.</p>
-<form action="/register" method="POST" id="registration-form" class="my-form">
+<form action="/user/register" method="POST" id="registration-form" class="my-form">
     <label for="username" id="username-label">
         Username:
     </label>
-    <input type="text" name="username" id="username"></input>
+    <input type="text" name="username" id="username">
 
     <label for="firstNameInput" id="firstNameInput-label">
         First Name:
     </label>
-    <input type="text" name="firstNameInput" id="firstNameInput"></input>
+    <input type="text" name="firstNameInput" id="firstNameInput">
     <label for="lastNameInput" id="lastNameInput-label">
         Last Name:
     </label>
-    <input type="text" name="lastNameInput" id="lastNameInput"></input>
+    <input type="text" name="lastNameInput" id="lastNameInput">
 
     <label for="emailAddressInput" id="emailAddressInput-label">
         Email:
-        <input type="email" name="emailAddressInput" id="emailAddressInput"></input>
+        <input type="email" name="emailAddressInput" id="emailAddressInput">
     </label>
 
     <label>
         Phone:
-        <input type="phone" name="phone" id="phone"></input>
+        <input type="phone" name="phone" id="phone">
     </label>
 
     <label for="passwordInput" id="passwordInput-label">
         Password:
-        <input type="password" name="passwordInput" id="passwordInput"></input>
+        <input type="password" name="passwordInput" id="passwordInput">
     </label>
 
     <label for="confirmPasswordInput" id="confirmPasswordInput-label">
         Confirm Password:
     </label>
-    <input type="password" name="confirmPasswordInput" id="confirmPasswordInput"></input>
+    <input type="password" name="confirmPasswordInput" id="confirmPasswordInput">
 
     <button type="submit" id="register-button">Register</button>
 </form>
-<p class="error" id="client">
+<p class="error" id="client-error">
     {{errorMessage}}
 </p>
-<a href="/login">Already have an account? Click here to log-in!</a>
+<a href="/user/login">Already have an account? Click here to log-in!</a>

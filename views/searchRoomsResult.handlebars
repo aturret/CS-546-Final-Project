@@ -20,8 +20,8 @@
                     {{#each roomType}}
                     <li>
                         <div class="roomItem">
-                            <input type="radio" id="{{roomTypeId}}" name="roomCheck" value="{{roomTypeId}}">
-                            <label for="{{roomTypeId}}">{{roomTypeName}}</label>
+                            <input type="radio" id="{{_id}}" name="roomCheck" value="{{_id}}">
+                            <label for="{{_id}}">{{roomTypeName}}</label>
                             <div class="roomPhoto"><img src="{{roomPhoto}}"></div>
                             <div class="roomInfo">
                                 {{!-- <div class="roomTypeName">
@@ -29,8 +29,7 @@
                                 </div> --}}
                                 <div class="roomPrice">
                                     <p>Price: {{roomPrice}}</p>
-                                </div>
-                                <div class="roomBook"><a href="{{hotelId}}/{{roomTypeId}}">Book</a></div>
+                                </div>                                
                             </div>
                         </div>
                     </li>
@@ -39,21 +38,31 @@
             </div>
             <div class="otherInfo">
                 <div class="guests">
-                    {{!-- This part will be increased by DOM operation. You need to get all guestFirstName and
-                    guestLastName and solve it at the backend. --}}
+                    {{!-- This part will be increased by DOM operation. --}}
                     <div class="guestItem" id="guest-1">
-                        <input type="text" name="guestFirstName-1">
-                        <label for="guestFirstName-1">Guest 1 firstname</label>
-                        <input type="text" name="guestLastName-1">
-                        <label for="guestLastName-1">Guest 1 lastname</label>
-                        <button type="button" onclick="removeGuest(1)">Remove</button>
+                        <input type="text" name="guestFirstNameInput-1">
+                        <label for="guestFirstNameInput-1">Guest 1 firstname</label>
+                        <input type="text" name="guestLastNameInput-1">
+                        <label for="guestLastNameInput-1">Guest 1 lastname</label>
                     </div>
-                    <button id="addNewGuest" onclick="addGuest()">Add another guest</button>
+                    <div class="guestItem" id="guest-2">
+                        <input type="text" name="guestFirstNameInput-2">
+                        <label for="guestFirstNameInput-2">Guest 2 firstname</label>
+                        <input type="text" name="guestLastNameInput-2">
+                        <label for="guestLastNameInput-2">Guest 2 lastname</label>
+                    </div>
                 </div>
-                <input type="hidden" name="hotelId" value="{{hotelId}}">
-                <input type="hidden" name="checkInDate" value="{{checkInDate}}">
-                <input type="hidden" name="checkOutDate" value="{{checkOutDate}}">
+                <input type="hidden" name="hotelIdInput" value="{{hotelId}}">
+                <input type="hidden" name="checkInDateInput" value="{{checkInDate}}">
+                <input type="hidden" name="checkOutDateInput" value="{{checkOutDate}}">
                 <input type="hidden" name="status" value="pending">
+                <div class="summary">
+                    <p>start date: {{checkInDate}}</p>
+                    <p>end date: {{checkOutDate}}</p>
+                    <p>room type:<span id="roomType"></span></p>
+                    <p>total days:<span id="totalDays"></span></p>
+                    <p id="totalPriceDiv">Total Price: <span id="totalPrice"></span></p>
+                </div>
                 <button type="submit" id="book-button">Book</button>
             </div>
         </form>
@@ -70,6 +79,6 @@
 </div>
 {{#if (eq user.identity "guest")}}
 <div class="new-user">
-    <p>You can <a href="/register">register</a> or <a href="/login">login</a> first.</p>
+    <p>You can <a href="/user/register">register</a> or <a href="/user/login">login</a> first.</p>
 </div>
 {{/if}}

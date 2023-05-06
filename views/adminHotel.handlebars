@@ -6,90 +6,64 @@
 
 {{#if error}}
 <div class="error">
-    <p>Error code {{status}}: {{errorMessage}}</p>
+    <p>Error code {{statusCode}}: {{errorMessage}}</p>
 </div>
 {{/if}}
-<div class="Avatar">
-    <img src="{{avatar}}" alt="thumbnail not available">
-</div>
-<h2>{{username}}</h2>
-<div class="information">
-    <div class="userIdentity">
-        <p>Identity: {{identity}}</p>
-    </div>
-    <div class="userFirstName">
-        <p>First Name: {{firstName}}</p>
-    </div>
-    <div class="userLastName">
-        <p>Last Name: {{lastName}}</p>
-    </div>
-    <div class="userEmail">
-        <p>Email: {{email}}</p>
-    </div>
-    <div class="userPhone">
-        <p>Phone: {{phone}}</p>
-    </div>
-</div>
-{{#if (eq user.identity "user")}}
-<div class="newApplication">
-    <button id="newHotelButton" onclick="newHotel()">Start Hotel Registration</button>
-    <div id="newHotelWindow" hidden="true">
-        <form action="/user/dashboard/{{username}}/upgrade" method="POST">
+
+<div class="newHotel">
+    <div id="newHotelWindow">
+        <form action="/admin/createHotel" method="POST">
             
             <label for="hotelNameInput" id="hotelNameInput-label">
                 Hotel Name:
             </label>
             <input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
-            <label for="hotelPhoto" id="hotelPhoto-label">
+
+            <label for="hotelPhotoInput" id="hotelPhotoInput-label">
                 Hotel Photo:
             </label>
-            <input type="text" name="hotelPhotoInput" id="hotelPhotoInput" value="{{hotelPhoto}}">
+            <input type="file" name="hotelPhotoInput" id="hotelPhotoInput" value="{{hotelPhoto}}">
+
             <div class="hotelContact">
                 <label for="hotelPhoneInput" id="hotelPhoneInput-label">
                     Hotel Phone:
                 </label>
                 <input type="text" name="hotelPhoneInput" id="hotelPhoneInput" value="{{hotelPhone}}">
+
                 <label for="hotelEmailInput" id="hotelEmailInput-label">
                     Hotel Email:
                 </label>
                 <input type="email" name="hotelEmailInput" id="hotelEmailInput" value="{{hotelEmail}}">
             </div>
+
             <div class="hotelAddress">
-                <input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
                 <label for="hotelCityInput" id="hotelCityInput-label">
                     Hotel City:
                 </label>
                 <input type="text" name="hotelCityInput" id="hotelCityInput" value="{{hotelCity}}">
+
                 <label for="hotelStreetInput" id="hotelStreetInput-label">
                     Hotel Street:
                 </label>
                 <input type="text" name="hotelStreetInput" id="hotelStreetInput" value="{{hotelStreet}}">
+
                 <label for="hotelStateInput" id="hotelStateInput-label">
                     Hotel State:
                 </label>
                 <select id="hotelStateInput" class="state" name="hotelStateInput">
                 </select>
+
                 <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
                     Hotel Zip:
                 </label>
                 <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput" value="{{hotelZipcode}}">
-                <input type="hidden" name="userIdInput" value="{{_id}}">
-                <button type="submit" id="newApplication">Apply for a new hotel</button>
+
+                <button type="submit" id="newApplication">Create hotel</button>
+            </div>
         </form>
     </div>
+</div>
 
-</div>
-{{/if}}
-<div class="functionMenu">
-    <div class="functionItem"><a href="/order">My Orders</a></div>
-    {{#if (eq user.identity "manager")}}
-    <div class="functionItem"><a href="/hotel">My Hotel</a></div>
-    {{/if}}
-    {{#if (eq user.identity "admin")}}
-    <div class="functionItem"><a href="/admin">Admin</a></div>
-    {{/if}}
-    <div class="functionItem"><a href="/logout">Log Out</a></div>
-</div>
 
 <div class="error" id="client">
     <p id="client-error"></p>

@@ -10,27 +10,21 @@ roomTypes: Please pass all roomTpyes when rendering this template.
 </div>
 {{/if}}
 <h2>Welcome, powerful admin.</h2>
-<div class="searchResult">
-    <ol>
-        {{#each applications}}
+<div class="adminFunctions">    
+    <ol>       
         <li>
-            <div class="applicationItem">
-                <div class="applicationName">
-                    <p>{{applications.applicationName}}</p>
-                </div>
-                <div class="applicationStatus">
-                    <p>{{applications.applicationStatus}}</p>
-                </div>
+            <div class="requests">
+                <a href="/admin/requests">Requests</a>
             </div>
-            {{#if (eq applications.applicationStatus "pending")}}
-            <div class="approveApplication">
-                <form action="/admin/{{applications.applicationId}}/approve" method="PATCH">
-                    <input type="hidden" name="applicationId" value="{{applications.applicationId}}">
-                    <button type="submit">Approve</button>
-                </form>
+            <div class="accounts">
+                <a href="/admin/accounts">Accounts</a>
             </div>
+            <div class="hotels">
+                <a href="/admin/createHotel">Create a hotel</a>
+            </div>
+            {{/if}}
         </li>
-        {{/each}}
+        
     </ol>
 
 </div>

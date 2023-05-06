@@ -1,4 +1,5 @@
-let stateDocument = document.querySelector('input[class="state"]');
+// let stateDocument = document.querySelector('select[id="state"]');
+const stateDocument = document.querySelectorAll('select.state, select#state')[0];
 const stateList = [
     {abbr: 'AL', name: 'Alabama'},
     {abbr: 'AK', name: 'Alaska'},

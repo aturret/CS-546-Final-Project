@@ -23,11 +23,11 @@ There are four types of identities: "guest", "user", "manager", "admin".
             <div class="nav">
                 <ul>
                     {{#if (eq user.identity "guest")}}
-                    <li><a href="/login">Login</a></li>
-                    <li><a href="/register">Register</a></li>
-                    {{#else}}                  
-                    <li><a href="/dashboard">Dashboard</a></li>
-                    <li><a href="/logout">Logout</a></li>
+                    <li><a href="/user/login">Login</a></li>
+                    <li><a href="/user/register">Register</a></li>
+                    {{else}}                  
+                    <li><a href="/user/dashboard/{{user.username}}">Dashboard</a></li>
+                    <li><a href="/user/logout">Logout</a></li>
                     {{/if}}
                 </ul>
         </header>

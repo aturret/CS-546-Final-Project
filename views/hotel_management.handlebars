@@ -1,9 +1,7 @@
 {{!--
 
 hotel_photo: the first photo of the Pictures attribute of the hotel
-hotel book button: You can modify the reletive address for your own purpose
-hotel room: you should calculate this variable of if there are available rooms to determine whether to show the hotel
-room information
+
 
 --}}
 
@@ -29,39 +27,39 @@ room information
         </div>
     </div>
     <div class="edit">
-        <button class="editHotelInfo">Edit Hotel Basic Info</button>
-        <div hidden="true" class="hotelInfoEdit">
-            <form action="/room" method="POST" id="registration-form" class="my-form">
-                <label for="hotelName" id="hotelName-label">
+        <button id="editHotelButton" onclick="editHotel()">Edit Hotel Basic Info</button>
+        <div hidden="true" id="editHotelWindow">
+            <form action="/hotel/{{hotelId}}" method="PATCH" id="editHotelForm" class="my-form">
+                <input type="hidden" name="hotelIdInput" value="{{hotelId}}">
+                <label for="hotelNameInput" id="hotelNameInput-label">
                     Hotel Name:
                 </label>
-                <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
+                <input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
                 <div class="hotelContact">
-                    <label for="hotelPhone" id="hotelPhone-label">
+                    <label for="hotelPhoneInput" id="hotelPhoneInput-label">
                         Hotel Phone:
                     </label>
-                    <input type="text" name="hotelPhone" id="hotelPhone" value="{{hotelPhone}}">
-                    <label for="hotelEmail" id="hotelEmail-label">
+                    <input type="text" name="hotelPhoneInput" id="hotelPhoneInput" value="{{hotelPhone}}">
+                    <label for="hotelEmailInput" id="hotelEmailInput-label">
                         Hotel Email:
                     </label>
-                    <input type="email" name="hotelEmail" id="hotelEmail" value="{{hotelEmail}}">
+                    <input type="email" name="hotelEmailInput" id="hotelEmailInput" value="{{hotelEmail}}">
                 </div>
                 <div class="hotelAddress">
-                    <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
-                    <label for="hotelCity" id="hotelCity-label">
+                    <label for="hotelCityInput" id="hotelCityInput-label">
                         Hotel City:
                     </label>
-                    <input type="text" name="hotelCity" id="hotelCity" value="{{hotelCity}}">
-                    <label for="hotelStreet" id="hotelStreet-label">
+                    <input type="text" name="hotelCityInput" id="hotelCityInput" value="{{hotelCity}}">
+                    <label for="hotelStreetInput" id="hotelStreetInput-label">
                         Hotel Street:
                     </label>
-                    <input type="text" name="hotelStreet" id="hotelStreet" value="{{hotelStreet}}">
-                    <label for="hotelState" id="hotelState-label">
+                    <input type="text" name="hotelStreetInput" id="hotelStreetInput" value="{{hotelStreet}}">
+                    <label for="hotelStateInput" id="hotelStateInput-label">
                         Hotel State:
                     </label>
-                    <select id="hotelState" class="state">
+                    <select id="hotelStateInput" class="state" name="hotelStateInput">
                     </select>
-                    <label for="hotelZipcode" id="hotelZipcode-label">
+                    <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
                         Hotel Zip:
                     </label>
                     <input type="text" name="hotelZipcode" id="hotelZipcode" value="{{hotelZipcode}}">
@@ -69,158 +67,22 @@ room information
                 <button type="submit">Submit Info Change</button>
             </form>
         </div>
-        <button class="AddHotelRoom">Edit Hotel Rooms</button>
+        <a href="/hotel/{{hotelId}}/room">Edit Hotel Rooms</a>
+        <a href="/hotel/{{hotelId}}/roomType">Edit Hotel Rooms Types</a>
+        <a href="/hotel/{{hotelId}}/orders">Edit Hotel Reviews</a>
     </div>
-
+    {{if (eq user.userIdentity "admin")}}
+    <div class="delete">
+        <button id="deleteHotelButton" onclick="deleteHotel()">Delete Hotel</button>
+        <div hidden="true" id="deleteHotelWindow">
+            <form action="/hotel/{{hotelId}}" method="DELETE" id="deleteHotelForm" class="my-form">
+                <input type="hidden" name="hotelIdInput" value="{{hotelId}}">
+                <button type="submit">Confirm Delete</button>
+            </form>
+        </div>
+    </div>
+    {{/if}}
 </div>
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-<a href="/register">Click here to register!</a>
-
-{{#if error}}
-<div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
-</div>
-{{/if}}
-<h2>{{hotelName}}</h2>
-<div class="hotelInfo">
-    <div class="hotelBasicInfo">
-        <div class="hotelPhoto"><img src="{{hotelPhoto}}"></div>
-        <div class="hotelRating">
-            <p>Rating: {{hotelRating}}</p>
-        </div>
-    </div>
-    <div class="hotelIntro">
-        <div class="hotelAddress">
-            <p>Address: {{hotelAddress}}</p>
-        </div>
-        <div class="hotelContacts">
-            <p>Contacts: Phone: {{hotelPhone}} Email: {{hotelEmail}}</p>
-        </div>
-    </div>
-    {{#if (ne user.identity "guest")}}
-    <div class="booking">
-        <p>Please choose the date and search if there are rooms available.</p>
-        <form action="/hotel/{{hotelId}}/result" method="POST" id="registration-form" class="my-form">
-            <label for="startDate" id="startDate-label">
-                Start Date:
-            </label>
-            <input type="date" name="startDate" id="startDate">
-            <label for="endDate" id="endDate-label">
-                End Date:
-            </label>
-            <input type="date" name="endDate" id="endDate">
-            <button type="submit">Search</button>
-        </form>
-    </div>
-    {{#else}}
-    <div class="booking">
-        <p>Please <a href="/register">log in</a> to book a room.</p>
-    </div>
-    {{/if}}
-    {{#if (eq user.hotel hotelId)}}
-    <div class="edit">
-        <button class="editHotelInfo">Edit Hotel Basic Info</button>
-        <div hidden="true" class="hotelInfoEdit">
-            <form action="/room" method="POST" id="registration-form" class="my-form">
-                <input type="text" name="hotelState" id="hotelState" placeholder="State">
-                <button type="submit">Submit Info Change</button>
-            </form>
-        </div>
-        <button class="AddHotelRoom">Edit Hotel Rooms</button>
-    </div>
-    {{/if}}
-</div>
-<div class="reviewSection">
-    <div class="reviewResult">
-        {{#if userHasReviewed}}
-        <div class="editReview">
-            <div class="editReviewButton">
-                <button class="editReview" onclick="editReview()">
-                    Edit Review
-                </button>
-            </div>
-            <div hidden="true" class="editReviewWindow">
-                <form action="/reviews/{{reviewId}}" method="PATCH">
-                    <textarea name="reviewComment" placeholder="Comment">{{reviewComment}}</textarea>
-                    <select name="reviewRating" id="reviewRating">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3" selected>3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                    <button type="submit">Submit</button>
-                </form>
-            </div>
-            {{/if}}
-            {{#if(ne userHasReviewed)}}
-            <div class="addReview">
-                <div class="addReviewButton">
-                    <button class="addReview" onclick="addReview()">
-                        Add Review
-                    </button>
-                </div>
-                <div hidden="true" class="addReviewWindow">
-                    <form action="/reviews" method="POST">
-                        <input type="text" name="reviewTitle" placeholder="Title">
-                        <textarea name="reviewComment" placeholder="Comment"></textarea>
-                        <select name="reviewRating" id="reviewRating">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                        <button type="submit">Submit</button>
-                    </form>
-                </div>
-                {{/if}}
-                <ol>
-                    {{#each reviews}}
-                    <li>
-                        <div class="reviewItem">
-                            <div class="reviewUserItem">
-                                <div class="reviewUserPhoto">{{reviews.userAvatar}}</div>
-                            </div>
-                            <div class="reviewContentItem">
-                                <div class="reviewTitle"><a
-                                        href="/reviews/{{reviews.reviewId}}">{{reviews.reviewTitle}}</a></div>
-                                <div class="reviewRating">
-                                    <p>{{reviews.reviewRating}}</p>
-                                </div>
-                                <div class="reviewComment">
-                                    <p>{{reviews.reviewComment}}</p>
-                                </div>
-                                <div class="reviewUpvote">
-                                    <p>Upvote: {{reviews.reviewUpvote}}</p>
-                                </div>
-                                <div class="reviewDownvote">
-                                    <p>Downvote: {{reviews.reviewDownvote}}</p>
-                                </div>
-                            </div>
-                            {{#if managerReply}}
-                            <div class="managerReply">
-                                <p>Manager reply: {{managerReply}}</p>
-                            </div>
-                            {{/if}}
-                            {{#if managerReplyWindow}}
-                            <div class="managerReplyWindow">
-                                <form action="/reviews/{{reviewId}}" method="POST">
-                                    <textarea name="managerReply" placeholder="Reply to this review"></textarea>
-                                    <button type="submit">Submit</button>
-                                </form>
-                            </div>
-                            {{/if}}
-                        </div>
-                    </li>
-                    {{/each}}
-                </ol>
-            </div>
-        </div>
-    </div>
-    <div class="error" id="client">
-        <p id="client-error"></p>
-    </div>
-    <a href="/register">Click here to register!</a>

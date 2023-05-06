@@ -14,10 +14,17 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
     <p>Error code {{statusCode}}: {{error}}</p>
 </div>
 {{/if}}
+{{#if (or(eq user.hotelId hotelId)(eq user.identity "admin"))}}
+<div class="management">
+    <p><a href="/hotel/{{hotelId}}/hotel_management">Click here to enter management page.</a></p>
+</div>
+{{/if}}
 <h2>{{hotelName}}</h2>
 <div class="hotelInfo">
     <div class="hotelBasicInfo">
-        <div class="hotelPhoto"><img src="{{hotelPhoto}}"></div>
+        <div class="hotelPhoto">
+            <img src="{{hotelPhoto}}">
+        </div>
         <div class="hotelRating">
             <p>Rating: {{hotelRating}}</p>
         </div>
@@ -32,7 +39,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
     </div>
     {{#if (ne user.identity "guest")}}
     <div class="booking">
-        <p>Please choose the date and search if there are rooms available.</p>
+        <p>Please choose the date and search if there are rooms available during your schedule.</p>
         <form action="/hotel/{{hotelId}}/result" method="POST" id="registration-form" class="my-form">
             <label for="startDate" id="startDate-label">
                 Start Date:
@@ -45,7 +52,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
             <button type="submit">Search</button>
         </form>
     </div>
-    {{#else}}
+    {{else}}
     <div class="booking">
         <p>Please <a href="/register">log in</a> to book a room.</p>
     </div>
@@ -54,95 +61,40 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
 <div class="reviewSection">
     <div class="reviewResult">
         {{#if userHasReviewed}}
-        <div class="editReview">
-            <div class="editReviewButton">
-                <button id="editReviewButton" onclick="editReview()">
-                    Edit Review
-                </button>
-            </div>
-            <div hidden="true" id="editReviewWindow">
-                <form action="/reviews/{{reviewId}}" method="PATCH">
-                <label for="reviewTitle">Title</label>
-                    <input type="text" name="reviewTitle" placeholder="Title" value="{{reviewTitle}}">
-                    <label for="reviewComment">Comment</label>
-                    <textarea name="reviewComment" placeholder="Comment">{{reviewComment}}</textarea>
-                    <label for="reviewRating">Rating</label>
-                    <select name="reviewRating" id="reviewRating">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3" selected>3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                    <button type="submit">Submit</button>
-                </form>
-            </div>
-        </div>
-        {{#else}}
-        <div class="addReview">
-            <div class="addReviewButton">
-                <button id="addReviewButton" onclick="addReview()">
-                    Add Review
-                </button>
-            </div>
-            <div hidden="true" id="addReviewWindow">
-                <form action="/reviews" method="POST">
-                <label for="reviewTitle">Title</label>
-                    <input type="text" name="reviewTitle" placeholder="Title">
-                     <label for="reviewComment">Comment</label>
-                    <textarea name="reviewComment" placeholder="Comment"></textarea>
-                    <label for="reviewRating">Rating</label>
-                    <select name="reviewRating" id="reviewRating">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3" selected>3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                    <button type="submit">Submit</button>
-                </form>
-            </div>
-        </div>
+        <a href="/review/{{reviewID}}">to your review</a>
         {{/if}}
         <ol>
             {{#each reviews}}
             <li>
                 <div class="reviewItem">
                     <div class="reviewUserItem">
-                        <div class="reviewUserPhoto"><img src="{{reviews.userAvatar}}"></div>
+                        <div class="reviewUserPhoto"><img src="{{userAvatar}}"></div>
                         <div class="reviewUserName">
-                            <p>{{reviews.userName}}</p>
+                            <p><a href="/reviews/{{this._id}}">{{this.userName}}</a></p>
                         </div>
                     </div>
                     <div class="reviewContentItem">
-                        <div class="reviewTitle"><a href="/reviews/{{reviews.reviewId}}">{{reviews.reviewTitle}}</a>
-                        </div>
                         <div class="reviewRating">
-                            <p>{{reviews.reviewRating}}</p>
+                            <p>{{this.rating}}</p>
                         </div>
                         <div class="reviewComment">
-                            <p>{{reviews.reviewComment}}</p>
+                            <p>{{this.comment}}</p>
                         </div>
                         <div class="reviewUpvote">
-                            <p>Upvote: {{reviews.reviewUpvote}}</p>
+                            <p>Upvote: {{this.upVote}}</p>
                         </div>
                         <div class="reviewDownvote">
-                            <p>Downvote: {{reviews.reviewDownvote}}</p>
+                            <p>Downvote: {{this.downVote}}</p>
                         </div>
                     </div>
-                    {{#if reviews.managerReply}}
-                    <div class="managerReply">
-                        <p>Manager reply: {{reviews.managerReply}}</p>
-                    </div>
-                    {{/if}}
                 </div>
             </li>
             {{/each}}
         </ol>
     </div>
 </div>
-</div>
+
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-<a href="/register">Click here to register!</a>
+<a href="/user/register">Click here to register!</a>

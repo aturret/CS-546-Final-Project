@@ -11,27 +11,37 @@ hotelPrice: might be the lowest price or average price. I think lowest is better
 </div>
 {{/if}}
 <h2>Search Result</h2>
+
 <div class="searchResult">
-<ol>
-    {{#each hotels}}
-    <li>
-    <div class="searchResultItem">
-        <div class="hotelName"><a href="/hotel/{{hotels.hotelId}}">{{hotels.hotelName}}</a></div>
-        <div class="hotelPicture"><img src="{{hotels.hotelPicture}}"></div>
-        <div class="hotelReviewNumber"><p>{{hotels.hotelReviewNumber}}</p></div>
-        <div class="hotelRating"><p>{{hotels.hotelRating}}</p></div>
-        <div class="hotelAddress"><p>{{hotels.hotelAddress}}</p></div>
-        <div class="hotelPrice"><p>{{hotels.hotelPrice}}</p></div>
-    </div>
-    </li>
-    {{/each}}
-</ol>
+    <ol>
+        {{#each hotels}}
+        <li>
+            <div class="searchResultItem">
+                <div class="hotelName"><a href="/hotel/{{this.hotelId}}">{{this.hotelName}}</a></div>
+                <div class="hotelPicture"><img src="{{this.hotelPicture}}"></div>
+                <div class="hotelReviewNumber">
+                    <p>Review number: {{this.hotelReviewNumber}}</p>
+                </div>
+                <div class="hotelRating">
+                    <p>Overall Rating: {{this.hotelRating}}</p>
+                </div>
+                <div class="hotelAddress">
+                    <p>Address: {{this.hotelAddress}}</p>
+                </div>
+                <div class="hotelPrice">
+                    <p>Up from {{this.hotelPrice}}</p>
+                </div>
+            </div>
+        </li>
+        {{/each}}
+    </ol>
 </div>
+
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
 {{#if (eq user.identity "guest")}}
 <div class="new-user">
-    <p>You can <a href="/register">register</a> or <a href="/login">login</a> first.</p>
+    <p>You can <a href="/user/register">register</a> or <a href="/user/login">login</a> first.</p>
 </div>
 {{/if}}

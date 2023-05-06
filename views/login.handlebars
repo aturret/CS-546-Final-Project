@@ -4,25 +4,25 @@ login form handlebar template
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 
 <p>Please log in your account.</p>
-<form action="/login" method="POST" id="login-form" class="my-form">
+<form action="/user/login" method="POST" id="login-form" class="my-form">
     <label for="username" id="username">  
         Username: 
     </label>
-    <input type="username" name="username" id="username"></input>
+    <input type="username" name="username" id="username">
     <label for="passwordInput" id="passwordInput-label">  
         Password:
     </label>
-    <input type="password" name="passwordInput" id="passwordInput"></input>
+    <input type="password" name="passwordInput" id="passwordInput">
     <button type="submit" id="login-button">Login</button>
 </form>
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-<p>Don't have an account? <a href="/register">Click here to register!</a></p>
+<p>Don't have an account? <a href="/user/register">Click here to register!</a></p>
