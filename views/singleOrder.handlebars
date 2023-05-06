@@ -40,7 +40,7 @@ order has status: pending, completed, cancelled.
                 <p>{{status}}</p>
             </div>
         </div>
-        {{#if (eq status "pending")}}
+        {{#if (eq status "accepted")}}
         <div class="editOrder">
             <button class="editOrderButton" onclick="showEditOrderWindow()">Edit</button>
             <div class="editOrderWindow" hidden="true">
@@ -83,9 +83,8 @@ order has status: pending, completed, cancelled.
                     <button type="submit" class="cancelOrderButton">Cancel</button>
                 </form>
             </div>
-        </div>
-        {{/if}}
-        {{#if (eq status "completed")}}
+        </div>        
+        {{#if (ne reviewId)}}
         <div class="addReview">
             <p>You have completed this order but had no reviews on it. Please write your review to give other tourists a
                 guide!</p>
@@ -96,12 +95,10 @@ order has status: pending, completed, cancelled.
             </div>
             <div hidden="true" id="addReviewWindow">
                 <form action="/reviews" method="POST">
-                    <label for="reviewTitle">Title</label>
-                    <input type="text" name="reviewTitle" placeholder="Title">
-                    <label for="reviewComment">Comment</label>
-                    <textarea name="reviewComment" placeholder="Comment"></textarea>
-                    <label for="reviewRating">Rating</label>
-                    <select name="reviewRating" id="reviewRating">
+                    <label for="reviewCommentInput">Comment</label>
+                    <textarea name="reviewCommentInput" placeholder="Comment"></textarea>
+                    <label for="reviewRatingInput">Rating</label>
+                    <select name="reviewRatingInput" id="reviewRatingInput">
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3" selected>3</option>
@@ -112,6 +109,7 @@ order has status: pending, completed, cancelled.
                 </form>
             </div>
         </div>
+        {{/if}}
         {{/if}}
     </div>
 

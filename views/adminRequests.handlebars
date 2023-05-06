@@ -25,15 +25,15 @@ roomTypes: Please pass all roomTpyes when rendering this template.
             {{#if (eq applications.applicationStatus "pending")}}
             <div class="approveApplication">
                 <form action="/hotel/{{hotelId}}/application/{{applications.applicationId}}/approve" method="POST">
-                    <input type="hidden" name="applicationId" value="{{applications.applicationId}}">
-                    <input type="hidden" name="applicationUserId" value="{{applications.applicationUserId}}">
+                    <input type="hidden" name="applicationIdInput" value="{{applications.applicationId}}">
+                    <input type="hidden" name="applicationUserIdInput" value="{{applications.applicationUserId}}">
                     <button type="submit">Approve</button>
                 </form>
             </div>
             <div class="denyApplication">
                 <form action="/hotel/{{hotelId}}/application/{{applications.applicationId}}/reject" method="POST">
-                    <input type="hidden" name="applicationId" value="{{applications.applicationId}}">
-                    <input type="hidden" name="applicationUserId" value="{{applications.applicationUserId}}">
+                    <input type="hidden" name="applicationIdInput" value="{{applications.applicationId}}">
+                    <input type="hidden" name="applicationUserIdInput" value="{{applications.applicationUserId}}">
                     <button type="submit">Deny</button>
                 </form>
             {{/if}}

@@ -12,23 +12,23 @@ login form handlebar template
 
 <p>Search for the best hotel you can have for your vacation!</p>
 <form action="/" method="POST" id="login-form" class="my-form">
-    <label for="hotalName" id="hotalName-label">  
+    <label for="hotalNameInput" id="hotalNameInput-label">  
         Hotel Name: 
     </label>
-    <input type="text" name="hotalName" id="hotalName">
+    <input type="text" name="hotalNameInput" id="hotalNameInput">
     <label for="hotelState" id="hotelState-label">  
         State:
     </label>
-    <select id="hotelState" name="hotelState">
+    <select id="hotelStateInput" name="hotelStateInput" class="state">
     </select>
     <label for="hotelCity" id="hotelCity-label">  
         City:
     </label>
-    <input type="text" name="hotelCity" id="hotelCity">
-    <label for="hotelZipcode" id="hotelZipcode-label">  
+    <input type="text" name="hotelCityInput" id="hotelCityInput">
+    <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">  
         Zipcode:
     </label>
-    <input type="text" name="hotelZipcode" id="hotelZipcode">
+    <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput">
     <button type="submit" id="login-button">Search</button>
 </form>
 <div class="error" id="client">

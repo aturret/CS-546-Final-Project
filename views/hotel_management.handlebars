@@ -30,36 +30,36 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
         <button id="editHotelButton" onclick="editHotel()">Edit Hotel Basic Info</button>
         <div hidden="true" id="editHotelWindow">
             <form action="/hotel/{{hotelId}}" method="PATCH" id="editHotelForm" class="my-form">
-                <input type="hidden" name="hotelId" value="{{hotelId}}">
-                <label for="hotelName" id="hotelName-label">
+                <input type="hidden" name="hotelIdInput" value="{{hotelId}}">
+                <label for="hotelNameInput" id="hotelNameInput-label">
                     Hotel Name:
                 </label>
-                <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
+                <input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
                 <div class="hotelContact">
-                    <label for="hotelPhone" id="hotelPhone-label">
+                    <label for="hotelPhoneInput" id="hotelPhoneInput-label">
                         Hotel Phone:
                     </label>
-                    <input type="text" name="hotelPhone" id="hotelPhone" value="{{hotelPhone}}">
-                    <label for="hotelEmail" id="hotelEmail-label">
+                    <input type="text" name="hotelPhoneInput" id="hotelPhoneInput" value="{{hotelPhone}}">
+                    <label for="hotelEmailInput" id="hotelEmailInput-label">
                         Hotel Email:
                     </label>
-                    <input type="email" name="hotelEmail" id="hotelEmail" value="{{hotelEmail}}">
+                    <input type="email" name="hotelEmailInput" id="hotelEmailInput" value="{{hotelEmail}}">
                 </div>
                 <div class="hotelAddress">
-                    <label for="hotelCity" id="hotelCity-label">
+                    <label for="hotelCityInput" id="hotelCityInput-label">
                         Hotel City:
                     </label>
-                    <input type="text" name="hotelCity" id="hotelCity" value="{{hotelCity}}">
-                    <label for="hotelStreet" id="hotelStreet-label">
+                    <input type="text" name="hotelCityInput" id="hotelCityInput" value="{{hotelCity}}">
+                    <label for="hotelStreetInput" id="hotelStreetInput-label">
                         Hotel Street:
                     </label>
-                    <input type="text" name="hotelStreet" id="hotelStreet" value="{{hotelStreet}}">
-                    <label for="hotelState" id="hotelState-label">
+                    <input type="text" name="hotelStreetInput" id="hotelStreetInput" value="{{hotelStreet}}">
+                    <label for="hotelStateInput" id="hotelStateInput-label">
                         Hotel State:
                     </label>
-                    <select id="hotelState" class="state">
+                    <select id="hotelStateInput" class="state" name="hotelStateInput">
                     </select>
-                    <label for="hotelZipcode" id="hotelZipcode-label">
+                    <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
                         Hotel Zip:
                     </label>
                     <input type="text" name="hotelZipcode" id="hotelZipcode" value="{{hotelZipcode}}">
@@ -76,7 +76,7 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
         <button id="deleteHotelButton" onclick="deleteHotel()">Delete Hotel</button>
         <div hidden="true" id="deleteHotelWindow">
             <form action="/hotel/{{hotelId}}" method="DELETE" id="deleteHotelForm" class="my-form">
-                <input type="hidden" name="hotelId" value="{{hotelId}}">
+                <input type="hidden" name="hotelIdInput" value="{{hotelId}}">
                 <button type="submit">Confirm Delete</button>
             </form>
         </div>

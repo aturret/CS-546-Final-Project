@@ -36,44 +36,44 @@
     <div id="newHotelWindow" hidden="true">
         <form action="/user/dashboard/{{username}}/upgrade" method="POST">
             
-            <label for="hotelName" id="hotelName-label">
+            <label for="hotelNameInput" id="hotelNameInput-label">
                 Hotel Name:
             </label>
-            <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
+            <input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
             <label for="hotelPhoto" id="hotelPhoto-label">
                 Hotel Photo:
             </label>
-            <input type="text" name="hotelPhoto" id="hotelPhoto" value="{{hotelPhoto}}">
+            <input type="text" name="hotelPhotoInput" id="hotelPhotoInput" value="{{hotelPhoto}}">
             <div class="hotelContact">
-                <label for="hotelPhone" id="hotelPhone-label">
+                <label for="hotelPhoneInput" id="hotelPhoneInput-label">
                     Hotel Phone:
                 </label>
-                <input type="text" name="hotelPhone" id="hotelPhone" value="{{hotelPhone}}">
-                <label for="hotelEmail" id="hotelEmail-label">
+                <input type="text" name="hotelPhoneInput" id="hotelPhoneInput" value="{{hotelPhone}}">
+                <label for="hotelEmailInput" id="hotelEmailInput-label">
                     Hotel Email:
                 </label>
-                <input type="email" name="hotelEmail" id="hotelEmail" value="{{hotelEmail}}">
+                <input type="email" name="hotelEmailInput" id="hotelEmailInput" value="{{hotelEmail}}">
             </div>
             <div class="hotelAddress">
-                <input type="text" name="hotelName" id="hotelName" value="{{hotelName}}">
-                <label for="hotelCity" id="hotelCity-label">
+                <input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
+                <label for="hotelCityInput" id="hotelCityInput-label">
                     Hotel City:
                 </label>
-                <input type="text" name="hotelCity" id="hotelCity" value="{{hotelCity}}">
-                <label for="hotelStreet" id="hotelStreet-label">
+                <input type="text" name="hotelCityInput" id="hotelCityInput" value="{{hotelCity}}">
+                <label for="hotelStreetInput" id="hotelStreetInput-label">
                     Hotel Street:
                 </label>
-                <input type="text" name="hotelStreet" id="hotelStreet" value="{{hotelStreet}}">
-                <label for="hotelState" id="hotelState-label">
+                <input type="text" name="hotelStreetInput" id="hotelStreetInput" value="{{hotelStreet}}">
+                <label for="hotelStateInput" id="hotelStateInput-label">
                     Hotel State:
                 </label>
-                <select id="hotelState" class="state">
+                <select id="hotelStateInput" class="state" name="hotelStateInput">
                 </select>
-                <label for="hotelZipcode" id="hotelZipcode-label">
+                <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
                     Hotel Zip:
                 </label>
-                <input type="text" name="hotelZipcode" id="hotelZipcode" value="{{hotelZipcode}}">
-                <input type="hidden" name="userId" value="{{_id}}">
+                <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput" value="{{hotelZipcode}}">
+                <input type="hidden" name="userIdInput" value="{{_id}}">
                 <button type="submit" id="newApplication">Apply for a new hotel</button>
         </form>
     </div>
