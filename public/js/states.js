@@ -57,7 +57,7 @@ const stateList = [
 
 stateList.forEach(state => {
     let option = document.createElement('option');
-    option.value = state.abbr;
+    option.value = state.name;
     option.textContent = state.name;
     stateDocument.appendChild(option);
 }

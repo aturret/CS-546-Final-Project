@@ -20,8 +20,8 @@
                     {{#each roomType}}
                     <li>
                         <div class="roomItem">
-                            <input type="radio" id="{{_id}}" name="roomCheck" value="{{_id}}">
-                            <label for="{{_id}}">{{roomTypeName}}</label>
+                            <input type="radio" id="type-{{_id}}" name="roomCheckInput" value="{{_id}}">
+                            <label for="type-{{_id}}">{{roomTypeName}}</label>
                             <div class="roomPhoto"><img src="{{roomPhoto}}"></div>
                             <div class="roomInfo">
                                 {{!-- <div class="roomTypeName">

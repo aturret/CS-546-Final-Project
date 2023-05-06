@@ -40,7 +40,7 @@ export async function getAllReq() {
 export async function getReq(id) {
   id = helper.checkId(id, true);
 
-  const mgrReqCollection = await mgrReqs();
+  const mgrReqCollection = await mgrReq();
 
   let req = await mgrReqCollection.find({_id: new ObjectId(id)});
 
