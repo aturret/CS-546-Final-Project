@@ -32,21 +32,44 @@ export async function getHotel(id) {
   return hotel;
 }
 
-//get manager hotel
-export async function getMgrHotel(username) {
-  username = helper.checkString(username, "username", true);
-  const tempAccount = await Account();
-  const hotel = await tempAccount.findOne({ username: username }, { _id: 0, hotel: 1 });
-  if (!hotel) throw CustomException(`No hotel with username ${username}`, true);
+// //get manager hotel
+// export async function getMgrHotel(username) {
+//   username = helper.checkString(username, "username", true);
+//   const tempAccount = await Account();
+//   const hotel = await tempAccount.findOne({ username: username }, { _id: 0, hotel: 1 });
+//   if (!hotel) throw CustomException(`No hotel with username ${username}`, true);
 
-  //get hotel info
-  const hotelCollection = await hotelReg();
-  const hotelInfo = await hotelCollection.findOne({ _id: hotel.hotel});
+//   //get hotel info
+//   const hotelCollection = await hotelReg();
+//   const hotelInfo = await hotelCollection.findOne({ _id: hotel.hotel});
 
-  if (!hotelInfo) throw CustomException(`No hotel with ID ${hotel.hotel}`, true);
-  hotelInfo._id = hotelInfo._id.toString();
-  return hotelInfo;
-}
+//   if (!hotelInfo) throw CustomException(`No hotel with ID ${hotel.hotel}`, true);
+//   hotelInfo._id = hotelInfo._id.toString();
+//   return hotelInfo;
+// }
+
+//get hotel manager
+// export async function getHotelMgr(hotelId) {
+//   hotelId = helper.checkId(hotelId, true);
+//   const tempHotel = await hotelReg();
+//   const hotel = await tempHotel.findOne({ hotelId: ObjectId(hotelId) }, { _id: 0, managers: 1 });
+//   if (!hotel) throw CustomException(`No hotel with username ${username}`, true);
+
+//   let mgrInfoList = []
+//   const tempAccount = await Account();
+//   hotel.managers.forEach(mgrId => {
+//     const mgrInfo = await tempAccount.findOne({ _id: mgrId }, { _id: 0, username: 1 });
+//     mgrInfoList.push({
+//       _id: mgrId,
+//       username: mgrInfo.username
+//     });
+//     if (!mgrInfo) throw
+//   });
+
+//   if (!hotelInfo) throw CustomException(`No hotel with ID ${hotel.hotel}`, true);
+//   hotelInfo._id = hotelInfo._id.toString();
+//   return hotelInfo;
+// }
 
 //need fix order for input
 export async function addHotel(...args) {
