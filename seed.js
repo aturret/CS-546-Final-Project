@@ -1,14 +1,21 @@
-import { Account, Room, mgrReq, Review, hotelReg, Order} from "./Mongo_Connections/mongoCollections.js";
+import { Account, Room, mgrReq, Review, hotelReg, Order, RoomType} from "./Mongo_Connections/mongoCollections.js";
+import { dbConnection, closeConnection } from './Mongo_Connections/mongoConnection.js';
 import * as helper from "./helper.js";
+import { CustomException } from "./helper.js";
 import * as userFuncs from "./data_model/User_Account.js";
 import faker from "faker";
 import moment from "moment";
 import bcrypt from "bcryptjs";
+import { ObjectId} from "mongodb";
 
+const saltRounds = 12;
+
+const db = await dbConnection();
+await db.dropDatabase();
 
 const admin = {
     username: "admin",
-    password: "admin",
+    password: "Group47admin1!",
     firstName: "admin",
     lastName: "admin",
     email: "group47@gmail.com",
@@ -38,7 +45,7 @@ async function create(...args) {
     user.avatar = args[2]? helper.checkWebsite(args[2], true): args[2];
     user.firstName = helper.checkString(args[3], "first name", true);
     user.lastName = helper.checkString(args[4], "last name", true);
-    user.phone = args[5]? helper.checkNumber(args[5], true): args[5];
+    user.phone = args[5]? helper.checkPhone(args[5], true): args[5];
     args[6] = helper.checkPassword(args[6], true);
     user.email = helper.checkEmail(args[7], true);
     user.hotel_id = "";
@@ -71,8 +78,8 @@ async function addHotel(...args) {
     newHotel.rooms = [];
     newHotel.room_types = [];
     newHotel.overall_rating = 0;
-    if (args[8] && Array.isArray(args[8])) {
-      newHotel.facilities = args[7].map((facility) =>
+    if (args[8] !== undefined && Array.isArray(args[8])) {
+      newHotel.facilities = args[8].map((facility) =>
         helper.checkString(facility, "facility", true)
       );
     } else if (!args[8]) {
@@ -80,7 +87,7 @@ async function addHotel(...args) {
     } else {
       throw CustomException("Invalid facilities.", true);
     }
-    newHotel.managers = args[9]
+    newHotel.managers = args[9] !== undefined
       ? args[9].map((manager) => helper.checkId(manager, true))
       : undefined;
     newHotel.reviews = [];
@@ -94,15 +101,17 @@ async function addHotel(...args) {
   }
 
   export async function addRoomType(...args) {
-    const hotel_id = helper.checkId(args[0], true);
+    const hotel_id = new ObjectId(helper.checkId(args[0], true));
     const name = helper.checkString(args[1], "room type", true);
-    const picture = helper.checkWebsite(args[2], true);
+    const pictures = args[2]
+    ? args[2].map((web) => helper.checkWebsite(web, true))
+    : [];
     const price = helper.checkPrice(args[3], true);
-    const rooms = args[4] ? helper.checkArray(args[4], true) : [];
+    const rooms = args[4].length > 0 ? helper.checkArray(args[4], "rooms", true) : [];
     const type = {
       hotel_id: hotel_id,
       name: name,
-      picture: picture,
+      pictures: pictures,
       price: price,
       rooms: rooms,
     };
@@ -124,7 +133,7 @@ async function addHotel(...args) {
       throw CustomException(`Could not add the room type.`, true);
   
     //add room type to hotel
-    const updateInfo = await tempHotel.findOneUpdate(
+    const updateInfo = await tempHotel.findOneAndUpdate(
       { _id: hotel_id },
       { $addToSet: { room_types: name } },
       { returnDocument: "after" }
@@ -139,9 +148,9 @@ async function addHotel(...args) {
   }
 
 export async function addRoom(...args) {
-    const hotel_id = ObjectId(helper.checkId(args[0], true));
+    const hotel_id = new ObjectId(helper.checkId(args[0], true));
     const room_number = helper.checkString(args[1], "room number", true);
-    if(!/^\[0-9]{0,5}$/.test(room_number)) throw CustomException(`Invalid room number.`, true);
+    if(!/^\d{1,5}$/.test(room_number)) throw CustomException(`Invalid room number.`, true);
     const room_type = helper.checkString(args[2], "room type", true);
     const order = {};
 
@@ -164,7 +173,7 @@ export async function addRoom(...args) {
 
     //check if room exists
     const tempRoom = await Room();
-    const rv = tempRoom.findOne({ hotel_id: hotel_id, room_number: room_number });
+    const rv = await tempRoom.findOne({ hotel_id: hotel_id, room_number: room_number });
     if (rv) throw CustomException(`Room ${room_number} already exists.`, true);
 
     //add room
@@ -173,7 +182,7 @@ export async function addRoom(...args) {
 
     const room_id = insertInfo.insertedId;
     //add room to room type
-    const updateInfo = await tempRoomType.findOneUpdate(
+    const updateInfo = await tempRoomType.findOneAndUpdate(
         { hotel_id: hotel_id, name: room_type },
         { $addToSet: { rooms: room_id } },
         { returnDocument: "after" }
@@ -181,7 +190,7 @@ export async function addRoom(...args) {
     if (!updateInfo) throw CustomException(`Could not update the room type ${room_type}.`, true);
 
     //add room to hotel
-    const updateInfo2 = await tempHotel.findOneUpdate(
+    const updateInfo2 = await tempHotel.findOneAndUpdate(
         { _id: hotel_id },
         { $addToSet: { rooms: room_id } },
         { returnDocument: "after" }
@@ -194,51 +203,53 @@ export async function addRoom(...args) {
 
 
 export async function addOrder(...args) {
-    if (args.keys().length < 9) throw CustomException("Missing inputs.");
-    args.hotel_id = ObjectId(helper.checkId(args[0]), true);
-    args.user_id = ObjectId(helper.checkId(args[1]), true);
-    args.room_id = ObjectId(helper.checkId(args[2]), true);
+    if (args.length < 9) throw CustomException("Missing inputs.");
+    let set = {};
+    set.hotel_id = new ObjectId(helper.checkId(args[0]), true);
+    set.user_id = new ObjectId(helper.checkId(args[1]), true);
+    set.room_id = new ObjectId(helper.checkId(args[2]), true);
   
-    args.hotel_name = helper.checkString(args[3], "hotel name", true);
-    args.checkin_date = helper.checkDate(args[4], true);
-    args.checkout_date = helper.checkDate(args[5], true);
+    set.hotel_name = helper.checkString(args[3], "hotel name", true);
+    set.checkin_date = helper.checkDate(args[4], true);
+    set.checkout_date = helper.checkDate(args[5], true);
   
-    if (!args.guests || args.guests === "null") {
-      args.guests = {};
+    if (!args[6] || args[6] === "null") {
+      set.guests = {};
     } else {
-      args.guests = helper.checkGuests(args[6], true);
+      set.guests = helper.checkGuests(args[6], true);
     }
-    args.price = helper.checkPrice(args.price[7], true);
-    args.status = helper.checkStatus(args.status[8], true);
-    args.review = "";
+    set.price = helper.checkPrice(args[7], true);
+    set.status = helper.checkStatus(args[8], true);
+    set.review = "";
   
     //update user account, and add order to order database
     const tempOrder = await Order();
     const tempAccount = await Account();
-    const orderInfo = tempOrder.insertOne(args);
-    if (orderInfo.insertedCount.n === 0)
+    const orderInfo = tempOrder.insertOne(set);
+    if (!orderInfo)
       throw CustomException(`Could not add the order.`, true);
-    const updateInfo = await tempAccount.findOneUpdate(
-      { _id: ObjectId(args.user_id) },
-      { $set, set },
+    console.log(set.user_id)
+    const updateInfo = await tempAccount.findOneAndUpdate(
+      { _id: set.user_id},
+      {$addToSet: { orders: orderInfo.insertedId}},
       { returnDocument: "after" }
     );
-    if (updateInfo.lastErrorObject.n === 0)
+    if (!updateInfo)
       throw CustomException(
-        `Could not update the account with id ${args.user_id}`,
+        `Could not update the account with id ${set.user_id}`,
         true
       );
     
     //update room
     const tempRoom = await Room();
-    const roomInfo = await tempRoom.findOneUpdate(
-      { _id: ObjectId(args.room_id) },
-      { $set, set },
+    const roomInfo = await tempRoom.findOneAndUpdate(
+      { _id: new ObjectId(args.room_id) },
+      {$addToSet: { orders: orderInfo.insertedId}},
       { returnDocument: "after" }
     );
-    if (roomInfo.lastErrorObject.n === 0)
+    if (!roomInfo)
       throw CustomException(
-        `Could not update the room with id ${args.room_id}`,
+        `Could not update the room with id ${set.room_id}`,
         true
       );
   
@@ -255,6 +266,7 @@ let manager_id = "";
 let hotel_id = "";
 let roomType_id = "";
 let room_id = "";
+let room = undefined;
 let hotelInfo = {};
 let roomType = {};
 let t = undefined;
@@ -263,16 +275,19 @@ let ref = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine
 let review = {};
 try
 {
+    const room_types = ["single room", "double room", "king room", "queen room", "suite", "penthouse"]
     for (let i = 0; i < 10; i++)
     {   
         //create user
         user = userGenerator.next().value;
+        console.log(user)
         userInfo = await create(user.identity, user.username, user.avatar, user.firstName, user.lastName, user.phone, user.password, user.email);
         if(!userInfo) throw "Failed to create user";
 
         if (i != 3, 4, 5){
         //create manager
             user = managerGenerator.next().value;
+            console.log(user.password)
             userInfo = await create(user.identity, user.username, user.avatar, user.firstName, user.lastName, user.phone, user.password, user.email);
             if(!userInfo) throw "Failed to create manager";
             manager_id = userInfo.insertedId.toString();
@@ -281,23 +296,32 @@ try
             hotelInfo = hotelGenerator.next().value;
             hotelInfo.facilities = [];
             hotelInfo.managers = [manager_id];
+            console.log(hotelInfo)
             hotelInfo = await addHotel(hotelInfo.name, hotelInfo.street, hotelInfo.city, hotelInfo.state, hotelInfo.zip_code, hotelInfo.phone, hotelInfo.email, hotelInfo.pictures, hotelInfo.facilities, hotelInfo.managers);
             if(!hotelInfo) throw "Failed to create hotel";
             hotel_id = hotelInfo.insertedId.toString();
             //create room type
-            t = faker.random.number(0, 5)
-            roomType = roomTypeGenerator.next(t).value;
-            roomType.hotel_id = hotelInfo.insertedId;
-            roomType = await addRoomType(roomType.name, roomType.hotel_id, roomType.price, roomType.capacity, roomType.pictures, roomType.facilities);
+            t = faker.datatype.number(0, 5);
+            
+            roomType = roomTypeGenerator.next().value;
+            console.log("roomType")
+            roomType.hotel_id = hotelInfo.insertedId.toString();
+            roomType.name = room_types[t];
+            roomType.rooms = [];
+            console.log(roomType)
+            roomType = await addRoomType( roomType.hotel_id, roomType.name, roomType.pictures, roomType.price, roomType.rooms);
             if(!roomType) throw "Failed to create room type";
             roomType_id = roomType.insertedId.toString();
             //create room
             for (let j = 0; j < 2; j++){
                 room = roomGenerator.next(t).value;
-                room.hotel_id = hotelInfo.insertedId;
-                room = await addRoom(room.hotel_id, room.room_type, room.floor, room.pictures);
+                room.room_type = room_types[t];
+                console.log(room)
+                room.hotel_id = hotelInfo.insertedId.toString();
+                room = await addRoom(room.hotel_id, room.room_number, room.room_type, room.floor, room.pictures);
                 if(!room) throw "Failed to create room";
                 room_id = room.insertedId.toString();
+                console.log("room created")
             }
             //create order
             order = orderGenerator.next().value;
@@ -305,7 +329,8 @@ try
             order.hotel_id = hotel_id;
             order.room_id = room_id;
             order.hotelName = "hotel" + ref[i]
-            order = await addOrder(order.user_id, order.hotel_id, order.room_id, order.hotelName, order.checkind_date, order.checkout_date, order.guest, order.price, order.status);
+            console.log(order)
+            order = await addOrder(order.user_id, order.hotel_id, order.room_id, order.hotelName, order.checkin_date, order.checkout_date, order.guest, order.price, order.status);
             if(!order) throw "Failed to create order";
 
             //create review
@@ -313,6 +338,7 @@ try
             review.user_id = userInfo.insertedId.toString();
             review.hotel_id = hotel_id;
             review.order_id = order.insertedId.toString();
+            console.log(review)
             review = await userFuncs.addReview(review.order_id, review.hotel_id, review.user_id, review.comment, review.rating);
             if(!review) throw "Failed to create review";
             }
