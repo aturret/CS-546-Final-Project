@@ -371,7 +371,7 @@ export async function addOrder(...args) {
   set.checkout_date = helper.checkDate(args[5], true);
 
   if (!args[6] || args[6] === "null") {
-    set.guests = {};
+    set.guests = [];
   } else {
     set.guests = helper.checkGuests(args[6], true);
   }

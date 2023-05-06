@@ -670,3 +670,47 @@ export async function checkRoomAvailabilityOrder(...args) {
   //get all orders' checkin findOneAndUpdate checkout date
 
 }
+
+export async function addOrderByRoomType(...args) {
+  const roomTypeId = new ObjectId(helper.checkId(args[0], "hotel id", true));
+  const checkin_date = moment(helper.checkDate(args[1], true), "YYYY-MM-DD");
+  const checkout_date = moment(helper.checkDate(args[2], true), "YYYY-MM-DD");
+
+  //get all room
+  const tempRoomType = await RoomType();
+  const roomTypeInfo = await tempRoomType.findOne({ _id: roomTypeId }, {_id : 0, rooms: 1}).toArray();
+  if(!roomTypeInfo.hasNext()) throw CustomException(`Room type does not exist.`, true);
+
+  //find orders of rooms
+  const tempRoom = await Room();
+  let roomsOrders = [];
+  for (let i of roomTypeInfo.rooms) {
+    roomsOrders.push(await tempRoom.findOne({ _id: i }, { orders: 1 }));
+  }
+
+  const tempOrder = await Order();
+
+  for (let i of roomsOrders) {
+    if (i.orders.length === 0) {
+      return i._id;
+    }
+    else{
+      let temp = await tempOrder.find(
+        { _id: { $in: i.orders } },
+        { _id: 0, checkin_date: 1, checkout_date: 1, status: 1 }
+      );
+      if (
+        temp.every(
+          (order) =>
+            order.status === "canceled" ||
+            checkin_date.isAfter(moment(order.checkout_date, "YYYY/MM/DD")) ||
+            checkout_date.isBefore(moment(order.checkin_date, "YYYY/MM/DD"))
+        )
+      )
+      {
+        return i._id;
+      }
+    }
+  }
+  throw CustomException(`No room available.`, true);
+}
