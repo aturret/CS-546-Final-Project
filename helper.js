@@ -197,7 +197,7 @@ export function* randomRoomTypeGenerator(i){
     {
         yield {
             name: undefined,
-            price: faker.random.number(50, 1000),
+            price: Math.floor(Math.random() * (951) + 50),
             picture: ["https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"],
         }
     }
@@ -222,7 +222,7 @@ export function* randomOrderGenerator(i){
         yield {
             checkin_date: checkin_date,
             checkout_date: checkout_date,
-            price: faker.datatype.number(50, 1000),
+            price: Math.floor(Math.random() * (2000 - 299) + 300),
             status: "accepted",
             guest: [{
                 firstName: faker.name.firstName(),
@@ -236,7 +236,7 @@ export function* randomReviewGenerator(){
     while(true)
     {
         yield {
-            rating: faker.datatype.number(1, 5),
+            rating: Math.floor(Math.random() * (5) + 1),
             comment: faker.lorem.paragraph()
         }
     }

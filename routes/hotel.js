@@ -13,7 +13,11 @@ export const isMgr = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.redirect("/user/login");
   }
-  if (req.user && req.user.identity !== 'mgr') {
+  if (req.user && req.user.identity === 'user') {
+    req.flash("You are not allow to access this page")
+    return res.redirect("/user/dashboard");
+  }
+  if (req.user.identity === 'mgr' && req.user.hotel !== req.params.hotelId) {
     req.flash("You are not allow to access this page")
     return res.redirect("/user/dashboard");
   }
@@ -112,7 +116,7 @@ router.route("/hotel/:hotel_name/:room_id").get((req, res) => {});
 
 router
   .route("/hotel/:hotelId/hotelManagement")
-  .get(isAdmin, async (req, res) => {
+  .get(isMgr, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotel = await hotelFuncs.getHotel(hotelId);
@@ -124,7 +128,7 @@ router
       res.redirect(previousUrl);
     }
   })
-  .put(isAdmin, async (req, res) => {
+  .put(isMgr, async (req, res) => {
     try {
       const hotelId = req.params.hotelId;
       const hotelName = req.body.hotelName;
@@ -177,12 +181,12 @@ router
 
 router
   .route("/hotel/:hotelId/hotelManagement/room")
-  .get(isAdmin, async (req, res) => {
+  .get(isMgr, async (req, res) => {
     const hotelId = helper.checkId(req.params.hotelId, true);
     const rooms = await hotelFuncs.getHotelRoom(hotelId);
     res.render('rooms', {rooms: rooms});
   })
-  .post(isAdmin, async (req, res) => {
+  .post(isMgr, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const roomId = helper.checkId(req.body.roomIdInput, true);
@@ -205,7 +209,7 @@ router
 
 router
   .route("/hotel/:hotelId/hotelManagement/room/:roomId")
-  .get(isAdmin, async (req, res) => {
+  .get(isMgr, async (req, res) => {
     try {
       const roomId = helper.checkId(req.params.roomId, true);
       const room = await hotelFuncs.getRoom(roomId);
@@ -217,7 +221,7 @@ router
       res.redirect(previousUrl);
     }
   })
-  .put(isAdmin, async (req, res) => {
+  .put(isMgr, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const roomId = helper.checkId(req.params.roomId, true);
@@ -235,7 +239,7 @@ router
       res.redirect(previousUrl);
     }
   })
-  .delete(isAdmin, async (req, res) => {
+  .delete(isMgr, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const roomId = helper.checkId(req.body.roomIdInput, true);
@@ -253,7 +257,7 @@ router
 
 router
   .route("/hotel/:hotelId/hotelManagement/roomtype")
-  .get(isAdmin, async (req, res) => {
+  .get(isMgr, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const roomTypes = await hotelFuncs.getHotelRoomType(hotelId);
@@ -265,7 +269,7 @@ router
       res.redirect(previousUrl);
     }
   })
-  .post(isAdmin, async (req, res) => {
+  .post(isMgr, async (req, res) => {
     try {
       let args = [];
       args[0] = helper.checkId(req.params.hotelId, true);
@@ -284,7 +288,7 @@ router
       res.redirect(previousUrl);
     }
   })
-  .put(isAdmin, async (req, res) => {
+  .put(isMgr, async (req, res) => {
     try {
       const roomTypeId = helper.checkId(req.body.roomTypeIdInput, true);
       const hotelId = helper.checkId(req.params.hotelId, true);
@@ -302,7 +306,7 @@ router
       res.redirect(previousUrl);
     } 
   })
-  .delete(isAdmin, async (req, res) => {
+  .delete(isMgr, async (req, res) => {
     try {
       const roomTypeId = helper.checkId(req.body.roomTypeIdInput, true);
       const hotelId = helper.checkId(req.params.hotelId, true);
@@ -319,7 +323,7 @@ router
 
 router
   .route("/hotel/:hotelId/hotelManagement/order")
-  .get(isAdmin, async (req, res) => {
+  .get(isMgr, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotel = await hotelFuncs.getHotel(hotelId);
@@ -331,14 +335,11 @@ router
       res.redirect(previousUrl);
     }
   })
-
-router
-  .route("/hotel/:hotelId/hotelManagement/order/:orderId")
-  .get(isAdmin, async (req, res) => {
+  .post(isMgr, async (req, res) => {
     try {
-      const orderId = helper.checkId(req.params.orderId, true);
-      const hotel = await userFuncs.getOrderById(orderId);
-      res.render('orderById', {orders: hotel.orders});
+      const hotelId = helper.checkId(req.params.hotelId, true);
+      const hotel = await userFuncs.addOrder(hotelId);
+      res.render('orders', {orders: hotel.orders});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -346,7 +347,22 @@ router
       res.redirect(previousUrl);
     }
   })
-  .put(isAdmin, async (req, res) => {
+
+router
+  .route("/hotel/:hotelId/hotelManagement/order/:orderId")
+  .get(isMgr, async (req, res) => {
+    try {
+      const orderId = helper.checkId(req.params.orderId, true);
+      const order = await userFuncs.getOrderById(orderId);
+      res.render('singleOrder', {orders: order});
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || '/hotel';
+      res.redirect(previousUrl);
+    }
+  })
+  .put(isMgr, async (req, res) => {
     try {
       const orderId = helper.checkId(req.params.orderId, true);
       const checkinDate = helper.checkDate(req.body.checkinDateInput, true);
@@ -365,7 +381,7 @@ router
       res.redirect(previousUrl);
     }
   })
-  .delete(isAdmin, async (req, res) => {
+  .delete(isMgr, async (req, res) => {
     try {
       const orderId = helper.checkId(req.params.orderId, true);
       const deleteOrderMessage = await userFuncs.deleteOrder(orderId);
@@ -381,7 +397,7 @@ router
 
 router
   .route("/hotel/:hotelId/hotelManagement/review")
-  .get(isAdmin, async (req, res) => {
+  .get(isMgr, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotelReviews = await hotelFuncs.getHotelReview(hotelId);
@@ -443,14 +459,12 @@ router
 
 router
   .route("/hotel/:hotelId/hotelManagement/manager")
-  .get(isAdmin, async (req, res) => {
+  .get(isMgr, async (req, res) => {
     try {
-      const mgrName = helper.checkId(req.body.mgrNameInput, true);
-      const userName = helper.checkId(req.body.userNameInput, true);
       const hotelId = helper.checkId(req.params.hotelId, true);
 
-      const hotelReviews = await userFuncs.addMgr(mgrName, userName, hotelId);
-      res.render('reviews', {hotelReviews: hotelReviews});
+      const hotel = await hotelFuncs.getHotel(hotelId);
+      res.render('reviews', {managers: hotel.managers});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -458,7 +472,7 @@ router
       res.redirect(previousUrl);
     }
   })
-  .post(isAdmin, async (req, res) => {
+  .post(isMgr, async (req, res) => {
     try {
       // const mgrName = helper.checkNameString(req.body.mgrNameInput, "manager username", true);
       const userName = helper.checkNameString(req.body.userNameInput, "user username", true);
@@ -474,9 +488,9 @@ router
       res.redirect(previousUrl);
     }
   })
-  .delete(isAdmin, async (req, res) => {
+  .delete(isMgr, async (req, res) => {
     try {
-      const respondentName = helper.checkNameString(req.body.respondentNameInput, "respondent username", true);
+      const respondentName = helper.checkNameString(req.body.respondentNameInput, "user username", true);
       const hotelId = helper.checkId(req.params.hotelId, true);
 
       const deleteReviewMessage = await userFuncs.deleteMgr(req.user.username, respondentName, hotelId);
