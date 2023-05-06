@@ -1,6 +1,7 @@
 import { Account } from "./Mongo_Connections/mongoCollections.js";
 import { ObjectId } from 'mongodb';
 import moment from 'moment';
+import faker from 'faker';
 
 
 
@@ -134,4 +135,112 @@ export function checkUserName(username, flag) {
     username = username.trim();
     if (/\s/.test(username)) throw CustomException("Error: Username cannot contain spaces", flag);
     return username;
+}
+
+
+/* ------------------------------------------- seed functions ------------------------------------------- */
+const ref = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+export function* randomUserGenerator(){
+    for (let i of ref)
+    {
+        
+        yield {
+            username: "user" + i,
+            password: "User" + i,
+            firstName: "user" + i + "1!",
+            lastName: i,
+            email: "user" + i + "@email.com",
+            phone: faker.phone.phoneNumberFormat(2),
+            identity: "user",
+            avatar: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+        }
+    }
+}
+
+export function* randomHotelGenerator(){
+    const base = "hotel"
+    for (let i of ref)
+    {
+        yield {
+            name: "hotel" + i,
+            street: faker.address.streetAddress(),
+            city: faker.address.city(),
+            state: faker.address.state(),
+            zip_code: faker.address.zipCode(),
+            phone: faker.phone.phoneNumberFormat(2),
+            email: faker.internet.email(),
+            picture: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
+            manager: []
+        }
+    }
+}
+
+export function* randomManagerGenerator(){
+    const base = "manager"
+    for (let i of ref)
+    {
+        yield {
+            username: base + i,
+            password: base + i + "1!",
+            firstName: base + i,
+            lastName: i,
+            email: base + i + "@email.com",
+            phone: faker.phone.phoneNumberFormat(2),
+            identity: base,
+            avatar: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+        }
+    }
+}
+
+const room_types = ["single room", "double room", "king room", "queen room", "suite", "penthouse"]
+export function* randomRoomTypeGenerator(i){
+    while(true)
+    {
+        yield {
+            name: room_types[i],
+            description: faker.lorem.paragraph(),
+            picture: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
+        }
+    }
+}
+   
+
+export function* randomRoomGenerator(i){
+    while(true)
+    {
+        yield {
+            price: faker.random.number(50, 1000),
+            room_number: faker.random.number(99999),
+            room_type: room_types[i],
+            picture: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
+        }
+    }
+}
+
+export function* randomOrderGenerator(i){
+    for (let i of ref)
+    {
+        const checkin_date = "2023/05/01"
+        const checkout_date = "2023/05/07"
+        yield {
+            checkin_date: checkin_date,
+            end_date: checkout_date,
+            price: faker.random.number(50, 1000),
+            status: "accepted",
+            guest: [{
+                firstName: faker.name.firstName(),
+                lastName: faker.Name.lastName(),
+            }]
+        }
+    }
+}
+
+export function* randomReviewGenerator(){
+    while(true)
+    {
+        yield {
+            rating: faker.random.number(1, 5),
+            comment: faker.lorem.paragraph()
+        }
+    }
 }
