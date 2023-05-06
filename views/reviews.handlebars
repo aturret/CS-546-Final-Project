@@ -7,9 +7,9 @@ reviewUserId: the id of the user who wrote the review
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <h2>{{reviewTitle}}</h2>

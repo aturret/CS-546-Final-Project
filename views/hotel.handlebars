@@ -9,9 +9,9 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 {{#if (or(eq user.hotelId hotelId)(eq user.identity "admin"))}}

@@ -4,9 +4,9 @@ userAvatar: the avatar of the user
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <div class="Avatar">
