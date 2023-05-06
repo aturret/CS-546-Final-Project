@@ -81,7 +81,7 @@ export async function reqApprove(reqId, response) {
   if (request.status !== 'pending') throw CustomException(`The request with ID ${reqId} is already closed`);
   
   const reqCollection = await mgrReq();
-  if (!response) {
+  if (response === 'reject') {
     const requestUpdateInfo = await reqCollection.findOneUpdate(
       { _id: new ObjectId(reqId) },
       { $set: { status: 'reject' } },
