@@ -3,7 +3,7 @@ import { Account } from "../Mongo_Connections/mongoCollections.js";
 import { Order } from "../Mongo_Connections/mongoCollections.js";
 import { Room } from "../Mongo_Connections/mongoCollections.js";
 import { hotelReg } from "../Mongo_Connections/mongoCollections.js";
-import { roomType } from "../Mongo_Connections/mongoCollections.js";
+import { RoomType } from "../Mongo_Connections/mongoCollections.js";
 import { mgrReq } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import * as helper from "../helper.js";
@@ -25,7 +25,7 @@ export async function getHotel(id) {
   id = helper.checkId(id, true);
   const hotelCollection = await hotelReg();
 
-  let hotel = await hotelCollection.find({ _id: new ObjectId(id) });
+  let hotel = await hotelCollection.find({ _id: new new ObjectId(id) });
 
   if (!hotel) throw CustomException(`No hotel with ID ${id}`, true);
   hotel._id = hotel._id.toString();
@@ -65,7 +65,7 @@ export async function addHotel(...args) {
   newHotel.room_types = [];
   newHotel.overall_rating = 0;
   if (args[8] && Array.isArray(args[8])) {
-    newHotel.facilities = args[7].map((facility) =>
+    newHotel.facilities = args[8].map((facility) =>
       helper.checkString(facility, "facility", true)
     );
   } else if (!args[8]) {
@@ -87,7 +87,7 @@ export async function addHotel(...args) {
 }
 
 export async function updateHotel(...args) {
-  const hotel_id = ObjectId(helper.checkId(args[0], true));
+  const hotel_id = new ObjectId(helper.checkId(args[0], true));
   const updateHotel = {};
   updateHotel.name = helper.checkString(args[1], "hotel name", false);
   updateHotel.street = helper.checkString(args[2], "street", false);
@@ -119,7 +119,7 @@ export async function updateHotel(...args) {
     : [];
 
   const tempHotel = await hotelReg();
-  const updateInfo = await tempHotel.findOneUpdate(
+  const updateInfo = await tempHotel.findOneAndUpdate(
     { _id: hotel_id },
     { $set: updateHotel },
     { returnDocument: "after" }
@@ -134,7 +134,7 @@ export async function deleteHotel(id) {
     id = helper.checkId(id, true);
     const tempHotel = await hotelReg();
 
-    const temp = await tempHotel.findOne({ _id: new ObjectId(id) }, {reviews: 1, room_types: 1, rooms: 1});
+    const temp = await tempHotel.findOne({ _id: new new ObjectId(id) }, {reviews: 1, room_types: 1, rooms: 1});
 
     if (temp.deletedCount === 0)  throw CustomException(`Delete hotel with id ${id} failed.`, true);
 
@@ -167,7 +167,7 @@ export async function deleteHotel(id) {
     }
 
     //delete Hotel
-    const deleteInfo = await tempHotel.deleteOne({ _id: new ObjectId(id) });
+    const deleteInfo = await tempHotel.deleteOne({ _id: new new ObjectId(id) });
     if (deleteInfo.deletedCount === 0)
         throw CustomException(`Delete hotel with id ${id} failed.`, true);
 
@@ -203,11 +203,11 @@ export async function hotelSearch(...args) {
 
 //get hotel review
 export async function getHotelReview(id) {
-  id = ObjectId(helper.checkId(id, true));
+  id = new ObjectId(helper.checkId(id, true));
   const tempHotel = await hotelReg();
 
   const reviewInfo = tempHotel.aggregate([
-    {$match: {_id: ObjectId(id)}},
+    {$match: {_id: new ObjectId(id)}},
     {$lookup: {
       from: "reviews",
       localField: "reviews",
@@ -244,15 +244,18 @@ export async function getHotelReview(id) {
 
 //room type
 export async function addRoomType(...args) {
-  const hotel_id = helper.checkId(args[0], true);
+  if(args.length !== 5) throw CustomException("Missing inputs.", true);
+  const hotel_id = new ObjectId(helper.checkId(args[0], true));
   const name = helper.checkString(args[1], "room type", true);
-  const picture = helper.checkWebsite(args[2], true);
+  const pictures = args[2]
+    ? args[2].map((web) => helper.checkWebsite(web, true))
+    : [];
   const price = helper.checkPrice(args[3], true);
-  const rooms = args[4] ? helper.checkArray(args[4], true) : [];
+  const rooms = args[4].length > 0 ? helper.checkArray(args[4], "rooms", true) : [];
   const type = {
     hotel_id: hotel_id,
     name: name,
-    picture: picture,
+    pictures: pictures,
     price: price,
     rooms: rooms,
   };
@@ -274,7 +277,7 @@ export async function addRoomType(...args) {
     throw CustomException(`Could not add the room type.`, true);
 
   //add room type to hotel
-  const updateInfo = await tempHotel.findOneUpdate(
+  const updateInfo = await tempHotel.findOneAndUpdate(
     { _id: hotel_id },
     { $addToSet: { room_types: name } },
     { returnDocument: "after" }
@@ -291,8 +294,8 @@ export async function addRoomType(...args) {
 
 //delete room type
 export async function deleteRoomType(id, hotel_id) {
-  id = ObjectId(helper.checkId(id, true));
-  hotel_id = ObjectId(helper.checkId(hotel_id, true));
+  id = new ObjectId(helper.checkId(id, true));
+  hotel_id = new ObjectId(helper.checkId(hotel_id, true));
 
   //get room type details
   const tempRoomType = await RoomType();
@@ -319,8 +322,8 @@ export async function deleteRoomType(id, hotel_id) {
 
 //update room type
 export async function updateRoomType(id, hotel_id, roomType, price, picture) {
-  id = ObjectId(helper.checkId(id, true));
-  hotel_id = ObjectId(helper.checkId(hotel_id, true));
+  id = new ObjectId(helper.checkId(id, true));
+  hotel_id = new ObjectId(helper.checkId(hotel_id, true));
   roomType = helper.checkString(roomType, "room type", true);
   price = helper.checkPrice(price, true);
   picture = helper.checkWebsite(picture, true);
@@ -358,7 +361,7 @@ export async function updateRoomType(id, hotel_id, roomType, price, picture) {
 
 //get hotel room
 export async function getHotelRoom(id) {
-  id = ObjectId(helper.checkId(id, true));
+  id = new ObjectId(helper.checkId(id, true));
   const tempHotel = await hotelReg();
   const tempRoom = await Room();
 
@@ -370,7 +373,7 @@ export async function getHotelRoom(id) {
 
 //get single room
 export async function getRoom(id) {
-  id = ObjectId(helper.checkId(id, true));
+  id = new ObjectId(helper.checkId(id, true));
   const tempRoom = await Room();
 
   const roomInfo = await tempRoom.find({_id: id});
@@ -380,7 +383,7 @@ export async function getRoom(id) {
 
 //get hotel room type
 export async function getHotelRoomType(id) {
-  id = ObjectId(helper.checkId(id, true));
+  id = new ObjectId(helper.checkId(id, true));
   const tempRoomType = await RoomType();
 
   const roomTypeInfo = await tempRoomType.find({hotel_id: id}).toArray();
@@ -391,7 +394,7 @@ export async function getHotelRoomType(id) {
 
 //check room availability
 export async function checkRoomAvailability(...args) {
-  const hotel_id = ObjectId(helper.checkId(args[0], true));
+  const hotel_id = new ObjectId(helper.checkId(args[0], true));
   const room_id = helper.checkId(args[1], "room type", true);
   const checkin_date = moment(helper.checkDate(args[2], true), "YYYY-MM-DD");
   const checkout_date = moment(helper.checkDate(args[3], true), "YYYY-MM-DD");
@@ -411,9 +414,9 @@ export async function checkRoomAvailability(...args) {
   //if the target room has no orders return the true.
   if (!room_orders.orders) return true;
   room_order.orders = room_orders.orders.filter((order) => order !== order_id);
-  room_orders.orders = room_orders.orders.map((order) => ObjectId(order));
+  room_orders.orders = room_orders.orders.map((order) => new ObjectId(order));
 
-  //get all orders' checkin and checkout date
+  //get all orders' checkin findOneAndUpdate checkout date
   temp.push(
     await tempOrder.find(
       { _id: { $in: room_orders.orders } },
@@ -437,9 +440,9 @@ export async function checkRoomAvailability(...args) {
 
 //add room
 export async function addRoom(...args) {
-    const hotel_id = ObjectId(helper.checkId(args[0], true));
+    const hotel_id = new ObjectId(helper.checkId(args[0], true));
     const room_number = helper.checkString(args[1], "room number", true);
-    if(!/^\[0-9]{0,5}$/.test(room_number)) throw CustomException(`Invalid room number.`, true);
+    if(!/^\d{1,5}$/.test(room_number)) throw CustomException(`Invalid room number.`, true);
     const room_type = helper.checkString(args[2], "room type", true);
     const order = {};
 
@@ -462,7 +465,7 @@ export async function addRoom(...args) {
 
     //check if room exists
     const tempRoom = await Room();
-    const rv = tempRoom.findOne({ hotel_id: hotel_id, room_number: room_number });
+    const rv = await tempRoom.findOne({ hotel_id: hotel_id, room_number: room_number });
     if (rv) throw CustomException(`Room ${room_number} already exists.`, true);
 
     //add room
@@ -471,7 +474,7 @@ export async function addRoom(...args) {
 
     const room_id = insertInfo.insertedId;
     //add room to room type
-    const updateInfo = await tempRoomType.findOneUpdate(
+    const updateInfo = await tempRoomType.findOneAndUpdate(
         { hotel_id: hotel_id, name: room_type },
         { $addToSet: { rooms: room_id } },
         { returnDocument: "after" }
@@ -479,7 +482,7 @@ export async function addRoom(...args) {
     if (!updateInfo) throw CustomException(`Could not update the room type ${room_type}.`, true);
 
     //add room to hotel
-    const updateInfo2 = await tempHotel.findOneUpdate(
+    const updateInfo2 = await tempHotel.findOneAndUpdate(
         { _id: hotel_id },
         { $addToSet: { rooms: room_id } },
         { returnDocument: "after" }
@@ -493,8 +496,8 @@ export async function addRoom(...args) {
 //TODO: delete room
 export async function deleteRoom(hotel_id, room_id) {
   //checkinput
-  hotel_id = ObjectId(helper.checkId(hotel_id, true));
-  room_id = ObjectId(helper.checkId(room_id, true));
+  hotel_id = new ObjectId(helper.checkId(hotel_id, true));
+  room_id = new ObjectId(helper.checkId(room_id, true));
 
   //check if room exists
   const tempRoom = await Room();
@@ -516,11 +519,11 @@ export async function deleteRoom(hotel_id, room_id) {
   if (rv.deletedCount === 0) throw CustomException(`Could not delete the room.`, true);
 
   //delete room from room type
-  const updateInfo = await tempRoomType.findOneUpdate({hotel_id: hotel_id, name: typeNme}, {$pull: {rooms: room_id}}, {returnDocument: "after"});
+  const updateInfo = await tempRoomType.findOneAndUpdate({hotel_id: hotel_id, name: typeNme}, {$pull: {rooms: room_id}}, {returnDocument: "after"});
   if (!updateInfo) throw CustomException(`Could not update the room type ${typeNme}.`, true);
 
   //delete room from hotel
-  const updateInfo2 = await tempHotel.findOneUpdate({_id: hotel_id}, {$pull: {rooms: room_id}}, {returnDocument: "after"});
+  const updateInfo2 = await tempHotel.findOneAndUpdate({_id: hotel_id}, {$pull: {rooms: room_id}}, {returnDocument: "after"});
   if (!updateInfo2) throw CustomException(`Could not update the hotel with id ${hotel_id}`, true);
 
   //delete order with room_id
@@ -548,8 +551,8 @@ export async function deleteRoom(hotel_id, room_id) {
 //TODO: update room
 export async function updateRoom(hotel_id, room_id, typeNme, roomNum) {
   //checkinput
-  hotel_id = ObjectId(helper.checkId(hotel_id, true));
-  room_id = ObjectId(helper.checkId(room_id, true));
+  hotel_id = new ObjectId(helper.checkId(hotel_id, true));
+  room_id = new ObjectId(helper.checkId(room_id, true));
   typeNme = helper.checkString(typeNme, "room type", true);
   if(!/[0-9]{0,5}$/.test(roomNum)) throw CustomException(`Invalid room number.`, true);
 
@@ -569,12 +572,12 @@ export async function updateRoom(hotel_id, room_id, typeNme, roomNum) {
   if (!roomTypeInfo) throw CustomException(`Room type ${typeNme} does not exist.`, true);
 
   //update room type
-  const updateInfo = await tempRoomType.findOneUpdate({hotel_id: hotel_id, name: typeNme}, {$addToSet: {rooms: room_id}}, {returnDocument: "after"});
+  const updateInfo = await tempRoomType.findOneAndUpdate({hotel_id: hotel_id, name: typeNme}, {$addToSet: {rooms: room_id}}, {returnDocument: "after"});
   if (!updateInfo) throw CustomException(`Could not update the room type ${typeNme}.`, true);
 
   //remove room from old room type
   const oldType = roomInfo.room_type;
-  const updateInfo2 = await tempRoomType.findOneUpdate({hotel_id: hotel_id, name: oldType}, {$pull: {rooms: room_id}}, {returnDocument: "after"});
+  const updateInfo2 = await tempRoomType.findOneAndUpdate({hotel_id: hotel_id, name: oldType}, {$pull: {rooms: room_id}}, {returnDocument: "after"});
   if (!updateInfo2) throw CustomException(`Could not update the room type ${oldType}.`, true);
 
   //update room

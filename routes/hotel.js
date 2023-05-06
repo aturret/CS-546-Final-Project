@@ -1,6 +1,6 @@
 import { Strategy as auth } from "passport-local";
 import express, { Router } from "express";
-import passport, { use } from "passport";
+import passport from "passport";
 import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
@@ -8,13 +8,6 @@ import * as helper from "../helper.js";
 import isAuth from "./user.js";
 
 const router = express.Router();
-
-export const isAuth = (req, res, next) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect("/user/login");
-  }
-  next();
-};
 
 export const isMgr = (req, res, next) => {
   if (!req.isAuthenticated()) {

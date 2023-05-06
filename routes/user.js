@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
-import {Order, hotelReg, Room, roomType}from "../Mongo_Connections/mongoCollections.js";
+import {Order, hotelReg, Room, RoomType}from "../Mongo_Connections/mongoCollections.js";
 const router = express.Router();
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
 
@@ -375,7 +375,7 @@ async (req, res) => {
     if (!room_type) throw new CustomException("Room not found", true);
 
     //calculate new order_price
-    const tempRoomType = await roomType();
+    const tempRoomType = await RoomType();
     const price = helper.checkPrice(tempRoomType.findOne({hotel_id: hotel_id, room_type: room_type}).price);
     const order_price = price * (moment(checkout_date, "YYYY/MM/DD").diff(moment(checkin_date, "YYYY/MM/DD"), 'days'))
 
@@ -538,7 +538,7 @@ async (req, res) => {
       const room_price = req.body.room_price;
       const room_picture = req.body.room_picture
         ? req.body.room_picture
-        : undefined;
+        :[];
       const rooms = req.body.rooms ? req.body.rooms : [];
       const result = await userFuncs.addRoomType(
         hotel_name,
