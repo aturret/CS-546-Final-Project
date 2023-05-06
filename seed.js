@@ -359,3 +359,6 @@ catch(e)
 {
     console.log(e);
 }
+
+console.log('Done seeding database');
+await closeConnection();

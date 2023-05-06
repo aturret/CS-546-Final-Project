@@ -4,7 +4,6 @@ import { Order } from "../Mongo_Connections/mongoCollections.js";
 import { Room } from "../Mongo_Connections/mongoCollections.js";
 import { hotelReg } from "../Mongo_Connections/mongoCollections.js";
 import { RoomType } from "../Mongo_Connections/mongoCollections.js";
-import { Review } from "../Mongo_Connections/mongoCollections.js";
 import { mgrReq } from "../Mongo_Connections/mongoCollections.js";
 import { Review } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
@@ -530,7 +529,7 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
   if (orderInfo.review !== "") throw CustomException(`Already reviewed.`, true);
 
   const reviewInfo = await tempReview.insertOne(newReview);
-  if (reviewInfo.insertedCount.n === 0)
+  if (!reviewInfo)
     throw CustomException(`Could not add the review.`, true);
 
   //update order
@@ -557,7 +556,7 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
       true
     );
 
-  const newHotel = await tempAccount.findOne(
+  const newHotel = await tempHotel.findOne(
     { _id: new ObjectId(hotel_id) },
     { reviews: 1 }
   );
@@ -567,11 +566,11 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
   //calculate overall rating
   let sum = 0;
   for (let i = 0; i < newHotel.reviews.length; i++) {
-    const tempReview = await tempReview.findOne(
+    const reviewInfo = tempReview.findOne(
       { _id: new ObjectId(newHotel.reviews[i]) },
       { rating: 1 }
     );
-    sum += tempReview.rating;
+    sum += reviewInfo.rating;
   }
   let overallRating = sum / newHotel.reviews.length;
   overallRating = overallRating.toFixed(2);
