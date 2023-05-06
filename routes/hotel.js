@@ -1,6 +1,6 @@
 import { Strategy as auth } from "passport-local";
 import express, { Router } from "express";
-import passport from "passport";
+import passport, { use } from "passport";
 import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
@@ -324,13 +324,13 @@ router
     }
   })
 
-  router
-  .route("/hotel/:hotelId/hotelManagement/manager")
+router
+  .route("/hotel/:hotelId/hotelManagement/order")
   .get(isAdmin, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotel = await hotelFuncs.getHotel(hotelId);
-      res.render('hotel_management', {hotel: hotel});
+      res.render('orders', {orders: hotel.orders});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -339,7 +339,54 @@ router
     }
   })
 
-  router
+router
+  .route("/hotel/:hotelId/hotelManagement/order/:orderId")
+  .get(isAdmin, async (req, res) => {
+    try {
+      const orderId = helper.checkId(req.params.orderId, true);
+      const hotel = await userFuncs.getOrderById(orderId);
+      res.render('orderById', {orders: hotel.orders});
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || '/hotel/:hotelId/';
+      res.redirect(previousUrl);
+    }
+  })
+  .put(isAdmin, async (req, res) => {
+    try {
+      const orderId = helper.checkId(req.params.orderId, true);
+      const checkinDate = helper.checkDate(req.body.checkinDateInput, true);
+      const checkoutDate = helper.checkDate(req.body.checkoutDateInput, true);
+      const guest = helper.checkArray(req.body.guestInput, "guest", true);
+      const price = helper.checkPrice(req.body.priceInput, true);
+      const status = helper.checkStatus(req.body.statusInput, true);
+
+      const updateOrderMessage = await userFuncs.updateOrder(orderId, checkinDate, checkoutDate, guest, price, status);
+      req.flash(updateOrderMessage);
+      res.redirect('/hotel/:hotelId/hotelManagement/order/:orderId');
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || '/hotel/:hotelId/';
+      res.redirect(previousUrl);
+    }
+  })
+  .delete(isAdmin, async (req, res) => {
+    try {
+      const orderId = helper.checkId(req.params.orderId, true);
+      const deleteOrderMessage = await userFuncs.deleteOrder(orderId);
+      req.flash(deleteOrderMessage);
+      res.redirect('/hotel/:hotelId/hotelManagement/order');
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || '/hotel/:hotelId/';
+      res.redirect(previousUrl);
+    }
+  })
+
+router
   .route("/hotel/:hotelId/hotelManagement/review")
   .get(isAdmin, async (req, res) => {
     try {

@@ -256,6 +256,15 @@ export async function getOrder(username) {
   return rv;
 }
 
+export async function getOrderById(orderId) {
+  orderId = helper.checkId(orderId, true);
+  const tempOrder = await Order();
+
+  const order = await tempOrder.findOne({ _id: ObjectId(orderId) });
+  if (!order) throw CustomException(`Could not find order with ID ${orderId}`, true);
+  return order;
+}
+
 export async function addOrder(...args) {
   if (args.keys().length < 9) throw CustomException("Missing inputs.");
   args.hotel_id = ObjectId(helper.checkId(args[0]), true);
