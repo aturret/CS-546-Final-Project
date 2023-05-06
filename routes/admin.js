@@ -99,7 +99,7 @@ router
     }
   })
   .post(isAdmin, async (req, res) => {
-    let identity = req.body.identityInput;
+    // let identity = req.body.identityInput;
     let username = req.body.usernameInput;
     let avatar = req.body.avatarInput;
     let firstName = req.body.firstNameInput;
@@ -145,18 +145,18 @@ router
 
       const newUserMessage = await userFuncs.create(args);
 
-      if (identity === 'manager') {
-        const hotel = {};
-        hotel.name = helper.checkString(req.body.nameInput, "hotel name", true);
-        hotel.street = helper.checkString(req.body.streetInput, "street", true);
-        hotel.city = helper.checkString(req.body.cityInput, "city", true);
-        hotel.state = helper.checkString(req.body.stateInput, "state", true);
-        hotel.zip_code = helper.checkZip(req.body.zip_codeInput, true);
+      // if (identity === 'manager') {
+      //   const hotel = {};
+      //   hotel.name = helper.checkString(req.body.nameInput, "hotel name", true);
+      //   hotel.street = helper.checkString(req.body.streetInput, "street", true);
+      //   hotel.city = helper.checkString(req.body.cityInput, "city", true);
+      //   hotel.state = helper.checkString(req.body.stateInput, "state", true);
+      //   hotel.zip_code = helper.checkZip(req.body.zip_codeInput, true);
 
-        const addMgrMessage = await adminFuncs.addMgr(req.user.username, username, hotel);
-        req.flash(addMgrMessage);
-        return res.redirect("/admin/account");
-      }
+      //   const addMgrMessage = await adminFuncs.addMgr(req.user.username, username, hotel);
+      //   req.flash(addMgrMessage);
+      //   return res.redirect("/admin/account");
+      // }
 
       req.flash(newUserMessage);
       return res.redirect("/admin/account");
@@ -171,7 +171,7 @@ router
     }
   })
   .put(isAdmin, async (req, res) => {
-    let identity = req.body.identityInput;
+    // let identity = req.body.identityInput;
     let username = req.body.usernameInput;
     let avatar = req.body.avatarInput;
     let firstName = req.body.firstNameInput;
@@ -211,18 +211,18 @@ router
       };
       const updatedUser = await userFuncs.updateUser(req.user.username, set);
 
-      if (identity === 'manager') {
-        const hotel = {};
-        hotel.name = helper.checkString(req.body.nameInput, "hotel name", true);
-        hotel.street = helper.checkString(req.body.streetInput, "street", true);
-        hotel.city = helper.checkString(req.body.cityInput, "city", true);
-        hotel.state = helper.checkString(req.body.stateInput, "state", true);
-        hotel.zip_code = helper.checkZip(req.body.zip_codeInput, true);
+      // if (identity === 'manager') {
+      //   const hotel = {};
+      //   hotel.name = helper.checkString(req.body.nameInput, "hotel name", true);
+      //   hotel.street = helper.checkString(req.body.streetInput, "street", true);
+      //   hotel.city = helper.checkString(req.body.cityInput, "city", true);
+      //   hotel.state = helper.checkString(req.body.stateInput, "state", true);
+      //   hotel.zip_code = helper.checkZip(req.body.zip_codeInput, true);
 
-        const addMgrMessage = await adminFuncs.addMgr(req.user.username, username, hotel);
-        req.flash(addMgrMessage);
-        return res.redirect("/admin/account");
-      }
+      //   const addMgrMessage = await adminFuncs.addMgr(req.user.username, username, hotel);
+      //   req.flash(addMgrMessage);
+      //   return res.redirect("/admin/account");
+      // }
       req.flash('Update sucessfully');
       return res.redirect(`/admin/accounts`);
     } catch (e) {
