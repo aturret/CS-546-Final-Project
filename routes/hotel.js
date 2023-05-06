@@ -167,8 +167,8 @@ router
       const checkin = helper.checkDate(req.body.checkin, true);
       const checkout = helper.checkDate(req.body.checkout, true);
 
-      const searchResult = await hotelFuncs.checkRoomAvailability(hotelId, checkin, checkout); 
-      res.render('searchAvailableRoomType', {});
+      const searchResult = await hotelFuncs.checkRoomAvailabilityOrder(hotelId, checkin, checkout); 
+      res.render('searchRoomsResult', {searchResult: searchResult});
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -181,9 +181,10 @@ router
   })
   .post(isAuth, async (req, res) => {
     try {
+      const roomTypeId = helper.checkId(req.body.roomTypeIdInput, true);
       const hotelId = helper.checkId(req.params.hotelId, true);
       const userId = helper.checkId(req.body.userIdInput, true);
-      const roomId = helper.checkId(req.body.roomIdInput, true);
+      const roomId = hotelFuncs;
 
       const hotel = await hotelFuncs.getHotel(hotelId);
       const hotelName = hotel.name;
@@ -210,6 +211,9 @@ router
       const status = 'pending';
 
       const args = [hotelId, userId, roomId, hotelName, checkin, checkout, guests, price, status];
+      const addOrder = await userFuncs.addOrder(args);
+      if (addOrder) req.flash('Add order successfullly');
+      res.redirect('/hotel/:hotelId/searchResult');
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
