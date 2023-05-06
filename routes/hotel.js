@@ -122,12 +122,12 @@ router
   .get(isAdmin, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
-      const hotel = hotelFuncs.getHotel(hotelId);
+      const hotel = await hotelFuncs.getHotel(hotelId);
       res.render('hotel_management', {hotel: hotel});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel/:hotelId/';
+      const previousUrl = req.headers.referer || '/hotel';
       res.redirect(previousUrl);
     }
   })
@@ -171,7 +171,7 @@ router
   .delete(isAdmin, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
-      const message = hotelFuncs.deleteHotel(hotelId);
+      const message = await hotelFuncs.deleteHotel(hotelId);
       req.flash(message);
       return res.redirect(200).redirect("/hotel");
     } catch (e) {
@@ -185,26 +185,75 @@ router
 router
   .route("/hotel/:hotelId/hotelManagement/room")
   .get(isAdmin, async (req, res) => {
-    try {
-      const hotelId = helper.checkId(req.params.hotelId, true);
-      const hotel = hotelFuncs.getHotel(hotelId);
-      res.render('hotel_management', {hotel: hotel});
-    } catch (e) {
-      req.session.status = e.code ? e.code : 500;
-      req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel/:hotelId/';
-      res.redirect(previousUrl);
-    }
+    const hotelId = helper.checkId(req.params.hotelId, true);
+    const rooms = await hotelFuncs.getHotelRoom(hotelId);
+    res.render('rooms', {rooms: rooms});
   })
   .post(isAdmin, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
-      const hotel = hotelFuncs.getHotel(hotelId);
-      res.render('hotel_management', {hotel: hotel});
+      const roomId = helper.checkId(req.body.roomIdInput, true);
+      const roomNumber = helper.checkString(req.body.roomNumberInput, "room number", true);
+      if(!/^\[0-9]{0,5}$/.test(roomNumber)) throw CustomException(`Invalid room number.`, true);
+      const roomType = helper.checkString(req.body.roomTypeInput, "room type", true);
+      
+      const args = [hotelId, roomId, roomNumber];
+
+      const addRoomMessage = hotelFuncs.addRoom(args);
+      req.flash(addRoomMessage);
+      res.redirect('/hotel/:hotelId/hotelManagement/room');
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel/:hotelId/';
+      const previousUrl = req.headers.referer || '/hotel';
+      res.redirect(previousUrl);
+    }
+  })
+
+router
+  .route("/hotel/:hotelId/hotelManagement/room/:roomId")
+  .get(isAdmin, async (req, res) => {
+    try {
+      const roomId = helper.checkId(req.params.roomId, true);
+      const room = await hotelFuncs.getRoom(roomId);
+      res.render('singleRoom', {room: room});
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || '/hotel';
+      res.redirect(previousUrl);
+    }
+  })
+  .put(isAdmin, async (req, res) => {
+    try {
+      const hotelId = helper.checkId(req.params.hotelId, true);
+      const roomId = helper.checkId(req.params.roomId, true);
+      const typeNme = helper.checkString(req.body.roomTypeInput, "room type", true);
+      const roomNum = helper.checkId(req.body.roomNum, 'room number', true);
+      if(!/[0-9]{0,5}$/.test(roomNum)) throw CustomException(`Invalid room number.`, true);
+      
+      const updateRoomMessage = await hotelFuncs.updateRoom(hotelId, roomId, typeNme, roomNum);
+      req.flash(updateRoomMessage);
+      res.redirect('/hotel/:hotelId/hotelManagement/room/:roomId');
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || '/hotel';
+      res.redirect(previousUrl);
+    }
+  })
+  .delete(isAdmin, async (req, res) => {
+    try {
+      const hotelId = helper.checkId(req.params.hotelId, true);
+      const roomId = helper.checkId(req.body.roomIdInput, true);
+      
+      const deleteRoomMessage = await hotelFuncs(hotelId, roomId);
+      req.flash(deleteRoomMessage);
+      res.redirect('/hotel/:hotelId/hotelManagement/room');
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || '/hotel';
       res.redirect(previousUrl);
     }
   })
@@ -214,12 +263,63 @@ router
   .get(isAdmin, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
-      const hotel = hotelFuncs.getHotel(hotelId);
-      res.render('hotel_management', {hotel: hotel});
+      const roomTypes = await hotelFuncs.getHotelRoomType(hotelId);
+      res.render('roomtTypes', {roomTypes: roomTypes});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel/:hotelId/';
+      const previousUrl = req.headers.referer || '/hotel';
+      res.redirect(previousUrl);
+    }
+  })
+  .post(isAdmin, async (req, res) => {
+    try {
+      let args = [];
+      args[0] = helper.checkId(req.params.hotelId, true);
+      args[1] = helper.checkString(req.body.roomTypeNameInput, "room type name", true);
+      args[2] = helper.checkWebsite(req.body.roomTypePictureInput, true);
+      args[3] = helper.checkPrice(req.body.price, true);
+      args[4] = req.body.rooms ? helper.checkArray(req.body.rooms, true) : [];
+
+      const addRoomTypeMessage = await hotelFuncs.addRoomType(args);
+      req.flash(addRoomTypeMessage);
+      res.redirect('/hotel/:hotelId/hotelManagement/room');
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || '/hotel';
+      res.redirect(previousUrl);
+    }
+  })
+  .put(isAdmin, async (req, res) => {
+    try {
+      const roomTypeId = helper.checkId(req.body.roomTypeIdInput, true);
+      const hotelId = helper.checkId(req.params.hotelId, true);
+      const roomTypeName = helper.checkString(req.body.roomTypeNameInput, "room type name", true);
+      const price = helper.checkPrice(req.body.price, true);
+      const picture = req.body.rooms ? helper.checkArray(req.body.rooms, true) : [];
+
+      const updateRoomTypeMessage = await hotelFuncs.updateRoomType(roomTypeId, hotelId, roomTypeName, price, picture);
+      req.flash(updateRoomTypeMessage);
+      res.redirect('/hotel/:hotelId/hotelManagement/room');
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || '/hotel';
+      res.redirect(previousUrl);
+    } 
+  })
+  .delete(isAdmin, async (req, res) => {
+    try {
+      const roomTypeId = helper.checkId(req.body.roomTypeIdInput, true);
+      const hotelId = helper.checkId(req.params.hotelId, true);
+      const deleteRoomTypeMessage = await hotelFuncs.deleteRoomType(roomTypeId, hotelId);
+      req.flash(deleteRoomTypeMessage);
+      res.redirect('/hotel/:hotelId/hotelManagement/room');
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || '/hotel';
       res.redirect(previousUrl);
     }
   })
@@ -229,7 +329,7 @@ router
   .get(isAdmin, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
-      const hotel = hotelFuncs.getHotel(hotelId);
+      const hotel = await hotelFuncs.getHotel(hotelId);
       res.render('hotel_management', {hotel: hotel});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
@@ -244,7 +344,7 @@ router
   .get(isAdmin, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
-      const hotel = hotelFuncs.getHotel(hotelId);
+      const hotel = await hotelFuncs.getHotel(hotelId);
       res.render('hotel_management', {hotel: hotel});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;

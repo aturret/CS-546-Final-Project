@@ -368,6 +368,16 @@ export async function getHotelRoom(id) {
   return roomInfo;
 }
 
+//get single room
+export async function getRoom(id) {
+  id = ObjectId(helper.checkId(id, true));
+  const tempRoom = await Room();
+
+  const roomInfo = await tempRoom.find({_id: id});
+  if (!roomInfo) throw CustomException("Room not found", false);
+  return roomInfo;
+}
+
 //get hotel room type
 export async function getHotelRoomType(id) {
   id = ObjectId(helper.checkId(id, true));
