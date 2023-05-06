@@ -30,12 +30,49 @@
         <p>Phone: {{phone}}</p>
     </div>
 </div>
+{{!-- edit personal information --}}
+<div class="editInformation">
+    <button id="editInformationButton" onclick="editInformation()">Edit</button>
+    <div id="editInformationWindow" hidden="true">
+    <form action="/user/dashboard/{{username}}/edit" method="PATCH" id="editInformation-form" class="my-form">
+        <div class="userFirstName">
+            <input type="text" name="userFirstNameInput" id="userFirstNameInput" value="{{firstName}}">
+            <label for="userFirstNameInput">First Name</label>
+        </div>
+        <div class="userLastName">
+            <input type="text" name="userLastNameInput" id="userLastNameInput" value="{{lastName}}">
+            <label for="userLastNameInput">Last Name</label>
+        </div>
+        <div class="userEmail">
+            <input type="email" name="userEmailInput" id="userEmailInput" value="{{email}}">
+            <label for="userEmail">Email</label>
+        </div>
+        <div class="userPhone">
+            <input type="text" name="userPhoneInput" id="userPhoneInput" value="{{phone}}">
+            <label for="userPhone">Phone</label>
+        </div>
+        <div class="userPassword">
+            <input type="password" name="userPasswordInput" id="userPasswordInput">
+            <label for="userPassword">Password</label>
+        </div>
+        <div class="userNewPassword">
+            <input type="password" name="userNewPasswordInput" id="userNewPasswordInput" class="PasswordInput">
+            <label for="userPassword">New Password</label>
+        </div>
+        <div class="userConfirmNewPassword">
+            <input type="password" name="userConfirmNewPasswordInput" id="userConfirmNewPasswordInput" class="confirmPasswordInput">
+            <label for="userConfirmPassword">Confirm New Password</label>
+        </div>
+        <button type="submit" id="editInformation">Submit</button>
+    </form>
+    </div>
+</div>
+{{!-- manager/hotel application --}}
 {{#if (eq user.identity "user")}}
 <div class="newApplication">
     <button id="newHotelButton" onclick="newHotel()">Start Hotel Registration</button>
     <div id="newHotelWindow" hidden="true">
         <form action="/user/dashboard/{{username}}/upgrade" method="POST">
-            
             <label for="hotelNameInput" id="hotelNameInput-label">
                 Hotel Name:
             </label>

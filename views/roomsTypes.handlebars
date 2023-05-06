@@ -38,8 +38,8 @@ new variable.
                 </form>
             </div>
             <div class="editRoomType">
-                <button id="editRoomTypeButton">Edit</button>
-                <div hidden="true" id="editRoomTypeWindow">
+                <button id="editRoomTypeButton-{{this._id}}" onclick="editRoomType({{this._id}})">Edit</button>
+                <div hidden="true" id="edit-{{this._id}}">
                     <form action="/hotel/{{hotelId}}/hotelManagement/roomType/{{this._id}}" method="PATCH"
                         id="editRoomType-form" class="my-form">
                         <label for="roomTypeName" id="roomTypeName-label">
