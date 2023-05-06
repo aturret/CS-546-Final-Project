@@ -28,33 +28,7 @@ You can add a new key-value pair to the roomTypes collection, or you can just ca
                 <div class="roomTypePrice">
                     <p>{{this.roomTypePrice}}</p>
                 </div>
-            </div>
-            {{#if roomTypeDeletableStatus}}
-            <div class="deleteRoomType">
-                <form action="/hotel/{{hotelId}}/roomType/{{this._id}}" method="DELETE" id="deleteRoomType-form" class="my-form">
-                    <input type="hidden" name="hotelId" value="{{hotelId}}">
-                    <button type="submit" id="deleteRoomType-button">Delete</button>
-                </form>
-            </div>
-            {{/if}}
-            <div class="editRoomType">
-                <form action="/hotel/{{hotelId}}/roomType/{{this._id}}" method="PATCH" id="editRoomType-form" class="my-form">
-                    <label for="roomTypeName" id="roomTypeName-label">
-                        Room Type:
-                    </label>
-                    <input type="text" name="roomTypeName" id="roomTypeName">
-                    <label for="roomTypePrice" id="roomTypePrice-label">
-                        Room Price:
-                    </label>
-                    <input type="number" name="roomTypePrice" id="roomTypePrice">
-                    <label for="roomTypePictures" id="roomTypePictures-label">
-                        Room Pictures:
-                    </label>
-                    <input type="hidden" name="hotelId" value="{{hotelId}}">
-                    <button type="submit" id="editRoomType-button">Edit</button>
-                </form>
-            </div>
-        </li>
+            </div>            
         {{/each}}
     </ol>
     <div class="addNewRoomType">
