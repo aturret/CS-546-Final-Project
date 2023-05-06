@@ -81,14 +81,14 @@
 </div>
 {{/if}}
 <div class="functionMenu">
-    <div class="functionItem"><a href="/order">My Orders</a></div>
+    <div class="functionItem"><a href="/user/dashboard/{{username}}/order_history">My Orders</a></div>
     {{#if (eq user.identity "manager")}}
-    <div class="functionItem"><a href="/hotel">My Hotel</a></div>
+    <div class="functionItem"><a href="/user/dashboard/{{username}}/hotel_management">My Hotel</a></div>
     {{/if}}
     {{#if (eq user.identity "admin")}}
     <div class="functionItem"><a href="/admin">Admin</a></div>
     {{/if}}
-    <div class="functionItem"><a href="/logout">Log Out</a></div>
+    <div class="functionItem"><a href="/user/logout">Log Out</a></div>
 </div>
 
 <div class="error" id="client">

@@ -17,12 +17,12 @@ export function checkString(s, key, flag){
     return s.trim();
 }
 
-export function checkNumber(n, flag){
-    if(!n || typeof n !== 'string') throw new CustomException("Website must exist and must be a string type.", flag);
-    n = n.trim()
-    if(!/^[0-9]{10}$/.test(n)) throw new CustomException("Phone number must be valid.", flag);
-    return n
-}
+// export function checkNumber(n, flag){
+//     if(!n || typeof n !== 'number') throw new CustomException("Room number must exist and must be a string type.", flag);
+//     n = n.trim()
+//     if(!/^[0-9]{10}$/.test(n)) throw new CustomException("Phone number must be valid.", flag);
+//     return n
+// }
 
 export function checkId(id, flag){
     if(!id || typeof id !== 'string' || id.trim().length === 0) throw new CustomException('Id must exist and must be a non empty string', flag);
@@ -39,8 +39,8 @@ export function checkArray(arr, key, flag){
 }
 
 export function checkDate(date, flag){
-    if(!date || typeof date !== "string" || date.trim().length === 0) throw new CustomException("releaseDate must exist and must be a non empty string.", flag);
-    if(!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw new CustomException("releaseDate must be a valid date.", flag);
+    if(!date || typeof date !== "string" || date.trim().length === 0) throw new CustomException("Date must exist and must be a non empty string.", flag);
+    if(!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw new CustomException("Date must be a valid date.", flag);
     date = date.trim();
     let temp = +date.split("/")[0];
     if (temp < 1900 || temp > 2023)
@@ -97,12 +97,12 @@ export function checkEmail(email, flag)
     return email
 }
 
-export function checkGuest(obj, flag)
+export function checkGuests(obj, flag)
 {
     if (!obj || !Array.isArray(obj)) throw new CustomException("Object must exist and must be an object.", flag);
-    for (let guest in obj){
+    for (let guest of obj){
         guest.firstName = checkNameString(guest.firstName, "First name", true)
-        guest.lastName = checkNameString(quest.lastName, "last name", true)
+        guest.lastName = checkNameString(guest.lastName, "last name", true)
     }
 
     return obj
@@ -145,12 +145,12 @@ export function* randomUserGenerator(){
     {
         
         yield {
-            username: "user" + i,
-            password: "User" + i,
-            firstName: "user" + i + "1!",
+            username: "User" + i,
+            firstName: "User" + i,
+            password: "User" + i + "1!",
             lastName: i,
-            email: "user" + i + "@email.com",
-            phone: faker.phone.phoneNumberFormat(2),
+            email: "User" + i + "@email.com",
+            phone: faker.phone.phoneNumber("###-###-####"),
             identity: "user",
             avatar: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
         }
@@ -166,17 +166,17 @@ export function* randomHotelGenerator(){
             street: faker.address.streetAddress(),
             city: faker.address.city(),
             state: faker.address.state(),
-            zip_code: faker.address.zipCode(),
-            phone: faker.phone.phoneNumberFormat(2),
+            zip_code: faker.address.zipCode("#####"),
+            phone: faker.phone.phoneNumber("###-###-####"),
             email: faker.internet.email(),
-            picture: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-            manager: []
+            picture: ["https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"],
+            managers: []
         }
     }
 }
 
 export function* randomManagerGenerator(){
-    const base = "manager"
+    const base = "Manager"
     for (let i of ref)
     {
         yield {
@@ -185,21 +185,20 @@ export function* randomManagerGenerator(){
             firstName: base + i,
             lastName: i,
             email: base + i + "@email.com",
-            phone: faker.phone.phoneNumberFormat(2),
-            identity: base,
+            phone: faker.phone.phoneNumber("###-###-####"),
+            identity: "manager",
             avatar: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
         }
     }
 }
 
-const room_types = ["single room", "double room", "king room", "queen room", "suite", "penthouse"]
 export function* randomRoomTypeGenerator(i){
     while(true)
     {
         yield {
-            name: room_types[i],
-            description: faker.lorem.paragraph(),
-            picture: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
+            name: undefined,
+            price: faker.random.number(50, 1000),
+            picture: ["https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"],
         }
     }
 }
@@ -209,10 +208,8 @@ export function* randomRoomGenerator(i){
     while(true)
     {
         yield {
-            price: faker.random.number(50, 1000),
-            room_number: faker.random.number(99999),
-            room_type: room_types[i],
-            picture: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
+            room_number: faker.random.number(99999).toString(),
+            picture: ["https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"],
         }
     }
 }
@@ -224,12 +221,12 @@ export function* randomOrderGenerator(i){
         const checkout_date = "2023/05/07"
         yield {
             checkin_date: checkin_date,
-            end_date: checkout_date,
-            price: faker.random.number(50, 1000),
+            checkout_date: checkout_date,
+            price: faker.datatype.number(50, 1000),
             status: "accepted",
             guest: [{
                 firstName: faker.name.firstName(),
-                lastName: faker.Name.lastName(),
+                lastName: faker.name.lastName(),
             }]
         }
     }
@@ -239,7 +236,7 @@ export function* randomReviewGenerator(){
     while(true)
     {
         yield {
-            rating: faker.random.number(1, 5),
+            rating: faker.datatype.number(1, 5),
             comment: faker.lorem.paragraph()
         }
     }
