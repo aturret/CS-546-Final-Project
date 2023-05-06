@@ -67,9 +67,13 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
                 <button type="submit">Submit Info Change</button>
             </form>
         </div>
-        <a href="/hotel/{{hotel._id}}/room">Edit Hotel Rooms</a>
-        <a href="/hotel/{{hotel._id}}/roomType">Edit Hotel Rooms Types</a>
-        <a href="/hotel/{{hotel._id}}/orders">Edit Hotel Reviews</a>
+        <a href="/hotel/{{hotel._id}}/hotelManagement/room">Edit Hotel Rooms</a>
+        <a href="/hotel/{{hotel._id}}/hotelManagement/roomType">Edit Hotel Rooms Types</a>
+        <a href="/hotel/{{hotel._id}}/hotelManagement/orders">Edit Hotel orders</a>
+        {{#if (eq user.userIdentity "admin")}}
+        <a href="/hotel/{{hotel._id}}/hotelManagement/review">Edit Hotel Reviews</a>
+        <a href="/hotel/{{hotel._id}}/hotelManagement/manager">Edit Hotel Managers</a>
+        {{/if}}
     </div>
     {{if (eq user.userIdentity "admin")}}
     <div class="delete">
