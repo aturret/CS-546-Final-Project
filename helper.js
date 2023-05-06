@@ -143,10 +143,11 @@ const ref = ["one", "two", "three", "four", "five", "six", "seven", "eight", "ni
 export function* randomUserGenerator(){
     for (let i of ref)
     {
+        
         yield {
             username: "user" + i,
-            password: "user" + i,
-            firstName: "user" + i,
+            password: "User" + i,
+            firstName: "user" + i + "1!",
             lastName: i,
             email: "user" + i + "@email.com",
             phone: faker.phone.phoneNumberFormat(2),
@@ -180,7 +181,7 @@ export function* randomManagerGenerator(){
     {
         yield {
             username: base + i,
-            password: base + i,
+            password: base + i + "1!",
             firstName: base + i,
             lastName: i,
             email: base + i + "@email.com",
@@ -216,16 +217,30 @@ export function* randomRoomGenerator(i){
     }
 }
 
-export function* randomOrderGenerator(i){
+export function* randomOrderGenerator(){
     for (let i of ref)
     {
+        const checkin_date = "2023/05/01"
+        const checkout_date = "2023/05/07"
         yield {
-            checkin_date: faker.date.past(),
-            end_date: faker.date.past(),
+            checkin_date: checkin_date,
+            end_date: checkout_date,
             price: faker.random.number(50, 1000),
             status: "accepted",
-            guest: [],
-            room: [],
+            guest: [{
+                firstName: faker.name.firstName(),
+                lastName: faker.Name.lastName(),
+            }]
+        }
+    }
+}
+
+export function* randomReviewGenerator(){
+    while(true)
+    {
+        yield {
+            rating: faker.random.number(1, 5),
+            comment: faker.lorem.paragraph()
         }
     }
 }

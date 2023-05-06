@@ -258,20 +258,21 @@ export async function getOrder(username) {
 
 export async function addOrder(...args) {
   if (args.keys().length < 9) throw CustomException("Missing inputs.");
-  args.hotel_id = ObjectId(helper.checkId(args.hotel_id), true);
-  args.user_id = ObjectId(helper.checkId(args.user_id), true);
-  args.room_id = ObjectId(helper.checkId(args.room_id), true);
-  //how to check date?
-  args.hotel_name = helper.checkString(args.hotel_name, "hotel name", true);
-  args.checkin_date = helper.checkDate(args.checkin_date, true);
-  args.checkout_date = helper.checkDate(args.checkout_date, true);
+  args.hotel_id = ObjectId(helper.checkId(args[0]), true);
+  args.user_id = ObjectId(helper.checkId(args[1]), true);
+  args.room_id = ObjectId(helper.checkId(args[2]), true);
+
+  args.hotel_name = helper.checkString(args[3], "hotel name", true);
+  args.checkin_date = helper.checkDate(args[4], true);
+  args.checkout_date = helper.checkDate(args[5], true);
+
   if (!args.guests || args.guests === "null") {
     args.guests = {};
   } else {
-    args.guests = helper.checkGuests(args.guests, true);
+    args.guests = helper.checkGuests(args[6], true);
   }
-  args.price = helper.checkPrice(args.price, true);
-  args.status = helper.checkStatus(args.status, true);
+  args.price = helper.checkPrice(args.price[7], true);
+  args.status = helper.checkStatus(args.status[8], true);
   args.review = "";
 
   //update user account, and add order to order database
@@ -588,7 +589,7 @@ export async function createRequest(...args) {
   const tempRequest = await mgrReq();
   const tempHotel = await hotelReg();
 
-  const userInfo = await tempAccount.findOne({ _id: args[9] }, { _id: 1 });
+  const userInfo = await tempAccount.findOne({ _id: args[9][0] }, { _id: 1 });
   if (userInfo === null) throw CustomException(`Could not find user with username ${username}`, true);
 
   const hotelInfo = await tempHotel.findOne(
