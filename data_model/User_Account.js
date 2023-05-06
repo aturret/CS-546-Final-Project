@@ -99,6 +99,41 @@ export async function updateUser(username, set) {
   return userInfo;
 }
 
+export async function addMgr(mgrName, userName, hotelId) {
+  mgrName = helper.checkNameString(mgrName, "manager username", true);
+  userName = helper.checkNameString(userName, "user username", true);
+  hotelId = helper.checkId(hotelId, true);
+
+  const tempAccount = await Account();
+  const tempHotel = await hotelReg();
+
+  const mgrInfo = await tempAccount.findOne({ username: mgrName }, { _id: 1 });
+  if (mgrInfo === null) throw CustomException(`Could not find user with username ${mgrName}`, true);
+  if (mgrInfo.identity === 'user') throw CustomException(`User ${mgrName} is not a manager, could not add another manager`, true);
+  
+  const userInfo = await tempAccount.findOne({ username: userName }, { _id: 1 });
+  if (userInfo === null) throw CustomException(`Could not find user with username ${userName}`, true);
+  if (userInfo.identity !== 'user') throw CustomException(`User ${userName} is not a user, could not upgrade`, true);
+
+  const hotelInfo = await tempHotel.findOne({ _id: Object(hotelId) }, { _id: 1 });
+  if (hotelInfo === null) throw CustomException(`Could not find hotel with ID ${hotelId}`, true);
+
+  const newMgrMessage = userFuncs.updateUser(
+    userName, 
+    { identity: 'manager' }
+  )
+
+  const hotelAddMgrInfo = await tempHotel.findOneUpdate(
+    { _id: hotelId },
+    { $addToSet: {manager: userInfo._id}, },
+    { returnDocument: "after" }
+  );
+  if (!hotelAddMgrInfo)
+    throw CustomException(`Update hotel with id ${hotelId} failed.`, true);
+
+  return { message: `Add a new manager ${userName} to hotel ${hotelId}` };
+}
+
 //delete account
 export async function deleteAccount(username) {
 
