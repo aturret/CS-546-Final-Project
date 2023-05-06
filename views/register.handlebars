@@ -5,14 +5,14 @@ registration handelbars
 --}}
 {{!--
 <script src="../public/js/lab10.js"></script> --}}
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code{{status_code}}: {{error}}</p>
+    <p>Error code{{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 
 <p>Please fill up this form and register your account.</p>
-<form action="/register" method="POST" id="registration-form" class="my-form">
+<form action="/user/register" method="POST" id="registration-form" class="my-form">
     <label for="username" id="username-label">
         Username:
     </label>
@@ -52,4 +52,4 @@ registration handelbars
 <p class="error" id="client">
     {{errorMessage}}
 </p>
-<a href="/login">Already have an account? Click here to log-in!</a>
+<a href="/user/login">Already have an account? Click here to log-in!</a>

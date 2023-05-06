@@ -4,7 +4,7 @@ import { Order } from "../Mongo_Connections/mongoCollections.js";
 import { Room } from "../Mongo_Connections/mongoCollections.js";
 import { hotelReg } from "../Mongo_Connections/mongoCollections.js";
 import { roomType } from "../Mongo_Connections/mongoCollections.js";
-import { Request } from "../Mongo_Connections/mongoCollections.js";
+import { mgrReq } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import * as helper from "../helper.js";
 import bcrypt from "bcryptjs";
@@ -66,6 +66,9 @@ export async function getUser(username) {
 
   const tempAccount = await Account();
   const user = await tempAccount.findOne({ username: username });
+  if (!user) throw CustomException(`Could not find user with username ${username}`, true);
+
+  user._id = user._id.toString();
   return user;
   // let authenticate_result = false
   // authenticate_result = await bcrypt.compare(password, refPassword)
@@ -88,7 +91,7 @@ export async function updateUser(username, set) {
   }
   const userInfo = await tempAccount.findOneUpdate(
     { username: username },
-    { $set, set },
+    { $set: set },
     { returnDocument: "after" }
   );
   if (userInfo.lastErrorObject.n === 0)
@@ -547,7 +550,7 @@ export async function createRequest(...args) {
   : undefined;
 
   const tempAccount = await Account();
-  const tempRequest = await Request();
+  const tempRequest = await mgrReq();
   const tempHotel = await hotelReg();
 
   const userInfo = await tempAccount.findOne({ _id: args[9] }, { _id: 1 });
@@ -559,13 +562,12 @@ export async function createRequest(...args) {
       street: args[1],
       city: args[2],
       state: args[3],
-      zip_code: args[4]
+      zip_code: args[4],
     }, 
     { _id: 1 });
   if (hotelInfo !== null) throw CustomException('Hotel exist', true);
 
   const newRequest = {
-    _id: new ObjectId(),
     username: userInfo.username,
     args: args,
     status: "pending"
@@ -576,4 +578,15 @@ export async function createRequest(...args) {
     throw CustomException(`Could not add the request.`, true);
 
   return { message: 'Request submit, wait for approval' };
+}
+
+//get request by username
+export async function getRequest(username) {
+  username = helper.checkString(username, "username", true);
+
+  const tempRequest = await mgrReq();
+  const requestInfo = await tempRequest.findOne({username: username});
+  if (requestInfo !== null) return false;
+
+  return true
 }

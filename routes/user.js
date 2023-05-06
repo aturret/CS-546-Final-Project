@@ -190,25 +190,44 @@ router
 //TODO: this function suppose to create a new request to admin. You need to define a funciton in user_model to create a new collection for requests schema.
 router
   .route("/dashboard/:username/upgrade")
-  .post(isAuth, async (req, res) => {
+  .post(
+    (req, res, next) =>
+    {
+      if(!req.isAuthenticated()) return res.redirect("/user/login");
+      if(req.user.identity !== "user"){
+        req.session.status = 403;
+        req.session.errorMessage = "You are not allowed to register a hotel.";
+        return res.redirect("/user/dashboard/:username")
+      }
+      next();
+    }
+  , async (req, res) => {
     try {
       req.user.username = helper.checkString(req.user.username, "username", true);
-      req.user.name = helper.checkString(req.user.name, "name", true);
-      req.user.street = helper.checkString(req.user.street, "street", true);
-      req.user.city = helper.checkString(req.user.city, "city", true);
-      req.user.state = helper.checkString(req.user.state, "state", true);
-      req.user.zip_code = helper.checkZip(req.user.zip_code, "zip_code", true);
 
-      const args = [
-        req.user.username,
-        req.user.name,
-        req.user.street,
-        req.user.city,
-        req.user.state,
-        req.user.zip_code
-      ];
+      //check if already have request
+      let permission = false
+      permission = await userFuncs.getRequest(req.user.username);
+      if(!permission)
+      {
+        req.session.status = 403;
+        req.session.errorMessage = "You already have a request.";
+        return res.redirect("/user/dashboard/:username");
+      }
 
-      const requestMessage = await userFuncs.createMgeReq(args);
+      const hotelName = helper.checkString(req.user.name, "name", true);
+      const email = helper.checkEmail(req.user.email, true);
+      const phone = helper.checkPhone(req.user.phone, true);
+
+      const street = helper.checkString(req.user.hotelStreet, "street", true);
+      const city = helper.checkString(req.user.hotelCity, "city", true);
+      const state = helper.checkString(req.user.hotelState, "state", true);
+      const zip_code = helper.checkZip(req.user.hotelZipcode, true);
+      const userId = helper.checkId(req.body.userId, true);
+      const manager = [userId];
+      const photo = helper.checkWebsite(req.body.hotelPhoto, true);
+
+      const requestMessage = await userFuncs.createRequest(hotelName, street, city, state, zip_code, phone, email, photo, [], manager);
       req.flash(requestMessage);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
@@ -630,10 +649,10 @@ router.route("/dashboard/:username/order_history/:order_id/add_review")
   }});
 
 //TODO: edit review
-router.route("/edit_review")
+router.route("/dashboard/:username/order_history/:order_id/edit_review")
 .patch(isAuth, async (req, res) => {
   try {
-  const review_id = helper.checkId(req.body.review_id, true);
+  const review_id = helper.checkId(req.params.review_id, true);
   const rating = req.body.rating;
   const comment = req.body.comment;
   const result = await userFuncs.editReview(review_id, rating, comment);

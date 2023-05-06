@@ -115,7 +115,8 @@ passport.deserializeUser(async (user, next) => {
 
 app.use((req, res, next) => {
     console.log("set user middleware fired")
-    res.locals.user = req.user;
+    res.locals.user = req.user || {username: undefined, identity: "guest"};
+    console.log(res.locals.user.identity)
     next();
 })
 
