@@ -388,7 +388,7 @@ export async function getHotelRoom(id) {
   const tempHotel = await hotelReg();
   const tempRoom = await Room();
 
-  const room_ids = await hotelReg.findOne({_id: id}, {rooms: 1});
+  const room_ids = await tempHotel.findOne({_id: id}, {rooms: 1});
   const roomInfo = await tempRoom.find({_id: {$in: room_ids}}).toArray();
   if (!roomInfo) throw CustomException("Hotel not found", false);
   return roomInfo;
