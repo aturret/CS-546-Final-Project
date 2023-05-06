@@ -242,8 +242,6 @@ router
     }
   });
 
-
-
 router.route("/dashboard/:username/logout").get(
   (req, res, next) => {
     if (!req.isAuthenticated()) {
