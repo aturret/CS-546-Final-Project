@@ -541,13 +541,38 @@ router
     }
   })
 
+// render the single review page
+router
+.route("/reviews/:reviewId")
+.get(async (req, res) => {
+  try {
+    const reviewId = helper.checkId(req.params.reviewId, true);
+    const review = await userFuncs.getReviewById(reviewId);
+    const user = await userFuncs.getUserById(review.user_id);
+    const reviewInfo = {
+      reviewId: review._id,
+      orderId: review.order_id,
+      hotelId: review.hotel_id,
+      username: user.username,
+      reviewUserId: review.user_id,
+    };
+    res.render('reviews', {review: review, title: `Review Control Panel`});
+  } catch (e) {
+    console.log(e.message);
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    const previousUrl = req.headers.referer || '/hotel';
+    res.redirect(previousUrl);
+  }
+})
+
 router
   .route("/hotel/:hotelId/hotelManagement/review")
   .get(isMgr, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotelReviews = await hotelFuncs.getHotelReview(hotelId);
-      res.render('reviews', {hotelReviews: hotelReviews, title: `Review Control Panel`});
+      res.render('hotelReviews', {hotelReviews: hotelReviews, title: `Review Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;

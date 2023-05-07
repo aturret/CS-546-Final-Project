@@ -44,7 +44,7 @@ reviewUserId: the id of the user who wrote the review
             <div class="reviewComment">
                 <p>{{reviewComment}}</p>
             </div>
-            {{#if (or(eq reviewUserId user.userId)(eq user.identity "admin"))}}
+            {{#if (eq reviewUserId user.userId)}}
             <div class="editReview">
                 <button id="editReviewButton" onclick="editReview()">Edit</button>
                 <div hidden="true" id="editReviewWindow">
