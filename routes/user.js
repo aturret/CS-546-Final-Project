@@ -247,11 +247,13 @@ router.route("/dashboard/:username/logout").get(
     if (!req.isAuthenticated()) {
       return res.redirect("/user/login");
     }
-    next();
+    else{
+      req.logout();
+      req.session.destroy();
+      res.redirect("/user/login");
+    }
   },
   (req, res) => {
-    req.logout();
-    req.session.destroy();
     res.redirect("/user/login");
   }
 );

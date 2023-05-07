@@ -1,11 +1,14 @@
 import { Strategy as auth } from "passport-local";
 import express, { Router } from "express";
+import { ObjectId } from "mongodb";
+import { Review, Account } from "../Mongo_Connections/mongoCollections.js";
 import passport from "passport";
 import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
 import * as helper from "../helper.js";
 import isAuth from "./user.js";
+
 
 const router = express.Router();
 
@@ -48,8 +51,8 @@ router
     }
     else req.session = {};
 
-
     if (errorMessage) return res.status(status).render("landpage", { errorMessage: errorMessage,title:"HotelFinder" });
+
     return res.status(status).render("landpage",{title:"HotelFinder"});
   })
   //search hotel
@@ -60,7 +63,35 @@ router
     const hotel_zip = req.body.hotelZipcodeInput;
     try{
       const result = await hotelFuncs.hotelSearch(hotel_name, hotel_city, hotel_state, hotel_zip);
-      return res.status(200).render("searchHotelsResult", { hotels: result ,title:"Search Result"});
+      const hotelList = [];
+      const hotelInfo = {};
+      let price = undefined;
+      let roomTypeInfo = undefined
+      for (let i = 0; i < result.length; i++){
+        for(let j = 0; j < result[i].room_types.length; j++){
+          roomTypeInfo = await hotelFuncs.getHotelRoomType(result[i]._id);
+          if(price === undefined) {
+             price = roomTypeInfo[j].price;
+          }
+          else if(roomTypeInfo.price < price){
+            price = roomTypeInfo.price;
+          }
+        }
+        hotelInfo.hotelPrice = price;
+        hotelInfo.hotelId = result[i]._id;
+        hotelInfo.hotelAddress = result[i].street + ", " + result[i].city + ", " + result[i].state + ", " + result[i].zip_code;
+        hotelInfo.hotelName = result[i].name;
+        hotelInfo.hotelId = result[i]._id;
+        hotelInfo.hotelPicture = result[i].pictures;
+        hotelInfo.hotelPhone = result[i].phone;
+        hotelInfo.hotelEmail = result[i].email;
+        hotelInfo.hotelRoom = result[i].rooms;
+        hotelInfo.hotelRoomTypes = result[i].room_types;
+        hotelInfo.hotelReviewNumber = result[i].reviews.length;
+        hotelInfo.hotelRating = result[i].overall_rating;
+        hotelList.push(hotelInfo);
+      }
+      return res.status(200).render("searchHotelsResult", { hotels: hotelList, title: "Hotel search result" });
     }
     catch(e){
       req.session.status = e.code ? e.code : 500;
@@ -69,6 +100,112 @@ router
     }
   });
 
+
+//TODO: Hotel searching -> hotel searching result -> hotel detail page
+// -> review page
+router
+  .route("/reviews/:reviewId")
+  .get(async (req, res) =>
+  {
+    const reviewId = req.params.reviewId;
+    try{
+      let review = undefined;
+      if (!req.session)
+      {
+        req.session = {};
+        review = await userFuncs.getReviewById(reviewId);
+        console.log(review);
+      }
+      else{
+        const tempReview = await Review();
+        review = await tempReview.findOne({_id: new ObjectId(reviewId)});
+        review.reviewRating = review.rating;
+        review.rating = null;
+        review.reviewComment = review.comment;
+        review.comment = null;
+        review.reviewUpvotes = review.upvote;
+        review.upvote = null;
+        review.reviewDownvotes = review.downvote;
+        if (req.session.hotelInfo && req.session.hotelInfo.reviewList && req.session.hotelInfo.reviewList.includes(reviewId)) {
+          review = Object.assign(review, req.session.hotelInfo);
+        }
+        else{
+          req.session.hotelInfo = {};
+          //get hotel info
+          const hotelInfo = await hotelFuncs.getHotel(review.hotel);
+          review.hotelName = hotelInfo.name;
+          review.hotelPhoto = hotelInfo.pictures;
+          review.hotelRating = hotelInfo.overall_rating;
+          review.hotelAddress = hotelInfo.street + ", " + hotelInfo.city + ", " + hotelInfo.state + ", " + hotelInfo.zip_code;
+          review.hotelPhone = hotelInfo.phone;
+          review.hotelEmail = hotelInfo.email;
+        }
+        if (req.session.userInfo && req.session.userInfo.reviewList && req.session.userInfo.reviewList.includes(reviewId)) {
+          review = Object.assign(review, req.session.userInfo);
+        }
+        else{
+          //get user info
+          req.session.userInfo = {};
+          const tempAccount = await Account();
+          const userInfo = await tempAccount.findOne({_id: new ObjectId(review.user_id)});
+          review.user_id = null;
+          review.userAvatar= userInfo.avatar;
+          review.reviewUserName = userInfo.username;
+        }
+        review.title = "Review";
+      }
+      const errorMessage = req.session && req.session.errorMessage || null;
+      const status = req.session && req.session.status || 200;
+      if (req.session) {
+        req.session.status = null;
+        req.session.errorMessage = null;
+      }
+      if (errorMessage)
+      {
+        review.status = status;
+        review.errorMessage = errorMessage;
+        return res.status(status).render("reviews", review);
+      }
+      review.reviewId = reviewId;
+      review._id = null;
+      console.log(review)
+      return res.status(status).render("reviews", review);
+  }
+  catch(e){
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    return res.redirect("/");
+  }
+  })
+  //update review
+  .put(isAuth, async (req, res) => {
+    const reviewId = req.params.reviewId;
+    const reviewRating = req.body.reviewRating;
+    const reviewComment = req.body.reviewComment;
+    try{
+      const result = await userFuncs.updateReview(reviewId, reviewComment, reviewRating);
+      return res.redirect(`/reviews/${{reviewId}}`);
+    }
+    catch(e){
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      return res.redirect("/");
+    }
+  })
+  .patch(async (req, res) => {
+    console.log("patch vote fired") 
+    const reviewId = req.params.reviewId;
+    const reviewVote= req.params.reviewVote === 'upvote' ? true : false;
+    try{
+      const result = await userFuncs.voteReview(reviewId, reviewVote);
+      return res.redirect(`/reviews/${{reviewId}}`);
+    }
+    catch(e){
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      return res.redirect(`/reviews/${reviewId}`);
+    }
+  })
 //TODO: Hotel detail page
 router
   .route("/hotel/:hotelId")
@@ -97,7 +234,7 @@ router
       hotelInfo.hotelId = hotel._id;
       hotelInfo.hotelName = hotel.name;
       hotelInfo.hotelPhoto = hotel.pictures;
-      hotelInfo.hotelRating = hotel.rating;
+      hotelInfo.HotelRating = hotel.overall_rating;
       hotelInfo.hotelAddress = hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code;
       hotelInfo.hotelPhone = hotel.phone;
       hotelInfo.hotelEmail = hotel.email;
@@ -109,7 +246,14 @@ router
       hotelInfo.roomType = roomTypes;
       //get hotel review
       const reviews = await hotelFuncs.getHotelReview(hotel_id);
+      
+      const reviewList = []; 
+      reviews.forEach(review => { reviewList.push(review._id); });
+      req.session.hotelInfo = hotelInfo;
+      req.session.hotelInfo.reviewList = reviewList;
+      
       hotelInfo.reviews = reviews;
+      hotelInfo.title = hotel.name;
       return res.status(status).render("hotel", hotelInfo);
     }
     catch(e){
@@ -165,8 +309,9 @@ router
       const checkin = helper.checkDate(req.body.checkin, true);
       const checkout = helper.checkDate(req.body.checkout, true);
 
-      const searchResult = await hotelFuncs.checkRoomAvailabilityOrder(hotelId, checkin, checkout); 
-      res.render('searchRoomsResult', {searchResult: searchResult,title:"Room Search Result"});
+      const searchResult = await hotelFuncs.checkRoomAvailabilityOrder(hotelId, checkin, checkout);
+      searchResult.title =  "Room Search Result"
+      res.render('searchRoomsResult', searchResult);
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;

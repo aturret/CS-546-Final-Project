@@ -527,8 +527,8 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
   review = helper.checkString(review, "review", true);
   rating = helper.checkRating(rating, true);
   const newReview = {
-    hotel_id: hotel_id,
-    user_id: user_id,
+    hotel_id: new ObjectId(hotel_id),
+    user_id: new ObjectId(user_id),
     comment: review,
     rating: rating,
     upvote: 0,
@@ -598,7 +598,38 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
   return true;
 }
 
-//TODO: vote review
+/*-------------get review by id------------*/
+export async function getReviewById(review_id) {
+  review_id = ObjectId(helper.checkId(review_id, true));
+  const tempReview = await Review();
+
+  //get review
+  const review = tempReview.findOne({_id: review_id});
+  //get hotel information
+  const hotelInfo = await hotelFuncs.getHotel(review.hotel_id);
+  review.hotelId = review.hotel_id;
+  review.hotelName = hotelInfo.name;
+  review.hotelRating = hotelInfo.overall_rating;
+  review.hotelAddress = hotelInfo.street + ", " + hotelInfo.city + ", " + hotelInfo.state + ", " + hotelInfo.zip_code;
+  review.hotelEmail = hotelInfo.email;
+
+  //get user information
+  const userInfo = await userFuncs.getUser(review.user_id);
+  review.reviewUserName = userInfo.username
+  review.userAvatar = userInfo.avatar;
+
+  review.reviewRating = review.rating;
+  review.rating = null;
+  review.reviewComment = review.comment;
+  review.comment = null;
+  review.reviewUpvotes = review.upvote;
+  review.upvote = null;
+  review.reviewDownvotes = review.downvote;
+  
+  return review
+}
+
+/*------------vote review------------*/
 export async function voteReview(review_id, flag) {
   review_id = helper.checkId(review_id, true);
 
