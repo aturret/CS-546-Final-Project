@@ -74,7 +74,6 @@ export async function getHotelMgr(hotelId) {
 //need fix order for input
 export async function addHotel(...args) {
   const newHotel = {};
-  console.log(args[0]);
   newHotel.name = helper.checkString(args[0], "hotel name", true);
   newHotel.street = helper.checkString(args[1], "street", true);
   newHotel.city = helper.checkString(args[2], "city", true);
@@ -98,7 +97,7 @@ export async function addHotel(...args) {
     throw CustomException("Invalid facilities.", true);
   }
   newHotel.managers = args[9]
-    ? args[9].map((manager) => helper.checkId(manager, true))
+    ? args[9].map((manager) => ObjectId(helper.checkId(manager, true)))
     : undefined;
   newHotel.reviews = [];
 
@@ -106,7 +105,7 @@ export async function addHotel(...args) {
   const insertInfo = await tempHotel.insertOne(newHotel);
   if (insertInfo.insertedCount === 0)
     throw CustomException("Insert hotel failed.", true);
-  const newHotelId = insertInfo._id.toString();
+  const newHotelId = insertInfo.insertedId.toString();
   return newHotelId;
 }
 
@@ -123,24 +122,14 @@ export async function updateHotel(...args) {
   updateHotel.picture = args[8]
     ? args[8].map((web) => helper.checkWebsite(web, false))
     : undefined;
-  updateHotel.rooms = args[9] ? args[9].map((room) => helper.checkId(room, false)) : [];
-  if (args[8] && Array.isArray(args[8])) {
-    updateHotel.facilities = args[8] ? args[8].map((facility) =>
+  if (args[9] && Array.isArray(args[9])) {
+    updateHotel.facilities = args[9] ? args[9].map((facility) =>
       helper.checkString(facility, "facility", false)) : [];
-  } else if (!args[8]) {
+  } else if (!args[9]) {
     updateHotel.facilities = [];
   } else {
     throw CustomException("Invalid facilities.", true);
   }
-  updateHotel.managers = args[10]
-    ? args[10].map((manager) => helper.checkId(manager, false))
-    : [];
-  updateHotel.roomTypes = args[11]
-    ? args[11].map((roomType) => helper.checkString(roomType, false))
-    : [];
-  updateHotel.reviews = args[12]
-    ? args[12].map((reviews) => helper.checkString(reviews, false))
-    : [];
 
   const tempHotel = await hotelReg();
   const updateInfo = await tempHotel.findOneAndUpdate(
