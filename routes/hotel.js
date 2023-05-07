@@ -73,7 +73,7 @@ router
 router
   .route("/hotel/:hotelId")
   .get(async (req, res) => {
-    const hotel_id = req.params.hotel_id;
+    const hotel_id = req.params.hotelId;
     const errorMessage = req.session && req.session.errorMessage || null;
     const status = req.session && req.session.status || 200;
     if (req.session) {
@@ -91,14 +91,13 @@ router
       hotelInfo.hotelName = hotel.hotel_name;
       hotelInfo.hotelPhoto = hotel.pictures;
       hotelInfo.hotelRating = hotel.rating;
-      hotelInfo.hotelAddress = hotel.address + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip;
+      hotelInfo.hotelAddress = hotel.address + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code;
       hotelInfo.hotelPhone = hotel.phone;
       hotelInfo.hotelEmail = hotel.email;
       hotelInfo.roomType = hotel.room_type;
       //get hotel room
       const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
       hotelInfo.roomType = roomTypes;
-
       //get hotel review
       const reviews = await hotelFuncs.getHotelReview(hotel_id);
       hotelInfo.reviews = reviews;
