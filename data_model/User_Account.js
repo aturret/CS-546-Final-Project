@@ -538,15 +538,15 @@ export async function getReview(username) {
 
   return reviews;
 }
-
-export async function getReviewById(review_id) {
-  review_id = helper.checkId(review_id, true);
-  const tempReview = await Review();
-  const review = await tempReview.findOne({ _id: new ObjectId(review_id) });
-  if (!review)
-    throw CustomException(`Could not find review with ID ${review_id}`, true);
-  return review;
-}
+// by Jichen. If you don't need this, you can just delete it.
+// export async function getReviewById(review_id) {
+//   review_id = helper.checkId(review_id, true);
+//   const tempReview = await Review();
+//   const review = await tempReview.findOne({ _id: new ObjectId(review_id) });
+//   if (!review)
+//     throw CustomException(`Could not find review with ID ${review_id}`, true);
+//   return review;
+// }
 
 export async function addReview(order_id, hotel_id, user_id, review, rating) {
   //rating is 1-5 stars
@@ -636,7 +636,7 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
 /*-------------get review by id------------*/
 export async function getReviewById(review_id) {
   console.log("review_id: " + review_id);
-  review_id = helper.checkId(review_id, true)
+  review_id = ObjectId(helper.checkId(review_id, true));
   const tempReview = await Review();
 
   //get review
@@ -780,31 +780,28 @@ export async function deleteReview(review_id) {
   );
   if (hotelInfo.value.reviews.length === 0)
     throw CustomException(`Could not find hotel with id ${hotel_id}`, true);
-  
-  //recalculate overall rating
-  recalculateOverall(hotel_id);
-  // let sum = 0;
-  // for (let i of hotel_reviews.reviews) {
-  //   const tempReview = await Review();
-  //   const tempSingleReview = await tempReview.findOne(
-  //     { _id: new ObjectId(i) },
-  //     { rating: 1 }
-  //   );
-  //   sum += tempSingleReview.rating;
-  // }
-  // let overallRating = sum / hotel_reviews.length;
-  // overallRating = overallRating.toFixed(2);
-  // overallRating = parseFloat(overallRating);
-  // const updateHotel = await tempHotel.findOneAndUpdate(
-  //   { _id: new ObjectId(hotel_id) },
-  //   { $set: { overall_rating: overallRating } },
-  //   { returnDocument: "after" }
-  // );
-  // if (updateHotel.lastErrorObject.n === 0)
-  //   throw CustomException(
-  //     `Could not update the hotel with id ${hotel_id}`,
-  //     true
-  //   );
+  let sum = 0;
+  for (let i of hotel_reviews.reviews) {
+    const tempReview = await Review();
+    const tempSingleReview = await tempReview.findOne(
+      { _id: new ObjectId(i) },
+      { rating: 1 }
+    );
+    sum += tempSingleReview.rating;
+  }
+  let overallRating = sum / hotel_reviews.length;
+  overallRating = overallRating.toFixed(2);
+  overallRating = parseFloat(overallRating);
+  const updateHotel = await tempHotel.findOneAndUpdate(
+    { _id: new ObjectId(hotel_id) },
+    { $set: { overall_rating: overallRating } },
+    { returnDocument: "after" }
+  );
+  if (updateHotel.lastErrorObject.n === 0)
+    throw CustomException(
+      `Could not update the hotel with id ${hotel_id}`,
+      true
+    );
 
   //delete review for order
   const tempOrder = await Order();

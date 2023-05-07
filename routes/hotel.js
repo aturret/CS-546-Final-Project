@@ -107,49 +107,79 @@ router
 // -> review page
 router
   .route("/reviews/:reviewId")
-  .get(async (req, res) => {
-    try {
-      const theUser = req.user;
-      const reviewId = helper.checkId(req.params.reviewId, true);
-      
-      const review = await userFuncs.getReviewById(reviewId);
-      const user = await userFuncs.getUserById(review.user_id);
-      const hotel = await hotelFuncs.getHotel(review.hotel_id);
-      let editable = false;
-      if(theUser){
-      const theUserId = await userFuncs.getUser(theUser.username);
-      if(theUser.identity==='admin' || review.user_id === theUserId._id){
-        editable = true;
-      }}
-      const reviewInfo = {
-        reviewId: review._id,
-        orderId: review.order_id,
-        reviewRating: review.rating,
-        reviewUpvotes: review.upvote,
-        reviewDownvotes: review.downvote,
-        hotelName: hotel.name,
-        hotelPhoto: hotel.pictures,
-        hotelRating: hotel.overall_rating,
-        hotelAddress: hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code,
-        hotelPhone: hotel.phone,
-        hotelEmail: hotel.email,
-        reviewTitle: `${user.username}'s Review`,
-        hotelId: review.hotel_id,
-        reviewComment: review.comment,
-        username: user.username,
-        userAvatar: user.avatar,
-        reviewUserId: review.user_id,
-        title: 'Review Control Panel',
-        editable: editable
-      };
-      res.render('reviews', reviewInfo);
-    } catch (e) {
-      console.log(e.message);
-      req.session.status = e.code ? e.code : 500;
-      req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel';
-      res.redirect(previousUrl);
-    }
+  .get(async (req, res) =>
+  {
+    const reviewId = req.params.reviewId;
+    try{
+      let review = undefined;
+      if (!req.session)
+      {
+        req.session = {};
+        review = await userFuncs.getReviewById(reviewId);
+        console.log(review);
+      }
+      else{
+        const tempReview = await Review();
+        review = await tempReview.findOne({_id: new ObjectId(reviewId)});
+        review.reviewRating = review.rating;
+        review.rating = null;
+        review.reviewComment = review.comment;
+        review.comment = null;
+        review.reviewUpvotes = review.upvote;
+        review.upvote = null;
+        review.reviewDownvotes = review.downvote;
+        review.hotelId = review.hotel_id;
+        review.reviewId = review._id;
+        if (req.session.hotelInfo && req.session.hotelInfo.reviewList && req.session.hotelInfo.reviewList.includes(reviewId)) {
+          review = Object.assign(review, req.session.hotelInfo);
+        }
+        else{
+          req.session.hotelInfo = {};
+          //get hotel info
+          const hotelInfo = await hotelFuncs.getHotel(review.hotel_id);
+          review.hotelName = hotelInfo.name;
+          review.hotelPhoto = hotelInfo.pictures;
+          review.hotelRating = hotelInfo.overall_rating;
+          review.hotelAddress = hotelInfo.street + ", " + hotelInfo.city + ", " + hotelInfo.state + ", " + hotelInfo.zip_code;
+          review.hotelPhone = hotelInfo.phone;
+          review.hotelEmail = hotelInfo.email;
+        }
+        if (req.session.userInfo && req.session.userInfo.reviewList && req.session.userInfo.reviewList.includes(reviewId)) {
+          review = Object.assign(review, req.session.userInfo);
+        }
+        else{
+          //get user info
+          req.session.userInfo = {};
+          const tempAccount = await Account();
+          const userInfo = await tempAccount.findOne({_id: new ObjectId(review.user_id)});
+          review.user_id = null;
+          review.userAvatar= userInfo.avatar;
+          review.reviewUserName = userInfo.username;
+        }
+        review.title = "Review";
+      }
+      const errorMessage = req.session && req.session.errorMessage || null;
+      const status = req.session && req.session.status || 200;
+      if (req.session) {
+        req.session.status = null;
+        req.session.errorMessage = null;
+      }
+      if (errorMessage)
+      {
+        review.status = status;
+        review.errorMessage = errorMessage;
+        return res.status(status).render("reviews", review);
+      }
+      review.reviewId = reviewId;
+      review._id = null;
+      console.log(review)
+      return res.status(status).render("reviews", review);
+  }
+  catch(e){
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    return res.redirect("/");
+  }
   })
   .put(isAuth, async (req, res) => {
     const reviewId = req.params.reviewId;
@@ -682,53 +712,54 @@ router
     }
   })
 
-// render the single review page
-router
-.route("/reviews/:reviewId")
-.get(async (req, res) => {
-  try {
-    const theUser = req.user;
-    const reviewId = helper.checkId(req.params.reviewId, true);
+// route of rendering the single review page by Jichen.
+//
+// router
+// .route("/reviews/:reviewId")
+// .get(async (req, res) => {
+//   try {
+//     const theUser = req.user;
+//     const reviewId = helper.checkId(req.params.reviewId, true);
     
-    const review = await userFuncs.getReviewById(reviewId);
-    const user = await userFuncs.getUserById(review.user_id);
-    const hotel = await hotelFuncs.getHotel(review.hotel_id);
-    let editable = false;
-    if(theUser){
-    const theUserId = await userFuncs.getUser(theUser.username);
-    if(theUser.identity==='admin' || review.user_id === theUserId._id){
-      editable = true;
-    }}
-    const reviewInfo = {
-      reviewId: review._id,
-      orderId: review.order_id,
-      reviewRating: review.rating,
-      reviewUpvotes: review.upvote,
-      reviewDownvotes: review.downvote,
-      hotelName: hotel.name,
-      hotelPhoto: hotel.pictures,
-      hotelRating: hotel.overall_rating,
-      hotelAddress: hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code,
-      hotelPhone: hotel.phone,
-      hotelEmail: hotel.email,
-      reviewTitle: `${user.username}'s Review`,
-      hotelId: review.hotel_id,
-      reviewComment: review.comment,
-      username: user.username,
-      userAvatar: user.avatar,
-      reviewUserId: review.user_id,
-      title: 'Review Control Panel',
-      editable: editable
-    };
-    res.render('reviews', reviewInfo);
-  } catch (e) {
-    console.log(e.message);
-    req.session.status = e.code ? e.code : 500;
-    req.session.errorMessage = e.message;
-    const previousUrl = req.headers.referer || '/hotel';
-    res.redirect(previousUrl);
-  }
-})
+//     const review = await userFuncs.getReviewById(reviewId);
+//     const user = await userFuncs.getUserById(review.user_id);
+//     const hotel = await hotelFuncs.getHotel(review.hotel_id);
+//     let editable = false;
+//     if(theUser){
+//     const theUserId = await userFuncs.getUser(theUser.username);
+//     if(theUser.identity==='admin' || review.user_id === theUserId._id){
+//       editable = true;
+//     }}
+//     const reviewInfo = {
+//       reviewId: review._id,
+//       orderId: review.order_id,
+//       reviewRating: review.rating,
+//       reviewUpvotes: review.upvote,
+//       reviewDownvotes: review.downvote,
+//       hotelName: hotel.name,
+//       hotelPhoto: hotel.pictures,
+//       hotelRating: hotel.overall_rating,
+//       hotelAddress: hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code,
+//       hotelPhone: hotel.phone,
+//       hotelEmail: hotel.email,
+//       reviewTitle: `${user.username}'s Review`,
+//       hotelId: review.hotel_id,
+//       reviewComment: review.comment,
+//       username: user.username,
+//       userAvatar: user.avatar,
+//       reviewUserId: review.user_id,
+//       title: 'Review Control Panel',
+//       editable: editable
+//     };
+//     res.render('reviews', reviewInfo);
+//   } catch (e) {
+//     console.log(e.message);
+//     req.session.status = e.code ? e.code : 500;
+//     req.session.errorMessage = e.message;
+//     const previousUrl = req.headers.referer || '/hotel';
+//     res.redirect(previousUrl);
+//   }
+// })
 
 router
   .route("/hotel/:hotelId/hotelManagement/review")
