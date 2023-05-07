@@ -109,7 +109,7 @@ export async function reqApprove(reqId, response) {
       request.username, 
       { 
         identity: 'manager',
-        hotel_id: newHotelId
+        hotel_id: ObjectId(newHotelId)
       }
     )
     

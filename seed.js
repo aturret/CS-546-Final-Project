@@ -88,7 +88,7 @@ async function addHotel(...args) {
       throw CustomException("Invalid facilities.", true);
     }
     newHotel.managers = args[9] !== undefined
-      ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))
+      ? args[9].map((manager) => ObjectId(helper.checkId(manager, true)))
       : undefined;
     newHotel.reviews = [];
   
@@ -299,8 +299,6 @@ try
           console.log(hotelInfo)
           hotelInfo = await addHotel(hotelInfo.name, hotelInfo.street, hotelInfo.city, hotelInfo.state, hotelInfo.zip_code, hotelInfo.phone, hotelInfo.email, hotelInfo.pictures, hotelInfo.facilities, hotelInfo.managers);
           if(!hotelInfo) throw "Failed to create hotel";
-          const tempAccount = await Account();
-          await tempAccount.findOneAndUpdate({_id: userInfo.insertedId}, {$set: { hotel: hotelInfo.insertedId}}, { returnDocument: "after" });
           hotel_id = hotelInfo.insertedId.toString();
           //create room type
           t = faker.datatype.number(0, 5);
@@ -351,7 +349,7 @@ try
               hotelInfo.managers = [userInfo.insertedId.toString()];
               console.log(hotelInfo)
               //create request
-              await userFuncs.createRequest(hotelInfo.name, hotelInfo.street, hotelInfo.city, hotelInfo.state, hotelInfo.zip_code, hotelInfo.phone, hotelInfo.email, hotelInfo.pictures, hotelInfo.facilities, hotelInfo.managers);
+              await userFuncs.createRequest(user.username, hotelInfo.name, hotelInfo.street, hotelInfo.city, hotelInfo.state, hotelInfo.zip_code, hotelInfo.phone, hotelInfo.email, hotelInfo.pictures, hotelInfo.facilities);
               console.log("request created")
       }
 

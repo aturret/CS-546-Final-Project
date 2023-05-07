@@ -476,11 +476,11 @@ router.route("/dashboard/:username/hotel_management").get(
         hotel_phone,
         hotel_email,
         hotel_picture,
-        rooms,
+        // rooms,
         facilities,
-        manager,
-        roomType,
-        reviews
+        // manager,
+        // roomType,
+        // reviews
       );
       req.flash(result);
       return res.redirect(200).redirect("/hotel_management");

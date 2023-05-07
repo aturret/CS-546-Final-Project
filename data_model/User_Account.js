@@ -777,12 +777,15 @@ export async function createRequest(...args) {
   const tempRequest = await mgrReq();
   const tempHotel = await hotelReg();
 
-  const userInfo = await tempAccount.findOne({ username: username }, {_id: 1, username: 1});
+  const userInfo = await tempAccount.findOne({ username: username }, {_id: 1, username: 1, identity: 1});
   if (userInfo === null)
     throw CustomException(
       `Could not find user with username ${username}`,
       true
     );
+
+  if (userInfo.identity === 'manager') 
+    throw CustomException(`The user with username ${username} is already a manager, could not create another request`, true);
 
   const hotelName = helper.checkString(args[1], "hotel name", true);
   const street = helper.checkString(args[2], "street", true);
@@ -802,7 +805,7 @@ export async function createRequest(...args) {
   } else {
     throw CustomException("Invalid facilities.", true);
   }
-  const managers = [userInfo._id]
+  const managers = [userInfo._id];
   // args[9]
   //   ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))
   //   : undefined;
