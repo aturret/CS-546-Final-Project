@@ -82,6 +82,14 @@ export async function getUser(username) {
   // return false;
 }
 
+export async function getUserById(id) {
+  id = helper.checkId(id, true);
+  const tempAccount = await Account();
+  const user = await tempAccount.findOne({ _id: new ObjectId(id) });
+  if (!user) throw CustomException(`Could not find user with ID ${id}`, true);
+  return user;
+}
+
 //FINISHED: update user info
 export async function updateUser(username, set) {
   if (typeof set !== "object" || Array.isArray(set) || set === "null")
@@ -498,6 +506,7 @@ export async function getReview(username) {
   return reviews;
 }
 
+
 export async function addReview(order_id, hotel_id, user_id, review, rating) {
   //rating is 1-5 stars
   const tempOrder = await Order();
@@ -716,7 +725,8 @@ export async function deleteReview(review_id) {
   const tempHotel = await hotelReg();
   const hotelInfo = await tempHotel.findOneAndUpdate(
     { _id: new ObjectId(hotel_id) },
-    { $pull: { reviews: review_id } }
+    { $pull: { reviews: review_id } },
+    {document: "after"}
   );
   if (hotelInfo.lastErrorObject.n === 0)
     throw CustomException(`Could not update hotel with id ${hotel_id}`, true);

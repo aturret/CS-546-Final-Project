@@ -33,10 +33,10 @@ reviewUserId: the id of the user who wrote the review
 <div class="reviewResult">
     <div class="reviewItem">
         <div class="reviewUserItem">
-            <div class="reviewUserPhoto">{{userAvatar}}</div>
+            <div class="reviewUserPhoto"><img src="{{userAvatar}}"></div>
         </div>
         <div class="reviewContentItem">
-            <div class="reviewTitle"><a href="/reviews/{{reviewId}}">{{reviewTitle}}</a></div>
+            {{!-- <div class="reviewTitle"><a href="/reviews/{{reviewId}}">{{reviewTitle}}</a></div> --}}
             <div class="reviewRating">
                 <p>{{reviewRating}}</p>
             </div>
@@ -52,8 +52,8 @@ reviewUserId: the id of the user who wrote the review
                     {{else}}
                     <form action="/reviews/{{reviewId}}" method="PUT">
                     {{/if}}
-                        <label for="reviewTitle">Title</label>
-                        <input type="text" name="reviewTitle" placeholder="Review Title">
+                        {{!-- <label for="reviewTitle">Title</label>
+                        <input type="text" name="reviewTitle" placeholder="Review Title" value="{{reviewTitle}}"> --}}
                         <label for="reviewRating">Rating</label>
                         <select name="reviewRating">
                             <option value="1" {{#if (eq reviewRating 1)}}selected{{/if}}>1</option>

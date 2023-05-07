@@ -51,8 +51,7 @@ router
     }
     else req.session = {};
 
-    if (errorMessage) return res.status(status).render("landpage", { errorMessage: errorMessage,title:"HotelFinder" });
-
+    if (errorMessage) return res.status(status).render("landpage", { errorMessage: errorMessage, title:"HotelFinder" });
     return res.status(status).render("landpage",{title:"HotelFinder"});
   })
   //search hotel
@@ -240,6 +239,7 @@ router
       hotelInfo.hotelEmail = hotel.email;
       hotelInfo.roomType = hotel.room_type;
       hotelInfo.manageable = manageable;
+      hotelInfo.title = hotel.name;
       //get hotel room
       const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
       hotelInfo.roomType = roomTypes;
@@ -686,13 +686,62 @@ router
     }
   })
 
+// render the single review page
+router
+.route("/reviews/:reviewId")
+.get(async (req, res) => {
+  try {
+    const theUser = req.user;
+    const reviewId = helper.checkId(req.params.reviewId, true);
+    
+    const review = await userFuncs.getReviewById(reviewId);
+    const user = await userFuncs.getUserById(review.user_id);
+    const hotel = await hotelFuncs.getHotel(review.hotel_id);
+    let editable = false;
+    if(theUser){
+    const theUserId = await userFuncs.getUser(theUser.username);
+    if(theUser.identity==='admin' || review.user_id === theUserId._id){
+      editable = true;
+    }}
+    const reviewInfo = {
+      reviewId: review._id,
+      orderId: review.order_id,
+      reviewRating: review.rating,
+      reviewUpvotes: review.upvote,
+      reviewDownvotes: review.downvote,
+      hotelName: hotel.name,
+      hotelPhoto: hotel.pictures,
+      hotelRating: hotel.overall_rating,
+      hotelAddress: hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code,
+      hotelPhone: hotel.phone,
+      hotelEmail: hotel.email,
+      reviewTitle: `${user.username}'s Review`,
+      hotelId: review.hotel_id,
+      reviewComment: review.comment,
+      username: user.username,
+      userAvatar: user.avatar,
+      reviewUserId: review.user_id,
+      title: 'Review Control Panel',
+      editable: editable
+    };
+    res.render('reviews', reviewInfo);
+  } catch (e) {
+    console.log(e.message);
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    const previousUrl = req.headers.referer || '/hotel';
+    res.redirect(previousUrl);
+  }
+})
+
 router
   .route("/hotel/:hotelId/hotelManagement/review")
   .get(isMgr, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotelReviews = await hotelFuncs.getHotelReview(hotelId);
-      res.render('reviews', {hotelReviews: hotelReviews, title: `Review Control Panel`});
+      hotelReviews.title = `Review Control Panel`;
+      res.render('hotelReviews', hotelReviews);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
