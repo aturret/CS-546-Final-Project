@@ -60,7 +60,28 @@ router
     const hotel_zip = req.body.hotelZipcodeInput;
     try{
       const result = await hotelFuncs.hotelSearch(hotel_name, hotel_city, hotel_state, hotel_zip);
+<<<<<<< HEAD
       return res.status(200).render("searchHotelsResult", { hotels: result ,title:"Search Result"});
+=======
+      const hotelList = [];
+      const hotelInfo = {};
+      for (let i = 0; i < result.length; i++){
+        hotelInfo.hotelStreet = result[i].street;
+        hotelInfo.hotelCity = result[i].city;
+        hotelInfo.hotelState = result[i].state;
+        hotelInfo.hotelZipcode = result[i].zip_code;
+        hotelInfo.hotelName = result[i].name;
+        hotelInfo.hotelId = result[i]._id;
+        hotelInfo.hotelPicture = result[i].pictures;
+        hotelInfo.hotelPhone = result[i].phone;
+        hotelInfo.hotelEmail = result[i].email;
+        hotelInfo.hotelRoom = result[i].rooms;
+        hotelInfo.hotelRoomTypes = result[i].room_types;
+        hotelList.push(hotelInfo);
+      }
+      console.log(hotelList);
+      return res.status(200).render("searchHotelsResult", { hotels: hotelList});
+>>>>>>> c285155 (premerge)
     }
     catch(e){
       req.session.status = e.code ? e.code : 500;
