@@ -43,7 +43,7 @@ reviewUserId: the id of the user who wrote the review
             <div class="reviewComment">
                 <p>{{reviewComment}}</p>
             </div>
-            {{!-- {{#if editable}} --}}
+            {{#if editable}}
             <div class="editReview">
                 <button id="editReviewButton" onclick="editReview()">Edit</button>
                 <div hidden="true" id="editReviewWindow">
@@ -82,7 +82,7 @@ reviewUserId: the id of the user who wrote the review
                     <button type="submit">Delete</button>
                 </form>
             </div>
-            {{!-- {{/if}} --}}
+            {{/if}}
             <div class="reviewVotes">
                 <p>Do you think this review is useful?</p>
                 <p>Upvote: {{reviewUpvotes}}</p>

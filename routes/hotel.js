@@ -108,6 +108,7 @@ router
   .get(async (req, res) =>
   {
     const reviewId = req.params.reviewId;
+    const theUser = req.user;
     try{
       let review = undefined;
       if (!req.session)
@@ -149,13 +150,21 @@ router
           //get user info
           req.session.userInfo = {};
           const tempAccount = await Account();
-          const userInfo = await tempAccount.findOne({_id: new ObjectId(review.user_id)});
-          review.user_id = null;
-          review.userAvatar= userInfo.avatar;
+          const userInfo = await tempAccount.findOne({ _id: new ObjectId(review.user_id) });
+          // review.user_id = null;
+          review.userAvatar = userInfo.avatar;
           review.reviewUserName = userInfo.username;
         }
         review.title = "Review";
       }
+      let editable = false;
+      if (theUser) {
+        const theUserId = await userFuncs.getUser(theUser.username);
+        if (theUser.identity === 'admin' || review.user_id === theUserId._id) {
+          editable = true;
+        }
+      }
+      review.editable = editable;
       const errorMessage = req.session && req.session.errorMessage || null;
       const status = req.session && req.session.status || 200;
       if (req.session) {
@@ -194,7 +203,7 @@ router
       return res.redirect("/");
     }
   })
-  .patch(async (req, res) => {
+  .patch(isAuth, async (req, res) => {
     console.log("patch vote fired") 
     const reviewId = req.params.reviewId;
     const reviewVote= req.params.reviewVote === 'upvote' ? true : false;
@@ -208,6 +217,18 @@ router
       return res.redirect(`/reviews/${reviewId}`);
     }
   })
+  .delete(isAuth, async (req, res) => {
+    const reviewId = req.params.reviewId;
+    try{
+      const result = await userFuncs.deleteReview(reviewId);
+      return res.redirect(`/dashboard`);
+    }
+    catch(e){
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      return res.redirect(`/reviews/${reviewId}`);
+    }
+  });
 //TODO: Hotel detail page
 router
   .route("/hotel/:hotelId")
@@ -701,12 +722,12 @@ router
 //     const review = await userFuncs.getReviewById(reviewId);
 //     const user = await userFuncs.getUserById(review.user_id);
 //     const hotel = await hotelFuncs.getHotel(review.hotel_id);
-//     let editable = false;
-//     if(theUser){
-//     const theUserId = await userFuncs.getUser(theUser.username);
-//     if(theUser.identity==='admin' || review.user_id === theUserId._id){
-//       editable = true;
-//     }}
+    // let editable = false;
+    // if(theUser){
+    // const theUserId = await userFuncs.getUser(theUser.username);
+    // if(theUser.identity==='admin' || review.user_id === theUserId._id){
+    //   editable = true;
+    // }}
 //     const reviewInfo = {
 //       reviewId: review._id,
 //       orderId: review.order_id,
