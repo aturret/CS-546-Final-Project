@@ -165,16 +165,15 @@ router
       );
       req.body.phone = helper.checkPhone(req.body.phone, true);
       req.body.email = helper.checkEmail(req.body.email, true);
-      const args = [
-        req.body.username,
-        req.body.avatar,
-        req.body.firstName,
-        req.body.lastName,
-        req.body.phone,
-        req.body.email,
-        req.user.username,
-      ];
-      const user = await userFuncs.updateUser(req.user.username, args);
+      const set = {
+        username: req.body.username,
+        avatar: req.body.avatar,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        phone: req.body.phone,
+        email: req.body.email,
+      };
+      const user = await userFuncs.updateUser(req.user.username, set);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
       if (!e.code) {

@@ -88,10 +88,10 @@ export async function updateUser(username, set) {
     throw CustomException("invalid update input", true);
   username = helper.checkString(username, "username", true);
   const tempAccount = await Account();
-  let updateInfo = {};
-  for (let items in set.keys()) {
-    updateInfo[items] = refInfo[items](set.items);
-  }
+  // let updateInfo = {};
+  // for (let items in Object.keys(set)) {
+  //   updateInfo[items] = refInfo[items](set.items);
+  // }
   const userInfo = await tempAccount.findOneAndUpdate(
     { username: username },
     { $set: set },
@@ -174,7 +174,7 @@ export async function deleteMgr(applicantName, respondentName, hotelId) {
   if (hotelInfo === null) throw CustomException(`Could not find hotel with ID ${hotelId}`, true);
   if (hotelInfo._id !== userInfo.hotel) throw CustomException(`Could not find user with username ${respondentName} who is the manager of hotel ${hotelId}`, true);
 
-  const newMgrMessage = updateUser(
+  const newMgrMessage = await updateUser(
     userName, 
     { 
       identity: 'user',
@@ -182,7 +182,7 @@ export async function deleteMgr(applicantName, respondentName, hotelId) {
     }
   )
 
-  const hoteldeleteMgrInfo = await tempHotel.findOneUpdate(
+  const hoteldeleteMgrInfo = await tempHotel.findOneAndUpdate(
     { _id: Object(hotelId) },
     { $pull: { manager: Object(respondentInfo._id) } },
     { returnDocument: "after" }

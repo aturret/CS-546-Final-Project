@@ -55,7 +55,7 @@ export async function getReq(id) {
   
 //   const hotelReqCollection = await hotelReqs();
 //   if (!response) {
-//     const requestUpdateInfo = await hotelReqCollection.findOneUpdate(
+//     const requestUpdateInfo = await hotelReqCollection.findOneAndUpdate(
 //       { _id: ObjectId(id) },
 //       { $set: { status: 'reject' } },
 //       { returnDocument: "after" }
@@ -66,7 +66,7 @@ export async function getReq(id) {
 
 //   const newHotelMessage = hotelData.addHotel(req)
 
-//   const requestUpdateInfo = await hotelReqCollection.findOneUpdate(
+//   const requestUpdateInfo = await hotelReqCollection.findOneAndUpdate(
 //     { _id: new ObjectId(id) },
 //     { $set: { status: 'approve' } },
 //     { returnDocument: "after" }
@@ -90,18 +90,41 @@ export async function reqApprove(reqId, response) {
     if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with id ${reqId}`, true);
     return {message: "Request reject"};
   } else if (response === 'true') {
-    const newHotelId = await hotelFuncs.addHotel(request.args);
+    const name = request.args[0];
+    const street = request.args[1];
+    const city = request.args[2];
+    const state = request.args[3];
+    const zip_code = request.args[4];
+    const phone = request.args[5];
+    const email = request.args[6];
+    const pictures = request.args[7];
+    const facilities = request.args[8];
+    console.log(request.args[9]);
+    const managers = [request.args[9][0].toString()];
+    
+    const newHotelId = await hotelFuncs.addHotel(
+      name,
+      street,
+      city,
+      state,
+      zip_code,
+      phone,
+      email,
+      pictures,
+      facilities,
+      managers
+    );
 
-    const newMgrMessage = userFuncs.updateUser(
+    const newMgrMessage = await userFuncs.updateUser(
       request.username, 
       { 
         identity: 'manager',
         hotel: newHotelId
       }
     )
-  
-    const requestUpdateInfo = await reqCollection.findOneUpdate(
-      { _id: ObjectId(reqId) },
+    
+    const requestUpdateInfo = await reqCollection.findOneAndUpdate(
+      { _id: new ObjectId(reqId) },
       { $set: { status: 'approve' } },
       { returnDocument: "after" }
     );
