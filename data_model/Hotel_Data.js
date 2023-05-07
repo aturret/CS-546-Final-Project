@@ -96,7 +96,6 @@ export async function addHotel(...args) {
   } else {
     throw CustomException("Invalid facilities.", true);
   }
-  console.log(args[9]);
   newHotel.managers = args[9]
     ? args[9].map((manager) => helper.checkId(manager, true))
     : undefined;

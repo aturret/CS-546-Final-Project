@@ -223,11 +223,13 @@ router
       const city = helper.checkString(req.user.hotelCity, "city", true);
       const state = helper.checkString(req.user.hotelState, "state", true);
       const zip_code = helper.checkZip(req.user.hotelZipcode, true);
-      const userId = helper.checkId(req.body.userId, true);
-      const manager = [userId];
-      const photo = helper.checkWebsite(req.body.hotelPhoto, true);
+      // const userId = await userFuncs.getUser(req.user.username)
+      // const managers = [req.user.username];
+      const pictures = req.user.hotelPictures
+        ? req.user.hotelPictures.map((web) => helper.checkWebsite(web, true))
+        : [];
 
-      const requestMessage = await userFuncs.createRequest(hotelName, street, city, state, zip_code, phone, email, photo, [], manager);
+      const requestMessage = await userFuncs.createRequest(req.user.username, hotelName, street, city, state, zip_code, phone, email, pictures, []);
       req.flash(requestMessage);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {

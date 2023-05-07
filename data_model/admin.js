@@ -37,7 +37,7 @@ export async function getAllReq() {
 //   return req;
 // }
 
-export async function getReq(id) {
+export async function getReqByID(id) {
   id = helper.checkId(id, true);
 
   const mgrReqCollection = await mgrReq();
@@ -77,7 +77,7 @@ export async function getReq(id) {
 
 export async function reqApprove(reqId, response) {
   reqId = helper.checkId(reqId, true);
-  let request = await getReq(reqId);
+  let request = await getReqByID(reqId);
   if (request.status !== 'pending') throw CustomException(`The request with ID ${reqId} is already closed`);
   
   const reqCollection = await mgrReq();
@@ -90,36 +90,26 @@ export async function reqApprove(reqId, response) {
     if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with id ${reqId}`, true);
     return {message: "Request reject"};
   } else if (response === 'true') {
-    const name = request.args[0];
-    const street = request.args[1];
-    const city = request.args[2];
-    const state = request.args[3];
-    const zip_code = request.args[4];
-    const phone = request.args[5];
-    const email = request.args[6];
-    const pictures = request.args[7];
-    const facilities = request.args[8];
-    console.log(request.args[9]);
-    const managers = [request.args[9][0].toString()];
+    request.managers = [request.managers[0].toString()];
     
     const newHotelId = await hotelFuncs.addHotel(
-      name,
-      street,
-      city,
-      state,
-      zip_code,
-      phone,
-      email,
-      pictures,
-      facilities,
-      managers
+      request.name,
+      request.street,
+      request.city,
+      request.state,
+      request.zip_code,
+      request.phone,
+      request.email,
+      request.pictures,
+      request.facilities,
+      request.managers
     );
 
     const newMgrMessage = await userFuncs.updateUser(
       request.username, 
       { 
         identity: 'manager',
-        hotel: newHotelId
+        hotel_id: newHotelId
       }
     )
     

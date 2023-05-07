@@ -771,54 +771,67 @@ export async function deleteReview(review_id) {
 /*-----------------------------Request---------------------------------*/
 //TODO: create request. request document should have three field. id, user_id, hotel_id.
 export async function createRequest(...args) {
-  args[0] = helper.checkString(args[0], "hotel name", true);
-  args[1] = helper.checkString(args[1], "street", true);
-  args[2] = helper.checkString(args[2], "city", true);
-  args[3] = helper.checkString(args[3], "state", true);
-  args[4] = helper.checkZip(args[4], true);
-  args[5] = helper.checkPhone(args[5], true);
-  args[6] = helper.checkEmail(args[6], true);
-  args[7] = args[7] ? args[7].map((web) => helper.checkWebsite(web, true)) : [];
-  if (args[8] && Array.isArray(args[8])) {
-    args[8] = args[8].map((facility) =>
-      helper.checkString(facility, "facility", true)
-    );
-  } else if (!args[8]) {
-    args[8] = [];
-  } else {
-    throw CustomException("Invalid facilities.", true);
-  }
-  args[9] = args[9]
-    ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))
-    : undefined;
+  const username = helper.checkString(args[0], "username", true);
 
   const tempAccount = await Account();
   const tempRequest = await mgrReq();
   const tempHotel = await hotelReg();
 
-  const userInfo = await tempAccount.findOne({ _id: args[9][0] }, { _id: 1 });
+  const userInfo = await tempAccount.findOne({ username: username }, {_id: 1, username: 1});
   if (userInfo === null)
     throw CustomException(
       `Could not find user with username ${username}`,
       true
     );
 
+  const hotelName = helper.checkString(args[1], "hotel name", true);
+  const street = helper.checkString(args[2], "street", true);
+  const city = helper.checkString(args[3], "city", true);
+  const state = helper.checkString(args[4], "state", true);
+  const zip_code = helper.checkZip(args[5], true);
+  const phone = helper.checkPhone(args[6], true);
+  const email = helper.checkEmail(args[7], true);
+  const pictures = args[8] ? args[8].map((web) => helper.checkWebsite(web, true)) : [];
+  let facilities = [];
+  if (args[9] && Array.isArray(args[9])) {
+    facilities = args[9].map((facility) =>
+      helper.checkString(facility, "facility", true)
+    );
+  } else if (!args[9]) {
+    facilities = [];
+  } else {
+    throw CustomException("Invalid facilities.", true);
+  }
+  const managers = [userInfo._id]
+  // args[9]
+  //   ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))
+  //   : undefined;
+
   const hotelInfo = await tempHotel.findOne(
     {
-      name: args[0],
-      street: args[1],
-      city: args[2],
-      state: args[3],
-      zip_code: args[4],
+      name: hotelName,
+      street: street,
+      city: city,
+      state: state,
+      zip_code: zip_code,
     },
     { _id: 1 }
   );
   if (hotelInfo !== null) throw CustomException("Hotel exist", true);
 
   const newRequest = {
-    username: userInfo.username,
-    args: args,
-    status: "pending",
+    username: username,
+    name: hotelName,
+    street: street,
+    city: city,
+    state: state,
+    zip_code: zip_code,
+    phone: phone,
+    email: email,
+    pictures: pictures,
+    facilities: facilities,
+    managers: managers,
+    status: "pending"
   };
 
   const requestInfo = await tempRequest.insertOne(newRequest);
