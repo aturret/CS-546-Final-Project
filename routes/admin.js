@@ -51,7 +51,7 @@ router
   .get(isAdmin, async (req, res) => {
     try {
       const requestId = helper.checkId(req.params.requestId, true);
-      const request = await adminFuncs.getReqByID(requestId);
+      const request = await adminFuncs.getReq(requestId);
       res.render('requestById', { request: request,title:"Hotel Application Processing Panel" });
     } catch (e) {
       if (!e.code) {

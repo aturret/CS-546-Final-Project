@@ -51,8 +51,7 @@ router
     }
     else req.session = {};
 
-    if (errorMessage) return res.status(status).render("landpage", { errorMessage: errorMessage,title:"HotelFinder" });
-
+    if (errorMessage) return res.status(status).render("landpage", { errorMessage: errorMessage, title:"HotelFinder" });
     return res.status(status).render("landpage",{title:"HotelFinder"});
   })
   //search hotel
