@@ -252,10 +252,7 @@ router
       req.session.hotelInfo.reviewList = reviewList;
       
       hotelInfo.reviews = reviews;
-<<<<<<< HEAD
       hotelInfo.title = hotel.name;
-=======
->>>>>>> 52f3090 (review update)
       return res.status(status).render("hotel", hotelInfo);
     }
     catch(e){

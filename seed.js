@@ -378,7 +378,7 @@ try {
       const tempAccount = await Account();
       await tempAccount.findOneAndUpdate(
         { _id: userInfo.insertedId },
-        { $set: { hotel: hotelInfo.insertedId } },
+        { $set: { hotel_id: hotelInfo.insertedId } },
         { returnDocument: "after" }
       );
       hotel_id = hotelInfo.insertedId.toString();
@@ -459,6 +459,7 @@ try {
       console.log(hotelInfo);
       //create request
       await userFuncs.createRequest(
+        user.username,
         hotelInfo.name,
         hotelInfo.street,
         hotelInfo.city,

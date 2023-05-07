@@ -506,14 +506,6 @@ export async function getReview(username) {
   return reviews;
 }
 
-export async function getReviewById(review_id) {
-  review_id = helper.checkId(review_id, true);
-  const tempReview = await Review();
-  const review = await tempReview.findOne({ _id: new ObjectId(review_id) });
-  if (!review)
-    throw CustomException(`Could not find review with ID ${review_id}`, true);
-  return review;
-}
 
 export async function addReview(order_id, hotel_id, user_id, review, rating) {
   //rating is 1-5 stars
