@@ -121,14 +121,10 @@ section.content{
   display: flex;
   justify-content: center;
   align-items: center;
-} */
-.adminFunctions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
   text-align: center;
 }
+
 .adminFunctions div {
   display: inline-block;
   padding: 10px 20px;
@@ -148,13 +144,13 @@ section.content{
 }
 
 
-.error{
-    color: #FF0000;
-    font-family: 'Georgia', serif;
-    padding: 1rem;
-    /* border: 1px solid #f5c6cb; */
-    font-size: 20px;
-    font-style: bold;
+.error {
+  color: #FF0000;
+  font-family: 'Georgia', serif;
+  padding: 1rem;
+  /* border: 1px solid #f5c6cb; */
+  font-size: 20px;
+  font-style: bold;
 }
 
 .adminFunctions div {
