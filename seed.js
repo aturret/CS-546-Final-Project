@@ -295,10 +295,12 @@ try
           //create hotel
           hotelInfo = hotelGenerator.next().value;
           hotelInfo.facilities = [];
-          hotelInfo.managers = [manager_id];
+          hotelInfo.managers = [userInfo.insertedId];
           console.log(hotelInfo)
           hotelInfo = await addHotel(hotelInfo.name, hotelInfo.street, hotelInfo.city, hotelInfo.state, hotelInfo.zip_code, hotelInfo.phone, hotelInfo.email, hotelInfo.pictures, hotelInfo.facilities, hotelInfo.managers);
           if(!hotelInfo) throw "Failed to create hotel";
+          const tempAccount = await Account();
+          await tempAccount.findOneAndUpdate({_id: userInfo.insertedId}, {$set: { hotel: hotelInfo.insertedId}}, { returnDocument: "after" });
           hotel_id = hotelInfo.insertedId.toString();
           //create room type
           t = faker.datatype.number(0, 5);
