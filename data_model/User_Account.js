@@ -733,7 +733,8 @@ export async function deleteReview(review_id) {
   const tempHotel = await hotelReg();
   const hotelInfo = await tempHotel.findOneAndUpdate(
     { _id: new ObjectId(hotel_id) },
-    { $pull: { reviews: review_id } }
+    { $pull: { reviews: review_id } },
+    {document: "after"}
   );
   if (hotelInfo.lastErrorObject.n === 0)
     throw CustomException(`Could not update hotel with id ${hotel_id}`, true);
