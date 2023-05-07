@@ -8,6 +8,7 @@ import { mgrReq } from "../Mongo_Connections/mongoCollections.js";
 import { Review } from "../Mongo_Connections/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import * as helper from "../helper.js";
+import * as hotelFuncs from "./Hotel_Data.js";
 import bcrypt from "bcryptjs";
 import { CustomException } from "../helper.js";
 const saltRounds = 12;
@@ -525,6 +526,7 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
     rating: rating,
     upvote: 0,
     downvote: 0,
+    votedId: [],
   };
 
   //check if already reviewed
@@ -593,11 +595,11 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
 /*-------------get review by id------------*/
 export async function getReviewById(review_id) {
   console.log("review_id: " + review_id);
-  review_id = ObjectId(helper.checkId(review_id, true));
+  review_id = helper.checkId(review_id, true)
   const tempReview = await Review();
 
   //get review
-  const review = tempReview.findOne({_id: review_id});
+  const review = await tempReview.findOne({_id: new ObjectId(review_id)});
   //get hotel information
   const hotelInfo = await hotelFuncs.getHotel(review.hotel_id);
   review.hotelId = review.hotel_id;
@@ -605,18 +607,15 @@ export async function getReviewById(review_id) {
   review.hotelRating = hotelInfo.overall_rating;
   review.hotelAddress = hotelInfo.street + ", " + hotelInfo.city + ", " + hotelInfo.state + ", " + hotelInfo.zip_code;
   review.hotelEmail = hotelInfo.email;
+  const userId = review.user_id;
 
   //get user information
-  const userInfo = await userFuncs.getUser(review.user_id);
+  const userInfo = await getUserById(userId);
   review.reviewUserName = userInfo.username
   review.userAvatar = userInfo.avatar;
-
   review.reviewRating = review.rating;
-  review.rating = null;
   review.reviewComment = review.comment;
-  review.comment = null;
   review.reviewUpvotes = review.upvote;
-  review.upvote = null;
   review.reviewDownvotes = review.downvote;
   
   return review
@@ -627,26 +626,36 @@ export async function voteReview(review_id, flag) {
   review_id = helper.checkId(review_id, true);
 
   const tempReview = await Review();
-  let updateInfo = undefined;
-  if (flag) {
-    updateInfo = await tempReview.findOneAndUpdate(
-      { _id: new ObjectId(review_id) },
-      { $inc: { upvote: 1 } },
-      { returnDocument: "after" }
-    );
-  } else {
-    updateInfo = await tempReview.findOneAndUpdate(
-      { _id: new ObjectId(review_id) },
-      { $inc: { downvote: 1 } },
-      { returnDocument: "after" }
-    );
+  let updateInfo = await tempReview.findOne({ _id: new ObjectId(review_id) });
+  const user_id = updateInfo.user_id;
+  if (updateInfo.votedId && updateInfo.votedId.includes(user_id)) {
+    throw CustomException(`Already voted.`, true);
+  }
+  else {
+    if (updateInfo.votedId === undefined) {
+      updateInfo.votedId = [];
+    }
+    if (flag) {
+      updateInfo = await tempReview.findOneAndUpdate(
+        { _id: new ObjectId(review_id) },
+        { $inc: { upvote: 1 } },
+        { $addToSet: { votedId: user_id } },
+        { returnDocument: "after" }
+      );
+    } else {
+      updateInfo = await tempReview.findOneAndUpdate(
+        { _id: new ObjectId(review_id) },
+        { $inc: { downvote: 1 } },
+        { $addToSet: { votedId: user_id } },
+        { returnDocument: "after" }
+      );
+    }
   }
   if (updateInfo.lastErrorObject.n === 0)
     throw CustomException(
       `Could not update the document with id ${review_id}`,
       true
     );
-
   return true;
 }
 
@@ -710,16 +719,6 @@ export async function deleteReview(review_id) {
   const reviewInfo = await tempReview.findOne({ _id: new ObjectId(review_id) });
   if (reviewInfo === null)
     throw CustomException(`Could not find review with id ${review_id}`, true);
-
-  const user_id = reviewInfo.user_id;
-  //delete review from user
-  const tempAccount = await Account();
-  const userInfo = await tempAccount.findOneAndUpdate(
-    { _id: new ObjectId(user_id) },
-    { $pull: { reviews: review_id } }
-  );
-  if (userInfo.lastErrorObject.n === 0)
-    throw CustomException(`Could not update user with id ${user_id}`, true);
 
   //delete review from hotel
   const hotel_id = reviewInfo.hotel_id;

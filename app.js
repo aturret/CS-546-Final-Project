@@ -11,6 +11,7 @@ import {fileURLToPath} from 'url';
 import {dirname} from 'path';
 import { Account } from "./Mongo_Connections/mongoCollections.js";
 import * as helper from "./helper.js";
+import methodOverride from 'method-override';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -127,7 +128,7 @@ app.use((req, res, next) => {
     console.log(`${now} ${req.method} ${req.originalUrl} ${req.user && req.user.username? req.user.username: "Guest"}`);
     next();
 })
-
+app.use(methodOverride('_method'));
 configRoutes(app);
 
 app.listen(3000, () => {

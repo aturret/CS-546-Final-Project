@@ -230,15 +230,14 @@ export async function getHotelReview(id) {
   //get user 
   console.log(reviewList)
   const tempAccount = await Account();
-  for (let i of reviewList)
-  {
-    const userInfo = await tempAccount.findOne({ _id: i.user_id }, { username: 1, avatar: 1 });
+  for (let i of reviewList) {
+    const userInfo = await tempAccount.findOne({ _id: new ObjectId(i.user_id) }, { username: 1, avatar: 1 });
     i.upVote = i.upvote
     i.downVote = i.downvote
     i.upvote = null
     i.downvote = null
-    i.userName = userInfo.username;
-    i.userAvatar = userInfo.avatar;
+    i.userName = userInfo.username
+    i.userAvatar = userInfo.avatar 
   }
   console.log(reviewList)
   if (!reviewInfo) throw CustomException("Hotel not found", false);

@@ -5,7 +5,7 @@ httpForms.forEach(form => {
     form.addEventListener("submit", function (event) {
         // event.preventDefault();
         const methodInput = form.querySelector('input[name="_method"][type="hidden"]');
-        if (methodInput && (methodInput.value === "PUT" || methodInput.value === "DELETE")) {
+        if (methodInput && (methodInput.value === "PUT" || methodInput.value === "DELETE" || methodInput.value === "PATCH")) {
             // 如果表单包含 name 为 "_method"，type 为 "hidden" 的 input 元素，并且其值为 "PUT" 或 "DELETE"
             event.preventDefault();
             console.log("Form submitted!");

@@ -779,7 +779,7 @@ router.route("/dashboard/:username/order_history/:order_id/edit_review")
   const review_id = helper.checkId(req.params.review_id, true);
   const rating = req.body.rating;
   const comment = req.body.comment;
-  const result = await userFuncs.editReview(review_id, rating, comment);
+  const result = await userFuncs.updateReview(review_id, rating, comment);
   if (!result) throw new CustomException("Review not found", true);
   req.flash(result);
   return res.status(200).redirect(`/user/dashboard/${req.user.username}/bookings`);
