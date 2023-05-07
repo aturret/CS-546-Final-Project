@@ -565,11 +565,10 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
   //calculate overall rating
   let sum = 0;
   for (let i = 0; i < newHotel.reviews.length; i++) {
-    const reviewInfo = tempReview.findOne(
-      { _id: new ObjectId(newHotel.reviews[i]) },
-      { rating: 1 }
+    const reviewInfo = await tempReview.findOne(
+      { _id: newHotel.reviews[i]}, { rating: 1 }
     );
-    console.log(reviewInfo.reviews.rating)
+    console.log(reviewInfo)
     sum += reviewInfo.rating;
   }
   console.log(sum)
