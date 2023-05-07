@@ -74,6 +74,7 @@ export async function getHotelMgr(hotelId) {
 //need fix order for input
 export async function addHotel(...args) {
   const newHotel = {};
+  console.log(args[0]);
   newHotel.name = helper.checkString(args[0], "hotel name", true);
   newHotel.street = helper.checkString(args[1], "street", true);
   newHotel.city = helper.checkString(args[2], "city", true);
@@ -105,8 +106,8 @@ export async function addHotel(...args) {
   const insertInfo = await tempHotel.insertOne(newHotel);
   if (insertInfo.insertedCount === 0)
     throw CustomException("Insert hotel failed.", true);
-
-  return { message: `${newHotel.name} Hotel added successfully.` };
+  const newHotelId = insertInfo._id.toString();
+  return newHotelId;
 }
 
 export async function updateHotel(...args) {

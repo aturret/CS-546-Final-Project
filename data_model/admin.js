@@ -42,7 +42,7 @@ export async function getReq(id) {
 
   const mgrReqCollection = await mgrReq();
 
-  let req = await mgrReqCollection.find({_id: new ObjectId(id)});
+  let req = await mgrReqCollection.findOne({_id: new ObjectId(id)});
 
   if (!req) throw CustomException(`No manager request with ID ${id}`);
   req._id = req._id.toString();
@@ -77,32 +77,35 @@ export async function getReq(id) {
 
 export async function reqApprove(reqId, response) {
   reqId = helper.checkId(reqId, true);
-  let request = getReq(reqId);
+  let request = await getReq(reqId);
   if (request.status !== 'pending') throw CustomException(`The request with ID ${reqId} is already closed`);
   
   const reqCollection = await mgrReq();
-  if (response === 'reject') {
-    const requestUpdateInfo = await reqCollection.findOneUpdate(
+  if (response === 'false') {
+    const requestUpdateInfo = await reqCollection.findOneAndUpdate(
       { _id: new ObjectId(reqId) },
       { $set: { status: 'reject' } },
       { returnDocument: "after" }
     );
     if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with id ${reqId}`, true);
     return {message: "Request reject"};
+  } else if (response === 'true') {
+    const newHotelId = await hotelFuncs.addHotel(request.args);
+
+    const newMgrMessage = userFuncs.updateUser(
+      request.username, 
+      { 
+        identity: 'manager',
+        hotel: newHotelId
+      }
+    )
+  
+    const requestUpdateInfo = await reqCollection.findOneUpdate(
+      { _id: ObjectId(reqId) },
+      { $set: { status: 'approve' } },
+      { returnDocument: "after" }
+    );
+    if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with reqId ${reqId}`, true);
+    return { message: "Request approve. Add new hotel and upgrate user to manager successfully" };
   }
-
-  const newMgrMessage = userFuncs.updateUser(
-    request.username, 
-    { identity: 'manager' }
-  )
-
-  const newHotelMessage = hotelFuncs.addHotel(request.args);
-
-  const requestUpdateInfo = await reqCollection.findOneUpdate(
-    { _id: ObjectId(reqId) },
-    { $set: { status: 'approve' } },
-    { returnDocument: "after" }
-  );
-  if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with reqId ${reqId}`, true);
-  return { message: "Request approve. Add new hotel and upgrate user to manager successfully" };
 }

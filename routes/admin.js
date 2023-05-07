@@ -60,7 +60,7 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      return res.redirect("/request");
+      return res.redirect("/admin/requests");
     }
   })
   .post(isAdmin, async (req, res) => {
@@ -68,8 +68,9 @@ router
       const requestId = helper.checkId(req.params.requestId, true);
       const response = req.body.response;
       const message = await adminFuncs.reqApprove(requestId, response);
+      
       req.flash(message);
-      return res.redirect("/request");
+      return res.redirect("/admin/requests");
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -77,7 +78,7 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      return res.redirect("/request/:requestId");
+      return res.redirect("/admin/requests/:requestId");
     }
   })
 
@@ -281,8 +282,8 @@ router
         throw CustomException("Invalid facilities.", true);
       }
       args[9] = [];
-      const addHotelMessage = await hotelFuncs.addHotel(args);
-      req.flash(addHotelMessage);
+      const addHotelId = await hotelFuncs.addHotel(args);
+      req.flash('Create hotel successfully');
       res.redirect("/admin/createHotel");
     } catch (e) {
       if (!e.code) {
