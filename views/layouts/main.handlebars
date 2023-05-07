@@ -34,7 +34,7 @@ There are four types of identities: "guest", "user", "manager", "admin".
                     <li><a href="/user/register">Register</a></li>
                     {{else}}                  
                     <li><a href="/user/dashboard/{{user.username}}">Dashboard</a></li>
-                    <li><a href="/user/logout">Logout</a></li>
+                    <li><a href="/user/dashboard/{{user.username}}/logout">Logout</a></li>
                     {{/if}}
                 </ul>
             </div>
