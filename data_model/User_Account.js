@@ -24,7 +24,6 @@ const refInfo = {
 };
 
 export async function create(...args) {
-  console.log(args);
   let user = {};
   user.username = helper.checkString(args[1], "username", true);
   user.identity = helper.checkString(args[0], "identity", true).toLowerCase();
@@ -384,7 +383,6 @@ export async function addOrder(...args) {
   const tempAccount = await Account();
   const orderInfo = tempOrder.insertOne(set);
   if (!orderInfo) throw CustomException(`Could not add the order.`, true);
-  console.log(set.user_id);
   const updateInfo = await tempAccount.findOneAndUpdate(
     { _id: set.user_id },
     { $addToSet: { orders: orderInfo.insertedId } },
@@ -568,13 +566,10 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
     const reviewInfo = await tempReview.findOne(
       { _id: newHotel.reviews[i]}, { rating: 1 }
     );
-    console.log(reviewInfo)
     sum += reviewInfo.rating;
   }
-  console.log(sum)
-  console.log(newHotel.reviews.length)
+
   let overallRating = sum / newHotel.reviews.length;
-  console.log(overallRating)
   overallRating = overallRating.toFixed(2);
   overallRating = parseFloat(overallRating);
   const updateHotel = await tempHotel.findOneAndUpdate(
@@ -798,7 +793,6 @@ export async function createRequest(...args) {
   const requestInfo = await tempRequest.insertOne(newRequest);
   if (requestInfo.insertedCount === 0)
     throw CustomException(`Could not add the request.`, true);
-  console.log(requestInfo);
   return { message: "Request submit, wait for approval" };
 }
 
