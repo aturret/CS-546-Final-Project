@@ -95,16 +95,24 @@ router
     //TODO: get hotel information
     //get hotel information
     try{
+      const user = req.user;
+      let manageable = "false";
+      if (user){
+        if ((user.identity === 'manager' && user.hotel !== hotel_id) || user.identity === 'admin'){
+          manageable = "true";
+        }
+      }
       const hotel = await hotelFuncs.getHotel(hotel_id);
       const hotelInfo = {};
-      hotelInfo.hotelId = hotel.hotel_id;
-      hotelInfo.hotelName = hotel.hotel_name;
+      hotelInfo.hotelId = hotel._id;
+      hotelInfo.hotelName = hotel.name;
       hotelInfo.hotelPhoto = hotel.pictures;
       hotelInfo.hotelRating = hotel.rating;
-      hotelInfo.hotelAddress = hotel.address + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code;
+      hotelInfo.hotelAddress = hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code;
       hotelInfo.hotelPhone = hotel.phone;
       hotelInfo.hotelEmail = hotel.email;
       hotelInfo.roomType = hotel.room_type;
+      hotelInfo.manageable = manageable;
       //get hotel room
       const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
       hotelInfo.roomType = roomTypes;

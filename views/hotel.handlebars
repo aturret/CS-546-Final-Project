@@ -14,11 +14,11 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
     <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
-{{!-- {{#if (or(eq user.hotelId hotelId)(eq user.identity "admin"))}} --}}
+{{#if (eq manageable "true")}}
 <div class="management">
     <p><a href="/hotel/{{hotelId}}/hotel_management">Click here to enter management page.</a></p>
 </div>
-{{!-- {{/if}} --}}
+{{/if}}
 <h2>{{hotelName}}</h2>
 <div class="hotelInfo">
     <div class="hotelBasicInfo">
@@ -26,7 +26,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
             <img src="{{hotelPhoto}}">
         </div>
         <div class="hotelRating">
-            <p>Rating: {{hotelRating}}</p>
+            <p>Rating: {{overall_rating}}</p>
         </div>
     </div>
     <div class="hotelIntro">
@@ -68,17 +68,17 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
             <li>
                 <div class="reviewItem">
                     <div class="reviewUserItem">
-                        <div class="reviewUserPhoto"><img src="{{userAvatar}}"></div>
+                        <div class="reviewUserPhoto"><img src="{{this.userAvatar}}"></div>
                         <div class="reviewUserName">
                             <p><a href="/reviews/{{this._id}}">{{this.userName}}</a></p>
                         </div>
                     </div>
                     <div class="reviewContentItem">
                         <div class="reviewRating">
-                            <p>{{this.rating}}</p>
+                            <p>Rating: {{this.rating}}</p>
                         </div>
                         <div class="reviewComment">
-                            <p>{{this.comment}}</p>
+                            <p>Comment: {{this.comment}}</p>
                         </div>
                         <div class="reviewUpvote">
                             <p>Upvote: {{this.upVote}}</p>

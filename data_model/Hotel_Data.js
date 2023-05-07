@@ -154,48 +154,48 @@ export async function updateHotel(...args) {
 }
 //delete hotel
 export async function deleteHotel(id) {
-    id = helper.checkId(id, true);
-    const tempHotel = await hotelReg();
+  id = helper.checkId(id, true);
+  const tempHotel = await hotelReg();
 
-    const temp = await tempHotel.findOne({ _id: new new ObjectId(id) }, {reviews: 1, room_types: 1, rooms: 1});
+  const temp = await tempHotel.findOne({ _id: new new ObjectId(id) }, { reviews: 1, room_types: 1, rooms: 1 });
 
-    if (temp.deletedCount === 0)  throw CustomException(`Delete hotel with id ${id} failed.`, true);
+  if (temp.deletedCount === 0) throw CustomException(`Delete hotel with id ${id} failed.`, true);
 
-    //delete reviews
-    let delete_review_info = undefined;
-    for (let i = 0; i < temp.reviews.length; i++) {
-        delete_review_info = await userFuncs.deleteReview(temp.reviews[i]);
-        if (delete_review_info.deletedCount === 0) throw CustomException(`Delete review with id ${temp.reviews[i]} failed.`, true);
-    }
-    
-    //delete rooms
-    const roomCollection = await Room();
-    const result_room = await roomCollection.deleteMany({ _id: { $in: temp.rooms } });
+  //delete reviews
+  let delete_review_info = undefined;
+  for (let i = 0; i < temp.reviews.length; i++) {
+    delete_review_info = await userFuncs.deleteReview(temp.reviews[i]);
+    if (delete_review_info.deletedCount === 0) throw CustomException(`Delete review with id ${temp.reviews[i]} failed.`, true);
+  }
 
-    //delete room types
-    const roomType = await RoomType();
-    const result_roomType = await roomType.deleteMany({ _id: { $in: temp.room_types } });
+  //delete rooms
+  const roomCollection = await Room();
+  const result_room = await roomCollection.deleteMany({ _id: { $in: temp.rooms } });
 
-    //delete orders
-    const orderCollection = await Order();
-    //get order id
-    const order_ids = await orderCollection.find({ hotel_id: id }, { _id: 1, user_id: 1 }).toArray();
-    const result_order = await orderCollection.deleteMany({ hotel_id: id }, {Document: "before"});
+  //delete room types
+  const roomType = await RoomType();
+  const result_roomType = await roomType.deleteMany({ _id: { $in: temp.room_types } });
 
-    //delete user order
-    const userCollection = await User();
-    for (let i of order_ids) {
-      const delete_result = await userCollection.findOneAndUpdate({_id: i.user_id}, {$pull: {orders: i._id}}, {returnDocument: "after"});
-      if (!delete_result) throw CustomException(`Delete order with id ${i._id} failed.`, true);
-    }
+  //delete orders
+  const orderCollection = await Order();
+  //get order id
+  const order_ids = await orderCollection.find({ hotel_id: id }, { _id: 1, user_id: 1 }).toArray();
+  const result_order = await orderCollection.deleteMany({ hotel_id: id }, { Document: "before" });
 
-    //delete Hotel
-    const deleteInfo = await tempHotel.deleteOne({ _id: new new ObjectId(id) });
-    if (deleteInfo.deletedCount === 0)
-        throw CustomException(`Delete hotel with id ${id} failed.`, true);
+  //delete user order
+  const userCollection = await User();
+  for (let i of order_ids) {
+    const delete_result = await userCollection.findOneAndUpdate({ _id: i.user_id }, { $pull: { orders: i._id } }, { returnDocument: "after" });
+    if (!delete_result) throw CustomException(`Delete order with id ${i._id} failed.`, true);
+  }
+
+  //delete Hotel
+  const deleteInfo = await tempHotel.deleteOne({ _id: new new ObjectId(id) });
+  if (deleteInfo.deletedCount === 0)
+    throw CustomException(`Delete hotel with id ${id} failed.`, true);
 
 
-    return { message: `Hotel with id ${id} deleted successfully.` };
+  return { message: `Hotel with id ${id} deleted successfully.` };
 }
 
 export async function hotelSearch(...args) {
@@ -230,33 +230,41 @@ export async function getHotelReview(id) {
   const tempHotel = await hotelReg();
 
   const reviewInfo = tempHotel.aggregate([
-    {$match: {_id: new ObjectId(id)}},
-    {$lookup: {
-      from: "reviews",
-      localField: "reviews",
-      foreignField: "_id",
-      as: "reviews"
-    }},
-    {$unwind: "$reviews"},
+    { $match: { _id: id } },
+    {
+      $lookup: {
+        from: "reviews",
+        localField: "reviews",
+        foreignField: "_id",
+        as: "reviews"
+      }
+    },
+    { $unwind: "$reviews" },
     {
       $lookup: {
         from: "users",
         localField: "reviews.user_id",
         foreignField: "_id",
-        as: "reviews.user"
+        as: "user"
       }
     },
     {
-        $project: {
-          _id: "$reviews._id",
-          rating: "$reviews.rating",
-          comment: "$reviews.comment",
-          upVote: "$reviews.upvote",
-          downVote: "$reviews.downvote",
-          userAvatar: "$reviews.user.avatar"
-        }
+      $addFields: {
+        "reviews.user": { $arrayElemAt: ["$user", 0] },
+      }
+    },
+    {
+      $project: {
+        _id: "$reviews._id",
+        rating: "$reviews.rating",
+        comment: "$reviews.comment",
+        upVote: "$reviews.upvote",
+        downVote: "$reviews.downvote",
+        userAvatar: "$reviews.user.avatar",
+        username: "$reviews.user.username"
+      }
     }
-  ])
+  ]).toArray();
   if (!reviewInfo) throw CustomException("Hotel not found", false);
   return reviewInfo;
 }
@@ -267,7 +275,7 @@ export async function getHotelReview(id) {
 
 //room type
 export async function addRoomType(...args) {
-  if(args.length !== 5) throw CustomException("Missing inputs.", true);
+  if (args.length !== 5) throw CustomException("Missing inputs.", true);
   const hotel_id = new ObjectId(helper.checkId(args[0], true));
   const name = helper.checkString(args[1], "room type", true);
   const pictures = args[2]
@@ -322,7 +330,7 @@ export async function deleteRoomType(id, hotel_id) {
 
   //get room type details
   const tempRoomType = await RoomType();
-  const roomType = await tempRoomType.findOne({_id: id});
+  const roomType = await tempRoomType.findOne({ _id: id });
   if (!roomType) throw CustomException(`Room type with id ${id} does not exist.`, true);
 
   //delete room 
@@ -333,14 +341,14 @@ export async function deleteRoomType(id, hotel_id) {
 
   //update hotel
   const tempHotel = await hotelReg();
-  const updateInfo = await tempHotel.findOneAndUpdate({_id: hotel_id}, {$pull: {room_types: roomType.name}}, {returnDocument: "after"});
+  const updateInfo = await tempHotel.findOneAndUpdate({ _id: hotel_id }, { $pull: { room_types: roomType.name } }, { returnDocument: "after" });
   if (!updateInfo) throw CustomException(`Could not update the hotel with id ${hotel_id}`, true);
 
   //delete room type
-  const deleteInfo = await tempRoomType.deleteOne({_id: id});
+  const deleteInfo = await tempRoomType.deleteOne({ _id: id });
   if (deleteInfo.deletedCount === 0) throw CustomException(`Delete room type with id ${id} failed.`, true);
 
-  return {message: `Room type with id ${id} deleted successfully.`};
+  return { message: `Room type with id ${id} deleted successfully.` };
 }
 
 //update room type
@@ -359,25 +367,24 @@ export async function updateRoomType(id, hotel_id, roomType, price, picture) {
 
   //get room type details
   const tempRoomType = await RoomType();
-  const rv = await tempRoomType.findOne({_id: id}, {rooms: 1, name: 1});
+  const rv = await tempRoomType.findOne({ _id: id }, { rooms: 1, name: 1 });
 
 
-  if(rv.name !== roomType){
+  if (rv.name !== roomType) {
     //update room
     const tempRoom = await Room();
-    for (let i of rv.rooms)
-    {
-      const rv = await tempRoom.findOneAndUpdate({_id: i}, {$set: {room_type: roomType}}, {returnDocument: "after"});
+    for (let i of rv.rooms) {
+      const rv = await tempRoom.findOneAndUpdate({ _id: i }, { $set: { room_type: roomType } }, { returnDocument: "after" });
       if (!rv) throw CustomException(`Could not update the room with id ${i}`, true);
     }
   }
 
 
   //update room type
-  const rv2  = await tempRoomType.findOneAndUpdate({_id: id}, {$set: updateInfo}, {returnDocument: "after"});
+  const rv2 = await tempRoomType.findOneAndUpdate({ _id: id }, { $set: updateInfo }, { returnDocument: "after" });
   if (!rv2) throw CustomException(`Could not update the room type with id ${id}`, true);
 
-  return {message: `Room type with id ${id} updated successfully.`};
+  return { message: `Room type with id ${id} updated successfully.` };
 }
 
 
@@ -388,8 +395,8 @@ export async function getHotelRoom(id) {
   const tempHotel = await hotelReg();
   const tempRoom = await Room();
 
-  const room_ids = await tempHotel.findOne({_id: id}, {rooms: 1});
-  const roomInfo = await tempRoom.find({_id: {$in: room_ids}}).toArray();
+  const room_ids = await tempHotel.findOne({ _id: id }, { rooms: 1 });
+  const roomInfo = await tempRoom.find({ _id: { $in: room_ids } }).toArray();
   if (!roomInfo) throw CustomException("Hotel not found", false);
   return roomInfo;
 }
@@ -399,7 +406,7 @@ export async function getRoom(id) {
   id = new ObjectId(helper.checkId(id, true));
   const tempRoom = await Room();
 
-  const roomInfo = await tempRoom.find({_id: id});
+  const roomInfo = await tempRoom.find({ _id: id });
   if (!roomInfo) throw CustomException("Room not found", false);
   return roomInfo;
 }
@@ -409,7 +416,7 @@ export async function getHotelRoomType(id) {
   id = new ObjectId(helper.checkId(id, true));
   const tempRoomType = await RoomType();
 
-  const roomTypeInfo = await tempRoomType.find({hotel_id: id}).toArray();
+  const roomTypeInfo = await tempRoomType.find({ hotel_id: id }).toArray();
   if (!roomTypeInfo) throw CustomException("Hotel not found", false);
   return roomTypeInfo;
 }
@@ -457,57 +464,57 @@ export async function checkRoomAvailability(...args) {
 
 //add room
 export async function addRoom(...args) {
-    const hotel_id = new ObjectId(helper.checkId(args[0], true));
-    const room_number = helper.checkString(args[1], "room number", true);
-    if(!/^\d{1,5}$/.test(room_number)) throw CustomException(`Invalid room number.`, true);
-    const room_type = helper.checkString(args[2], "room type", true);
-    const order = {};
+  const hotel_id = new ObjectId(helper.checkId(args[0], true));
+  const room_number = helper.checkString(args[1], "room number", true);
+  if (!/^\d{1,5}$/.test(room_number)) throw CustomException(`Invalid room number.`, true);
+  const room_type = helper.checkString(args[2], "room type", true);
+  const order = {};
 
-    //check if hotel exists
-    const tempHotel = await hotelReg();
-    const hotelInfo = await tempHotel.findOne({ _id: hotel_id });
-    if (!hotelInfo) throw CustomException(`Hotel with id ${hotel_id} does not exist.`, true);
+  //check if hotel exists
+  const tempHotel = await hotelReg();
+  const hotelInfo = await tempHotel.findOne({ _id: hotel_id });
+  if (!hotelInfo) throw CustomException(`Hotel with id ${hotel_id} does not exist.`, true);
 
-    //check if room type exists
-    const tempRoomType = await RoomType();
-    const roomTypeInfo = await tempRoomType.findOne({ hotel_id: hotel_id, name: room_type });
-    if (!roomTypeInfo) throw CustomException(`Room type ${room_type} does not exist.`, true);
+  //check if room type exists
+  const tempRoomType = await RoomType();
+  const roomTypeInfo = await tempRoomType.findOne({ hotel_id: hotel_id, name: room_type });
+  if (!roomTypeInfo) throw CustomException(`Room type ${room_type} does not exist.`, true);
 
-    const newRoom = {
-        hotel_id: hotel_id,
-        room_number: room_number,
-        room_type: room_type,
-        orders: order
-    };
+  const newRoom = {
+    hotel_id: hotel_id,
+    room_number: room_number,
+    room_type: room_type,
+    orders: order
+  };
 
-    //check if room exists
-    const tempRoom = await Room();
-    const rv = await tempRoom.findOne({ hotel_id: hotel_id, room_number: room_number });
-    if (rv) throw CustomException(`Room ${room_number} already exists.`, true);
+  //check if room exists
+  const tempRoom = await Room();
+  const rv = await tempRoom.findOne({ hotel_id: hotel_id, room_number: room_number });
+  if (rv) throw CustomException(`Room ${room_number} already exists.`, true);
 
-    //add room
-    const insertInfo = await tempRoom.insertOne(newRoom);
-    if (insertInfo.insertedCount === 0) throw CustomException(`Could not add the room.`, true);
+  //add room
+  const insertInfo = await tempRoom.insertOne(newRoom);
+  if (insertInfo.insertedCount === 0) throw CustomException(`Could not add the room.`, true);
 
-    const room_id = insertInfo.insertedId;
-    //add room to room type
-    const updateInfo = await tempRoomType.findOneAndUpdate(
-        { hotel_id: hotel_id, name: room_type },
-        { $addToSet: { rooms: room_id } },
-        { returnDocument: "after" }
-    );
-    if (!updateInfo) throw CustomException(`Could not update the room type ${room_type}.`, true);
+  const room_id = insertInfo.insertedId;
+  //add room to room type
+  const updateInfo = await tempRoomType.findOneAndUpdate(
+    { hotel_id: hotel_id, name: room_type },
+    { $addToSet: { rooms: room_id } },
+    { returnDocument: "after" }
+  );
+  if (!updateInfo) throw CustomException(`Could not update the room type ${room_type}.`, true);
 
-    //add room to hotel
-    const updateInfo2 = await tempHotel.findOneAndUpdate(
-        { _id: hotel_id },
-        { $addToSet: { rooms: room_id } },
-        { returnDocument: "after" }
-    );
+  //add room to hotel
+  const updateInfo2 = await tempHotel.findOneAndUpdate(
+    { _id: hotel_id },
+    { $addToSet: { rooms: room_id } },
+    { returnDocument: "after" }
+  );
 
-    if (!updateInfo2) throw CustomException(`Could not update the hotel with id ${hotel_id}`, true);
+  if (!updateInfo2) throw CustomException(`Could not update the hotel with id ${hotel_id}`, true);
 
-    return { message: `Room ${room_number} added successfully.` };
+  return { message: `Room ${room_number} added successfully.` };
 }
 
 //TODO: delete room
@@ -518,7 +525,7 @@ export async function deleteRoom(hotel_id, room_id) {
 
   //check if room exists
   const tempRoom = await Room();
-  const roomInfo = await tempRoom.findOne({ _id: room_id});
+  const roomInfo = await tempRoom.findOne({ _id: room_id });
   if (!roomInfo) throw CustomException(`Room ${roomNum} does not exist.`, true);
   const typeNme = roomInfo.room_type
   //check if hotel exists
@@ -532,36 +539,36 @@ export async function deleteRoom(hotel_id, room_id) {
   if (!roomTypeInfo) throw CustomException(`Room type ${typeNme} does not exist.`, true);
 
   //delete room
-  const rv = await tempRoom.deleteOne({_id: room_id});
+  const rv = await tempRoom.deleteOne({ _id: room_id });
   if (rv.deletedCount === 0) throw CustomException(`Could not delete the room.`, true);
 
   //delete room from room type
-  const updateInfo = await tempRoomType.findOneAndUpdate({hotel_id: hotel_id, name: typeNme}, {$pull: {rooms: room_id}}, {returnDocument: "after"});
+  const updateInfo = await tempRoomType.findOneAndUpdate({ hotel_id: hotel_id, name: typeNme }, { $pull: { rooms: room_id } }, { returnDocument: "after" });
   if (!updateInfo) throw CustomException(`Could not update the room type ${typeNme}.`, true);
 
   //delete room from hotel
-  const updateInfo2 = await tempHotel.findOneAndUpdate({_id: hotel_id}, {$pull: {rooms: room_id}}, {returnDocument: "after"});
+  const updateInfo2 = await tempHotel.findOneAndUpdate({ _id: hotel_id }, { $pull: { rooms: room_id } }, { returnDocument: "after" });
   if (!updateInfo2) throw CustomException(`Could not update the hotel with id ${hotel_id}`, true);
 
   //delete order with room_id
   const tempOrder = await Order();
-  const temp= await tempOrder.find({room_id: room_id}, {_id : 1, review: 1}).toArray();
+  const temp = await tempOrder.find({ room_id: room_id }, { _id: 1, review: 1 }).toArray();
   const orderList = temp.map((order) => order._id);
   const reviewList = temp.map((order) => order.review);
-  const deleteInfo = await tempOrder.deleteMany({room_id: room_id});
-  if(deleteInfo.deletedCount !== orderList.length) throw Error(`Could not delete the order.`);
+  const deleteInfo = await tempOrder.deleteMany({ room_id: room_id });
+  if (deleteInfo.deletedCount !== orderList.length) throw Error(`Could not delete the order.`);
 
   //delete order from user
   const tempUser = await User();
-  const updateInfo3 = await tempUser.updateMany({orders: {$in: orderList}}, {$pull: {orders: {$in: orderList}}}, {returnDocument: "after"});
+  const updateInfo3 = await tempUser.updateMany({ orders: { $in: orderList } }, { $pull: { orders: { $in: orderList } } }, { returnDocument: "after" });
   if (!updateInfo3) throw Error(`Could not update the user with id ${hotel_id}`);
 
   //delete review
   const tempReview = await Review();
-  const deleteInfo2 = await tempReview.deleteMany({_id: {$in: reviewList}});
-  if(deleteInfo2.deletedCount !== reviewList.length) throw Error(`Could not delete the review.`);
+  const deleteInfo2 = await tempReview.deleteMany({ _id: { $in: reviewList } });
+  if (deleteInfo2.deletedCount !== reviewList.length) throw Error(`Could not delete the review.`);
 
-  return {message: `Room ${roomNum} deleted successfully.`};
+  return { message: `Room ${roomNum} deleted successfully.` };
 }
 
 
@@ -571,11 +578,11 @@ export async function updateRoom(hotel_id, room_id, typeNme, roomNum) {
   hotel_id = new ObjectId(helper.checkId(hotel_id, true));
   room_id = new ObjectId(helper.checkId(room_id, true));
   typeNme = helper.checkString(typeNme, "room type", true);
-  if(!/[0-9]{0,5}$/.test(roomNum)) throw CustomException(`Invalid room number.`, true);
+  if (!/[0-9]{0,5}$/.test(roomNum)) throw CustomException(`Invalid room number.`, true);
 
   //check if room exists
   const tempRoom = await Room();
-  const roomInfo = await tempRoom.findOne({ _id: room_id});
+  const roomInfo = await tempRoom.findOne({ _id: room_id });
   if (!roomInfo) throw CustomException(`Room ${roomNum} does not exist.`, true);
 
   //check if hotel exists
@@ -589,20 +596,20 @@ export async function updateRoom(hotel_id, room_id, typeNme, roomNum) {
   if (!roomTypeInfo) throw CustomException(`Room type ${typeNme} does not exist.`, true);
 
   //update room type
-  const updateInfo = await tempRoomType.findOneAndUpdate({hotel_id: hotel_id, name: typeNme}, {$addToSet: {rooms: room_id}}, {returnDocument: "after"});
+  const updateInfo = await tempRoomType.findOneAndUpdate({ hotel_id: hotel_id, name: typeNme }, { $addToSet: { rooms: room_id } }, { returnDocument: "after" });
   if (!updateInfo) throw CustomException(`Could not update the room type ${typeNme}.`, true);
 
   //remove room from old room type
   const oldType = roomInfo.room_type;
-  const updateInfo2 = await tempRoomType.findOneAndUpdate({hotel_id: hotel_id, name: oldType}, {$pull: {rooms: room_id}}, {returnDocument: "after"});
+  const updateInfo2 = await tempRoomType.findOneAndUpdate({ hotel_id: hotel_id, name: oldType }, { $pull: { rooms: room_id } }, { returnDocument: "after" });
   if (!updateInfo2) throw CustomException(`Could not update the room type ${oldType}.`, true);
 
   //update room
-  const rv = await tempRoom.updateOne({_id: room_id}, {$set: {room_number: roomNum, room_type: typeNme}});
+  const rv = await tempRoom.updateOne({ _id: room_id }, { $set: { room_number: roomNum, room_type: typeNme } });
 
   if (rv.modifiedCount === 0) throw CustomException(`Could not update the room.`, true);
 
-  return {message: `Room ${roomNum} updated successfully.`};
+  return { message: `Room ${roomNum} updated successfully.` };
 }
 
 
@@ -614,7 +621,7 @@ export async function checkRoomAvailabilityOrder(...args) {
   const returnInfo = new Set();
   //get all room
   const tempHotel = await hotelReg();
-  const roomInfo = await tempHotel.findOne({ _id: hotel_id }, {_id : 0, rooms: 1});
+  const roomInfo = await tempHotel.findOne({ _id: hotel_id }, { _id: 0, rooms: 1 });
   const roomsId = [];
   for (let i of roomInfo.rooms) {
     roomsId.push(i.map(obj => new ObjectId(obj)));
@@ -623,7 +630,7 @@ export async function checkRoomAvailabilityOrder(...args) {
   const tempRoom = await Room();
   let roomsOrders = [];
   for (let i of roomsId) {
-    roomsOrders.push(tempRoom.find({ _id: {$in: roomInfo} }, { orders: 1 }).toArray());
+    roomsOrders.push(tempRoom.find({ _id: { $in: roomInfo } }, { orders: 1 }).toArray());
   }
 
   if (!roomsOrders) throw CustomException(`Room does not exist.`, true);
@@ -638,13 +645,13 @@ export async function checkRoomAvailabilityOrder(...args) {
 
   //get all orders' checkin findOneAndUpdate checkout date
   let temp = [];
-  for (let i of roomsOrders){
-      temp.push(
-          await tempOrder.find(
-            { _id: { $in: i.orders } },
-            { _id: 0, checkin_date: 1, checkout_date: 1, status: 1 }
-          )
-        );
+  for (let i of roomsOrders) {
+    temp.push(
+      await tempOrder.find(
+        { _id: { $in: i.orders } },
+        { _id: 0, checkin_date: 1, checkout_date: 1, status: 1 }
+      )
+    );
     if (
       temp.every(
         (order) =>
@@ -652,18 +659,17 @@ export async function checkRoomAvailabilityOrder(...args) {
           checkin_date.isAfter(moment(order.checkout_date, "YYYY/MM/DD")) ||
           checkout_date.isBefore(moment(order.checkin_date, "YYYY/MM/DD"))
       )
-    )
-    {
+    ) {
       roomAvailable.add(i._id);
     }
 
     //get room type
     const tempRoomType = await RoomType();
     for (let i of roomAvailable) {
-      const roomTypeInfo = await tempRoomType.find({ hotel_id: hotel_id, rooms: {$elemMatch: i}});
+      const roomTypeInfo = await tempRoomType.find({ hotel_id: hotel_id, rooms: { $elemMatch: i } });
       returnInfo.add(roomTypeInfo.name);
     }
-    if(!returnInfo) throw CustomException(`No room available.`, true);
+    if (!returnInfo) throw CustomException(`No room available.`, true);
     return returnInfo;
   }
 
@@ -678,8 +684,8 @@ export async function addOrderByRoomType(...args) {
 
   //get all room
   const tempRoomType = await RoomType();
-  const roomTypeInfo = await tempRoomType.findOne({ _id: roomTypeId }, {_id : 0, rooms: 1}).toArray();
-  if(!roomTypeInfo.hasNext()) throw CustomException(`Room type does not exist.`, true);
+  const roomTypeInfo = await tempRoomType.findOne({ _id: roomTypeId }, { _id: 0, rooms: 1 }).toArray();
+  if (!roomTypeInfo.hasNext()) throw CustomException(`Room type does not exist.`, true);
 
   //find orders of rooms
   const tempRoom = await Room();
@@ -694,7 +700,7 @@ export async function addOrderByRoomType(...args) {
     if (i.orders.length === 0) {
       return i._id;
     }
-    else{
+    else {
       let temp = await tempOrder.find(
         { _id: { $in: i.orders } },
         { _id: 0, checkin_date: 1, checkout_date: 1, status: 1 }
@@ -706,8 +712,7 @@ export async function addOrderByRoomType(...args) {
             checkin_date.isAfter(moment(order.checkout_date, "YYYY/MM/DD")) ||
             checkout_date.isBefore(moment(order.checkin_date, "YYYY/MM/DD"))
         )
-      )
-      {
+      ) {
         return i._id.toString();
       }
     }
