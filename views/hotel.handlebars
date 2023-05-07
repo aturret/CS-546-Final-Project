@@ -14,11 +14,11 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
     <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
-{{#if (or(eq user.hotelId hotelId)(eq user.identity "admin"))}}
+{{!-- {{#if (or(eq user.hotelId hotelId)(eq user.identity "admin"))}} --}}
 <div class="management">
     <p><a href="/hotel/{{hotelId}}/hotel_management">Click here to enter management page.</a></p>
 </div>
-{{/if}}
+{{!-- {{/if}} --}}
 <h2>{{hotelName}}</h2>
 <div class="hotelInfo">
     <div class="hotelBasicInfo">

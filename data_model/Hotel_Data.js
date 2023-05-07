@@ -25,7 +25,7 @@ export async function getHotel(id) {
   id = helper.checkId(id, true);
   const hotelCollection = await hotelReg();
 
-  let hotel = await hotelCollection.find({ _id: new new ObjectId(id) });
+  let hotel = await hotelCollection.findOne({ _id: new ObjectId(id) });
 
   if (!hotel) throw CustomException(`No hotel with ID ${id}`, true);
   hotel._id = hotel._id.toString();
