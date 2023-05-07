@@ -88,7 +88,7 @@ async function addHotel(...args) {
       throw CustomException("Invalid facilities.", true);
     }
     newHotel.managers = args[9] !== undefined
-      ? args[9].map((manager) => helper.checkId(manager, true))
+      ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))
       : undefined;
     newHotel.reviews = [];
   
@@ -295,7 +295,7 @@ try
           //create hotel
           hotelInfo = hotelGenerator.next().value;
           hotelInfo.facilities = [];
-          hotelInfo.managers = [userInfo.insertedId];
+          hotelInfo.managers = [manager_id];
           console.log(hotelInfo)
           hotelInfo = await addHotel(hotelInfo.name, hotelInfo.street, hotelInfo.city, hotelInfo.state, hotelInfo.zip_code, hotelInfo.phone, hotelInfo.email, hotelInfo.pictures, hotelInfo.facilities, hotelInfo.managers);
           if(!hotelInfo) throw "Failed to create hotel";
