@@ -569,9 +569,13 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
       { _id: new ObjectId(newHotel.reviews[i]) },
       { rating: 1 }
     );
+    console.log(reviewInfo.reviews.rating)
     sum += reviewInfo.rating;
   }
+  console.log(sum)
+  console.log(newHotel.reviews.length)
   let overallRating = sum / newHotel.reviews.length;
+  console.log(overallRating)
   overallRating = overallRating.toFixed(2);
   overallRating = parseFloat(overallRating);
   const updateHotel = await tempHotel.findOneAndUpdate(
