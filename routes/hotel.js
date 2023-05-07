@@ -687,17 +687,40 @@ router
 .route("/reviews/:reviewId")
 .get(async (req, res) => {
   try {
+    const theUser = req.user;
     const reviewId = helper.checkId(req.params.reviewId, true);
+    
     const review = await userFuncs.getReviewById(reviewId);
     const user = await userFuncs.getUserById(review.user_id);
+    const hotel = await hotelFuncs.getHotel(review.hotel_id);
+    let editable = false;
+    if(theUser){
+    const theUserId = await userFuncs.getUser(theUser.username);
+    if(theUser.identity==='admin' || review.user_id === theUserId._id){
+      editable = true;
+    }}
     const reviewInfo = {
       reviewId: review._id,
       orderId: review.order_id,
+      reviewRating: review.rating,
+      reviewUpvotes: review.upvote,
+      reviewDownvotes: review.downvote,
+      hotelName: hotel.name,
+      hotelPhoto: hotel.pictures,
+      hotelRating: hotel.overall_rating,
+      hotelAddress: hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code,
+      hotelPhone: hotel.phone,
+      hotelEmail: hotel.email,
+      reviewTitle: `${user.username}'s Review`,
       hotelId: review.hotel_id,
+      reviewComment: review.comment,
       username: user.username,
+      userAvatar: user.avatar,
       reviewUserId: review.user_id,
+      title: 'Review Control Panel',
+      editable: editable
     };
-    res.render('reviews', {review: review, title: `Review Control Panel`});
+    res.render('reviews', reviewInfo);
   } catch (e) {
     console.log(e.message);
     req.session.status = e.code ? e.code : 500;
@@ -713,7 +736,8 @@ router
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotelReviews = await hotelFuncs.getHotelReview(hotelId);
-      res.render('hotelReviews', {hotelReviews: hotelReviews, title: `Review Control Panel`});
+      hotelReviews.title = `Review Control Panel`;
+      res.render('hotelReviews', hotelReviews);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
