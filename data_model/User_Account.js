@@ -82,6 +82,14 @@ export async function getUser(username) {
   // return false;
 }
 
+export async function getUserById(id) {
+  id = helper.checkId(id, true);
+  const tempAccount = await Account();
+  const user = await tempAccount.findOne({ _id: new ObjectId(id) });
+  if (!user) throw CustomException(`Could not find user with ID ${id}`, true);
+  return user;
+}
+
 //FINISHED: update user info
 export async function updateUser(username, set) {
   if (typeof set !== "object" || Array.isArray(set) || set === "null")
@@ -496,6 +504,15 @@ export async function getReview(username) {
     );
 
   return reviews;
+}
+
+export async function getReviewById(review_id) {
+  review_id = helper.checkId(review_id, true);
+  const tempReview = await Review();
+  const review = await tempReview.findOne({ _id: new ObjectId(review_id) });
+  if (!review)
+    throw CustomException(`Could not find review with ID ${review_id}`, true);
+  return review;
 }
 
 export async function addReview(order_id, hotel_id, user_id, review, rating) {
