@@ -60,14 +60,12 @@ router
     const hotel_zip = req.body.hotelZipcodeInput;
     try{
       const result = await hotelFuncs.hotelSearch(hotel_name, hotel_city, hotel_state, hotel_zip);
-      return res.status(200).render("searchHotelResult", { hotels: result });
+      return res.status(200).render("searchHotelsResult", { hotels: result });
     }
     catch(e){
-      const code = req.session && req.session.status ? req.session.status : 200;
-      const error =
-        req.session && req.session.errorMessage
-          ? req.session.errorMessage
-          : undefined;
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      return res.redirect("/");
     }
   });
 
@@ -89,7 +87,7 @@ router
     try{
       const hotel = await hotelFuncs.getHotel(hotel_id);
       const hotelInfo = {};
-      hotelInfo.hotelId = hotel.hotel_id;
+      hotelInfo.hotelId = hotel.hotelId;
       hotelInfo.hotelName = hotel.hotel_name;
       hotelInfo.hotelPhoto = hotel.pictures;
       hotelInfo.hotelRating = hotel.rating;
@@ -113,7 +111,7 @@ router
     }
   })
   .post(isAuth, async (req, res) => {
-    const hotel_id = req.params.hotel_id;
+    const hotel_id = req.params.hotelId;
     const errorMessage = req.session && req.session.errorMessage || null;
     const status = req.session && req.session.status || 200;
     if (req.session) {
