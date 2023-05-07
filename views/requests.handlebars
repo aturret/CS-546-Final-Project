@@ -1,14 +1,15 @@
 {{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{errorMessage}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <h2>Request List</h2>
 <div class="requestList">
+    {{#if reqList}}
     <ol>
         {{#each reqList}}
         <li>
-            <div class="requestList">
+            <div class="requestItem">
                 <div class="requestId"><a href="/request/{{this._id}}">{{this._id}}</a></div>
                 <div class="username"><a>{{this.username}}</a></div>
                 <div class="status"><a>{{this.status}}</a></div>
@@ -16,6 +17,9 @@
         </li>
         {{/each}}
     </ol>
+    {{else}}
+    <p>No request found. As an admin, you should be careful to your job.</p>
+    {{/if}}
 </div>
 <div class="adminPage">
     <a href="/admin">Admin Main Page</a>

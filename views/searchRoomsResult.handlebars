@@ -4,9 +4,9 @@
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <h2>Room Search Result</h2>
@@ -20,8 +20,8 @@
                     {{#each roomType}}
                     <li>
                         <div class="roomItem">
-                            <input type="radio" id="{{_id}}" name="roomCheck" value="{{_id}}">
-                            <label for="{{_id}}">{{roomTypeName}}</label>
+                            <input type="radio" id="type-{{_id}}" name="roomCheckInput" value="{{_id}}">
+                            <label for="type-{{_id}}">{{roomTypeName}}</label>
                             <div class="roomPhoto"><img src="{{roomPhoto}}"></div>
                             <div class="roomInfo">
                                 {{!-- <div class="roomTypeName">
@@ -77,6 +77,7 @@
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
+<script src="/public/js/totalPrice.js"></script>
 {{#if (eq user.identity "guest")}}
 <div class="new-user">
     <p>You can <a href="/user/register">register</a> or <a href="/user/login">login</a> first.</p>

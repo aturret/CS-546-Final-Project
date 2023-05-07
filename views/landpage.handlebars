@@ -4,24 +4,24 @@ login form handlebar template
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 
 <p>Search for the best hotel you can have for your vacation!</p>
 <form action="/" method="POST" id="login-form" class="my-form">
-    <label for="hotalNameInput" id="hotalNameInput-label">  
+    <label for="hotelNameInput" id="hotelNameInput-label">  
         Hotel Name: 
     </label>
-    <input type="text" name="hotalNameInput" id="hotalNameInput">
+    <input type="text" name="hotelNameInput" id="hotelNameInput">
     <label for="hotelState" id="hotelState-label">  
         State:
     </label>
     <select id="hotelStateInput" name="hotelStateInput" class="state">
     </select>
-    <label for="hotelCity" id="hotelCity-label">  
+    <label for="hotelCityInput" id="hotelCityInput-label">  
         City:
     </label>
     <input type="text" name="hotelCityInput" id="hotelCityInput">
@@ -34,7 +34,6 @@ login form handlebar template
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-
 {{#if (eq user.identity "guest")}}
 <div class="new-user">
     <p>You can <a href="/user/register">register</a> or <a href="/user/login">login</a> first.</p>

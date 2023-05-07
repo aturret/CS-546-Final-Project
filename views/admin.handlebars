@@ -4,28 +4,30 @@ roomTypes: Please pass all roomTpyes when rendering this template.
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <h2>Welcome, powerful admin.</h2>
 <div class="adminFunctions">    
-    <ol>       
+    <ul>       
         <li>
             <div class="requests">
                 <a href="/admin/requests">Requests</a>
             </div>
+        </li>
+        <li>
             <div class="accounts">
                 <a href="/admin/accounts">Accounts</a>
             </div>
+        </li>
+        <li>
             <div class="hotels">
                 <a href="/admin/createHotel">Create a hotel</a>
             </div>
-            {{/if}}
         </li>
-        
-    </ol>
+        </ul>
 
 </div>
 </div>

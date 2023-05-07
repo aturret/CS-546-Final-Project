@@ -4,16 +4,16 @@
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{errorMessage}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 
 <div class="newHotel">
     <div id="newHotelWindow">
         <form action="/admin/createHotel" method="POST">
-            
+
             <label for="hotelNameInput" id="hotelNameInput-label">
                 Hotel Name:
             </label>
@@ -22,8 +22,7 @@
             <label for="hotelPhotoInput" id="hotelPhotoInput-label">
                 Hotel Photo:
             </label>
-            <input type="file" name="hotelPhotoInput" id="hotelPhotoInput" value="{{hotelPhoto}}">
-
+            <input type="file" name="hotelPhotoInput" id="hotelPhotoInput" accept="image/*" multiple>
             <div class="hotelContact">
                 <label for="hotelPhoneInput" id="hotelPhoneInput-label">
                     Hotel Phone:
@@ -52,16 +51,15 @@
                 </label>
                 <select id="hotelStateInput" class="state" name="hotelStateInput">
                 </select>
-
                 <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
                     Hotel Zip:
                 </label>
                 <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput" value="{{hotelZipcode}}">
-
-                <button type="submit" id="newApplication">Create hotel</button>
             </div>
-        </form>
+            <button type="submit" id="newApplication">Create hotel</button>
     </div>
+    </form>
+</div>
 </div>
 
 

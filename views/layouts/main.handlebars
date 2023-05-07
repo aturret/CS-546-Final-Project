@@ -20,6 +20,13 @@ There are four types of identities: "guest", "user", "manager", "admin".
     <h1>{{title}}</h1>
     <main>
         <header>
+            <div class="logo">
+                <a href="/"><img src="/public/img/logo.png" alt="logo"></a>
+            </div>
+            <div class="homepage">
+                <a href="/" class="home-button">Index</a>
+            </div>
+                
             <div class="nav">
                 <ul>
                     {{#if (eq user.identity "guest")}}
@@ -27,11 +34,14 @@ There are four types of identities: "guest", "user", "manager", "admin".
                     <li><a href="/user/register">Register</a></li>
                     {{else}}                  
                     <li><a href="/user/dashboard/{{user.username}}">Dashboard</a></li>
-                    <li><a href="/user/logout">Logout</a></li>
+                    <li><a href="/user/dashboard/{{user.username}}/logout">Logout</a></li>
                     {{/if}}
                 </ul>
+            </div>
         </header>
+        <section class="content">
         {{{body}}}
+        </section>
     </main>
     <script src="/public/js/validation.js"></script>
     <script src="/public/js/newWindow.js"></script>

@@ -20,43 +20,44 @@ forms.forEach(form => {
         const emailInputs = document.querySelectorAll('input[type="email"]');
         const phoneInputs = document.querySelectorAll('input[class="phone"]');
         const textareas = document.querySelectorAll('textarea');
+        const picInputs = document.querySelectorAll('input[type="file"]');
         try {
-            textInputs.forEach(input => {                
+            textInputs.forEach(input => {
+                console.log('text checking');             
                 input.value = checkString(input.value, input.name, false);
             })
-            roomTypeInputs.forEach(input => {
-                
+            roomTypeInputs.forEach(input => {                
                 input.value = checkString(input.value, input.name, false);
             })
-            phoneInputs.forEach(input => {
-                console.log('hi');
+            phoneInputs.forEach(input => {                
                 input.value = checkPhone(input.value, false);
             })
-            emailInputs.forEach(input => {
-                console.log('hi');
+            emailInputs.forEach(input => {                
                 input.value = checkEmail(input.value, false);
             })            
             passwordInputs.forEach(input => {               
                 input.value = checkPassword(input.value, false);
             })
-            dateInputs.forEach(input => {
-                console.log('hi');
+            dateInputs.forEach(input => {                
                 input.value = checkDate(input.value, false);
             })
-            textareas.forEach(input => {
-                console.log('hi');
+            textareas.forEach(input => {                
                 input.value = checkString(input.value, input.name, false);
             })
-            
-            if (document.getElementById('confirmPasswordInput')) {
-                const confirmPasswordInput = document.getElementById('confirmPasswordInput');
-                const PasswordInput = document.getElementById('passwordInput');
+            picInputs.forEach(input => {
+                const file = input.files[0];
+                if (!file) throw "No file selected";
+                if (!file.type.startsWith('image/')) throw "Picture file must be an image";
+                input.value = file.name;
+            })            
+            if (document.getElementById('confirmPasswordInput')) {    
+                const confirmPasswordInput = document.getElementsByClassName('confirmPasswordInput')[0];
+                const PasswordInput = document.getElementsByClassName('PasswordInput')[0];
                 if (confirmPasswordInput.value !== PasswordInput.value) throw "Passwords do not match";
             }
         }
         catch (e) {
             event.preventDefault();
-            // clientErrorDiv.style.display = 'block';
             clientError.innerHTML = e;
         }
     }

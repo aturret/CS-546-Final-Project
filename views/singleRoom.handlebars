@@ -6,9 +6,9 @@ roomTypes collection, or you can just calculate its availability and set it as a
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <h2>The room {{roomNumber}}</h2>
@@ -25,7 +25,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
             </div>
 {{#if (eq roomStatus "available")}}
 <div class="deleteRoom">
-    <form action="/hotel/{{hotelId}}/room/{{roomId}}/delete" method="DELETE">
+    <form action="/user/dashboard/{{username}}/hotel/{{hotelId}}/room/{{roomId}}/delete" method="DELETE">
         <button type="submit">Delete the room</button>
     </form>
 </div>
@@ -35,7 +35,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
         <button class="editRoom" onclick="editRoom()">Edit the room</button>
     </div>
     <div class="editRoomWindow" hidden="true" id="edit">
-        <form action="/hotel/{{hotelId}}/room/{{roomId}}/edit" method="PATCH" id="editRoom-form" class="my-form">
+        <form action="/user/dashboard/{{username}}/hotel/{{hotelId}}/room/{{roomId}}/edit" method="PATCH" id="editRoom-form" class="my-form">
             <label id="roomNumberInput-label">
                 Room Number:
                 <input type="text" name="roomNumberInput">

@@ -1,6 +1,7 @@
 // let stateDocument = document.querySelector('select[id="state"]');
 const stateDocument = document.querySelectorAll('select.state, select#state')[0];
 const stateList = [
+    {abbr:'', name: 'Select a State'},
     {abbr: 'AL', name: 'Alabama'},
     {abbr: 'AK', name: 'Alaska'},
     {abbr: 'AZ', name: 'Arizona'},
@@ -56,7 +57,7 @@ const stateList = [
 
 stateList.forEach(state => {
     let option = document.createElement('option');
-    option.value = state.abbr;
+    option.value = state.name;
     option.textContent = state.name;
     stateDocument.appendChild(option);
 }

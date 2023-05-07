@@ -10,9 +10,9 @@ order has status: pending, completed, cancelled.
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <h2>Search Result</h2>
@@ -80,10 +80,12 @@ order has status: pending, completed, cancelled.
         <div class="cancelOrder">
             <div class="cancelOrderWindow">
                 <form action="/order/{{orderId}}/cancel" method="PUT" id="cancelOrder-form" class="my-form">
+                    <input type="hidden" name="orderId" value="{{orderId}}">
+                    <input type="hidden">
                     <button type="submit" class="cancelOrderButton">Cancel</button>
                 </form>
             </div>
-        </div>        
+        </div>
         {{#if (ne reviewId)}}
         <div class="addReview">
             <p>You have completed this order but had no reviews on it. Please write your review to give other tourists a
@@ -94,7 +96,7 @@ order has status: pending, completed, cancelled.
                 </button>
             </div>
             <div hidden="true" id="addReviewWindow">
-                <form action="/reviews" method="POST">
+                <form action="/dashboard/{{username}}/order_history/{{orderId}}/add_review" method="POST">
                     <label for="reviewCommentInput">Comment</label>
                     <textarea name="reviewCommentInput" placeholder="Comment"></textarea>
                     <label for="reviewRatingInput">Rating</label>

@@ -4,9 +4,9 @@ roomTypes: Please pass all roomTpyes when rendering this template.
 
 --}}
 
-{{#if error}}
+{{#if errorMessage}}
 <div class="error">
-    <p>Error code {{statusCode}}: {{error}}</p>
+    <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
 <h2>Welcome, powerful admin.</h2>
