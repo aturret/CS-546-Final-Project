@@ -401,337 +401,337 @@ async (req, res) => {
   }
 });
 
-//TODO: load hotel information for the manager
-router.route("/dashboard/:username/hotel_management").get(
-  (req, res, next) => {
-    if (!req.isAuthenticated()) {
-      return res.redirect("/user/login");
-    }
-    if (req.user && req.user.identity === "user") {
-      req.session.status = 403;
-      req.session.errorMessage = "You are not allow to access this page";
-      return res.redirect("/user/dashboard");
-    }
-    next();
-  },
-  async (req, res) => {
-    try {
-      req.user.username = helper.checkString(req.user.username);
-      if (req.session && req.session.status) {
-        user.status = req.session.status;
-        user.errorMessage = req.session.errorMessage;
-        req.session.status = null;
-        req.session.errorMessage = null;
-      }
-      const hotel = await hotelFuncs.getMgrHotel(req.user.username);
-      return res.status(200).render("hotel_management", {hotel, title: "Hotel Management"});
-    } catch (e) {
-      //customized error are thrown. if e.code exist its a customized error. Otherwise, its a server error.
-      if (!e.code) {
-        req.session.status = 500;
-      } else {
-        req.session.status = e.code;
-      }
-      req.session.errorMessage = e.message;
-      res.redirect(`/user/dashboard/${req.user.username}`);
-    }
-  }
-)
-.put(
-  (req, res, next) =>  (req, res, next) => {
-    if (!req.isAuthenticated()) {
-      return res.redirect("/user/login");
-    }
-    if (req.user && req.user.identity === "user") {
-      req.session.status = 403;
-      req.session.errorMessage = "You are not allow to access this page";
-      return res.redirect("/user/dashboard");
-    }
-    next();
-  },
-  async (req, res) => {
-    try {
-      const hotel_id = req.body.hotel_id;
-      const hotel_name = req.body.hotel_name;
-      const hotel_street = req.body.hotel_street;
-      const hotel_city = req.body.hotel_city;
-      const hotel_state = req.body.hotel_state;
-      const hotel_zip = req.body.hotel_zip;
-      const hotel_phone = req.body.hotel_phone;
-      const hotel_email = req.body.hotel_email;
-      const hotel_picture = req.body.hotel_picture;
-      const facilities = req.body.facilities;
-      const manager = req.body.manager;
-      const rooms = req.body.rooms;
-      const roomType = req.body.roomType;
-      const reviews = req.body.reviews;
+// //TODO: load hotel information for the manager
+// router.route("/dashboard/:username/hotel_management").get(
+//   (req, res, next) => {
+//     if (!req.isAuthenticated()) {
+//       return res.redirect("/user/login");
+//     }
+//     if (req.user && req.user.identity === "user") {
+//       req.session.status = 403;
+//       req.session.errorMessage = "You are not allow to access this page";
+//       return res.redirect("/user/dashboard");
+//     }
+//     next();
+//   },
+//   async (req, res) => {
+//     try {
+//       req.user.username = helper.checkString(req.user.username);
+//       if (req.session && req.session.status) {
+//         user.status = req.session.status;
+//         user.errorMessage = req.session.errorMessage;
+//         req.session.status = null;
+//         req.session.errorMessage = null;
+//       }
+//       const hotel = await hotelFuncs.getMgrHotel(req.user.username);
+//       return res.status(200).render("hotel_management", {hotel, title: "Hotel Management"});
+//     } catch (e) {
+//       //customized error are thrown. if e.code exist its a customized error. Otherwise, its a server error.
+//       if (!e.code) {
+//         req.session.status = 500;
+//       } else {
+//         req.session.status = e.code;
+//       }
+//       req.session.errorMessage = e.message;
+//       res.redirect(`/user/dashboard/${req.user.username}`);
+//     }
+//   }
+// )
+// .put(
+//   (req, res, next) =>  (req, res, next) => {
+//     if (!req.isAuthenticated()) {
+//       return res.redirect("/user/login");
+//     }
+//     if (req.user && req.user.identity === "user") {
+//       req.session.status = 403;
+//       req.session.errorMessage = "You are not allow to access this page";
+//       return res.redirect("/user/dashboard");
+//     }
+//     next();
+//   },
+//   async (req, res) => {
+//     try {
+//       const hotel_id = req.body.hotel_id;
+//       const hotel_name = req.body.hotel_name;
+//       const hotel_street = req.body.hotel_street;
+//       const hotel_city = req.body.hotel_city;
+//       const hotel_state = req.body.hotel_state;
+//       const hotel_zip = req.body.hotel_zip;
+//       const hotel_phone = req.body.hotel_phone;
+//       const hotel_email = req.body.hotel_email;
+//       const hotel_picture = req.body.hotel_picture;
+//       const facilities = req.body.facilities;
+//       const manager = req.body.manager;
+//       const rooms = req.body.rooms;
+//       const roomType = req.body.roomType;
+//       const reviews = req.body.reviews;
 
-      const result = await hotelFuncs.updateHotel(
-        hotel_id,
-        hotel_name,
-        hotel_street,
-        hotel_city,
-        hotel_state,
-        hotel_zip,
-        hotel_phone,
-        hotel_email,
-        hotel_picture,
-        rooms,
-        facilities,
-        manager,
-        roomType,
-        reviews
-      );
-      req.flash(result);
-      return res.redirect(200).redirect("/hotel_management");
-    } catch (e) {
-      e.code = e.code ? e.code : 500;
-      req.session.errorMessage = e.message;
-      res.redirect("/hotel_management");
-    }
-  }
-);
-//add room type for the hotel, hotel mnr or admin only
-router.route("/dashboard/:username/hotel_management/:hotel_id/room_type")
-.get((req, res, next) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect("/user/login");
-  }
-  if (req.user && req.user.identity === "user") {
-    req.flash("You are not allow to access this page");
-    return res.redirect("/user/dashboard");
-  }
-  next();
-},
-async (req, res) => {
-  try {
-    const hotel_id = helper.checkId(req.params.hotel_id);
-    const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
-    return res.status(200).render("roomsTypes", { roomTypes, title: "Room Types Control Panel" });
-  } catch (e) {
-    //customized error are thrown. if e.code exist its a customized error. Otherwise, its a server error.
-    if (!e.code) {
-      req.session.status = 500;
-    } else {
-      req.session.status = e.code;
-    }
-    req.session.errorMessage = e.message;
-    res.redirect(`/user/dashboard/${req.user.username}/hotel_management`);
-  }
+//       const result = await hotelFuncs.updateHotel(
+//         hotel_id,
+//         hotel_name,
+//         hotel_street,
+//         hotel_city,
+//         hotel_state,
+//         hotel_zip,
+//         hotel_phone,
+//         hotel_email,
+//         hotel_picture,
+//         rooms,
+//         facilities,
+//         manager,
+//         roomType,
+//         reviews
+//       );
+//       req.flash(result);
+//       return res.redirect(200).redirect("/hotel_management");
+//     } catch (e) {
+//       e.code = e.code ? e.code : 500;
+//       req.session.errorMessage = e.message;
+//       res.redirect("/hotel_management");
+//     }
+//   }
+// );
+// //add room type for the hotel, hotel mnr or admin only
+// router.route("/dashboard/:username/hotel_management/:hotel_id/room_type")
+// .get((req, res, next) => {
+//   if (!req.isAuthenticated()) {
+//     return res.redirect("/user/login");
+//   }
+//   if (req.user && req.user.identity === "user") {
+//     req.flash("You are not allow to access this page");
+//     return res.redirect("/user/dashboard");
+//   }
+//   next();
+// },
+// async (req, res) => {
+//   try {
+//     const hotel_id = helper.checkId(req.params.hotel_id);
+//     const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
+//     return res.status(200).render("roomsTypes", { roomTypes, title: "Room Types Control Panel" });
+//   } catch (e) {
+//     //customized error are thrown. if e.code exist its a customized error. Otherwise, its a server error.
+//     if (!e.code) {
+//       req.session.status = 500;
+//     } else {
+//       req.session.status = e.code;
+//     }
+//     req.session.errorMessage = e.message;
+//     res.redirect(`/user/dashboard/${req.user.username}/hotel_management`);
+//   }
 
-}
-)
-.post(
-  (req, res, next) => {
-    if (!req.isAuthenticated()) {
-      return res.redirect("/user/login");
-    }
-    if (req.user && req.user.identity === "user") {
-      req.session.status = 403;
-      req.session.errorMessage = "You are not allow to access this page";
-      return res.redirect("/user/dashboard");
-    }
-    next();
-  },
-  async (req, res) => {
-    try {
-      const hotel_name = req.body.hotel_name;
-      const room_type = req.body.room_type;
-      const room_price = req.body.room_price;
-      const room_picture = req.body.room_picture
-        ? req.body.room_picture
-        :[];
-      const rooms = req.body.rooms ? req.body.rooms : [];
-      const result = await userFuncs.addRoomType(
-        hotel_name,
-        room_type,
-        room_price,
-        room_picture,
-        rooms
-      );
-      req.flash({ successMessage: "Room type added successfully" });
-      return res.redirect(200).redirect("/user/dashboard/:username/hotel_management/room_type");
-    } catch (e) {
-      e.code = e.code ? e.code : 500;
-      req.session.errorMessage = e.message;
-      res.redirect("/hotel_management");
-    }
-  }
-)
-router.route("/dashboard/:username/hotel_management/:hotel_id/room_type/:type_id")
-.patch( (req, res, next) => {
-    if (!req.isAuthenticated()) {
-      return res.redirect("/user/login");
-    }
-    if (req.user && req.user.identity === "user") {
-      req.session.status = 403;
-      req.session.errorMessage = "You are not allow to access this page";
-      return res.redirect("/user/dashboard");
-    }
-    next();
-  },
-async (req, res) => {
-  try {
-    const hotel_id = req.params.hotel_id;
-    const type_id = req.params.room_type;
-    const room_type = req.params.room_type;
-    const room_price = req.body.room_price;
-    const room_picture = req.body.room_picture;
+// }
+// )
+// .post(
+//   (req, res, next) => {
+//     if (!req.isAuthenticated()) {
+//       return res.redirect("/user/login");
+//     }
+//     if (req.user && req.user.identity === "user") {
+//       req.session.status = 403;
+//       req.session.errorMessage = "You are not allow to access this page";
+//       return res.redirect("/user/dashboard");
+//     }
+//     next();
+//   },
+//   async (req, res) => {
+//     try {
+//       const hotel_name = req.body.hotel_name;
+//       const room_type = req.body.room_type;
+//       const room_price = req.body.room_price;
+//       const room_picture = req.body.room_picture
+//         ? req.body.room_picture
+//         :[];
+//       const rooms = req.body.rooms ? req.body.rooms : [];
+//       const result = await userFuncs.addRoomType(
+//         hotel_name,
+//         room_type,
+//         room_price,
+//         room_picture,
+//         rooms
+//       );
+//       req.flash({ successMessage: "Room type added successfully" });
+//       return res.redirect(200).redirect("/user/dashboard/:username/hotel_management/room_type");
+//     } catch (e) {
+//       e.code = e.code ? e.code : 500;
+//       req.session.errorMessage = e.message;
+//       res.redirect("/hotel_management");
+//     }
+//   }
+// )
+// router.route("/dashboard/:username/hotel_management/:hotel_id/room_type/:type_id")
+// .patch( (req, res, next) => {
+//     if (!req.isAuthenticated()) {
+//       return res.redirect("/user/login");
+//     }
+//     if (req.user && req.user.identity === "user") {
+//       req.session.status = 403;
+//       req.session.errorMessage = "You are not allow to access this page";
+//       return res.redirect("/user/dashboard");
+//     }
+//     next();
+//   },
+// async (req, res) => {
+//   try {
+//     const hotel_id = req.params.hotel_id;
+//     const type_id = req.params.room_type;
+//     const room_type = req.params.room_type;
+//     const room_price = req.body.room_price;
+//     const room_picture = req.body.room_picture;
 
-    const result = await hotelFuncs.updateRoomType(type_id, hotel_id, room_type, room_price, room_picture);
-    req.flash({ successMessage: "Room type updated successfully" });
-    return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
-  }
-  catch (e) {
-    e.code = e.code ? e.code : 500;
-    req.session.errorMessage = e.message;
-    res.redirect("/hotel_management");
-  }
-}
-)
-//TODO: delete room type
-.delete((req, res, next) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect("/user/login");
-  }
-  if (req.user && req.user.identity === "user") {
-    req.session.status = 403;
-    req.session.errorMessage = "You are not allow to access this page";
-    return res.redirect("/user/dashboard");
-  }
-  next();
-},
-async (req, res) => {
-  try {
-    const hotel_id = req.params.hotel_id;
-    const type_id = req.params.room_type;
-    const result = await hotelFuncs.deleteRoomType(type_id, hotel_id);
-    req.flash({ successMessage: "Room type deleted successfully" });
-    return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
-  }
-  catch (e) {
-    e.code = e.code ? e.code : 500;
-    req.session.errorMessage = e.message;
-    return res.redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
-  }
-}
-);
-
-
+//     const result = await hotelFuncs.updateRoomType(type_id, hotel_id, room_type, room_price, room_picture);
+//     req.flash({ successMessage: "Room type updated successfully" });
+//     return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
+//   }
+//   catch (e) {
+//     e.code = e.code ? e.code : 500;
+//     req.session.errorMessage = e.message;
+//     res.redirect("/hotel_management");
+//   }
+// }
+// )
+// //TODO: delete room type
+// .delete((req, res, next) => {
+//   if (!req.isAuthenticated()) {
+//     return res.redirect("/user/login");
+//   }
+//   if (req.user && req.user.identity === "user") {
+//     req.session.status = 403;
+//     req.session.errorMessage = "You are not allow to access this page";
+//     return res.redirect("/user/dashboard");
+//   }
+//   next();
+// },
+// async (req, res) => {
+//   try {
+//     const hotel_id = req.params.hotel_id;
+//     const type_id = req.params.room_type;
+//     const result = await hotelFuncs.deleteRoomType(type_id, hotel_id);
+//     req.flash({ successMessage: "Room type deleted successfully" });
+//     return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
+//   }
+//   catch (e) {
+//     e.code = e.code ? e.code : 500;
+//     req.session.errorMessage = e.message;
+//     return res.redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
+//   }
+// }
+// );
 
 
-//add room for the hotel, hotel mnr or admin only
-router
-  .route("/hotel_management/:hotel_id/room")
-  .get(
-    (req, res, next) => {
-      if (!req.isAuthenticated()) {
-        return res.redirect("/user/login");
-      }
-      if (req.user && req.user.identity === "user") {
-        res.session.status = 403;
-        res.session.errorMessage = "You are not allow to access this page";
-        return res.redirect(`/user/dashboard/${req.user.username}`);
-      }
-      next();
-    },
-    async (req, res) => {
-      try {
-        const hotel_id = helper.checkId(req.params.hotel_id)
-        const rooms = await hotelFuncs.getHotelRoom(hotel_id);
-        return res.status(200).render("rooms", {rooms, title: "Rooms Control Panel"});
-      } catch (e) {
-        if (!e.code) {
-          req.session.status = 500;
-        } else {
-          req.session.status = e.code;
-        }
-        req.session.errorMessage = e.message;
-        res.redirect(`/user/dashboard/${req.user.username}/hotel_management`);
-      }
-    }
-  )
-  .post(
-    (req, res, next) => {
-      if (!req.isAuthenticated()) {
-        return res.redirect("/user/login");
-      }
-      if (req.user && req.user.identity === "user") {
-        req.session.status = 403;
-        req.session.errorMessage = "You are not allow to access this page";
-        return res.redirect(`/user/dashboard/${req.user.username}/hotel_management`);
-      }
-      next();
-    },
-    async (req, res) => {
-      try {
-        const hotel_name = req.body.hotel_id;
-        const room_type = req.body.room_type;
-        const room_id = req.body.room_id;
-        const result = await userFuncs.addRoom(hotel_name, room_type, room_id);
-        req.flash(result);
-        return res.redirect(200).redirect("/hotel_management");
-      } catch (e) {
-        e.code = e.code ? e.code : 500;
-        req.session.errorMessage = e.message;
-        res.redirect("/hotel_management");
-      }
-    }
-  )
-  //TODO: delete room
-router.route("/user/dashboard/:username/hotel_management/:hotel_id/room/:room_id")
-  .delete((req, res, next) => {
-    if (!req.isAuthenticated()) {
-      return res.redirect("/user/login");
-    }
-    if (req.user && req.user.identity === "user") {
-      req.session.status = 403;
-      req.session.errorMessage = "You are not allow to access this page";
-      return res.redirect(`/user/dashboard/${req.user.username}/hotel_management/${hotel_id}/room`);
-    }
-    next();
-  },
-  async (req, res) => {
-    try {
-      const hotel_id = req.params.hotel_id;
-      const room_id = req.params.room_id;
-      const result = await hotelFuncs.deleteRoom(room_id, hotel_id);
-      req.flash({ successMessage: "Room deleted successfully" });
-      return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
-    }
-    catch (e) {
-      e.code = e.code ? e.code : 500;
-      req.session.errorMessage = e.message;
-      return res.redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
-    }
-  }
-  )
-  .patch((req, res, next) => {
-    if (!req.isAuthenticated()) {
-      return res.redirect("/user/login");
-    }
-    if (req.user && req.user.identity === "user") {
-      req.session.status = 403;
-      req.session.errorMessage = "You are not allow to access this page";
-      return res.redirect(`/user/dashboard/${req.user.username}/hotel_management/${hotel_id}/room`);
-    }
-    next();
-  },
-  async (req, res) => {
-    try {
-      const hotel_id = req.params.hotel_id;
-      const room_id = req.params.room_id;
-      const result = await hotelFuncs.updateRoom(room_id, hotel_id);
-      req.flash({ successMessage: "Room updated successfully" });
-      return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
-    }
-    catch (e) {
-      e.code = e.code ? e.code : 500;
-      req.session.errorMessage = e.message;
-      return res.redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
-    }
-  }
-  )
+
+
+// //add room for the hotel, hotel mnr or admin only
+// router
+//   .route("/hotel_management/:hotel_id/room")
+//   .get(
+//     (req, res, next) => {
+//       if (!req.isAuthenticated()) {
+//         return res.redirect("/user/login");
+//       }
+//       if (req.user && req.user.identity === "user") {
+//         res.session.status = 403;
+//         res.session.errorMessage = "You are not allow to access this page";
+//         return res.redirect(`/user/dashboard/${req.user.username}`);
+//       }
+//       next();
+//     },
+//     async (req, res) => {
+//       try {
+//         const hotel_id = helper.checkId(req.params.hotel_id)
+//         const rooms = await hotelFuncs.getHotelRoom(hotel_id);
+//         return res.status(200).render("rooms", {rooms, title: "Rooms Control Panel"});
+//       } catch (e) {
+//         if (!e.code) {
+//           req.session.status = 500;
+//         } else {
+//           req.session.status = e.code;
+//         }
+//         req.session.errorMessage = e.message;
+//         res.redirect(`/user/dashboard/${req.user.username}/hotel_management`);
+//       }
+//     }
+//   )
+//   .post(
+//     (req, res, next) => {
+//       if (!req.isAuthenticated()) {
+//         return res.redirect("/user/login");
+//       }
+//       if (req.user && req.user.identity === "user") {
+//         req.session.status = 403;
+//         req.session.errorMessage = "You are not allow to access this page";
+//         return res.redirect(`/user/dashboard/${req.user.username}/hotel_management`);
+//       }
+//       next();
+//     },
+//     async (req, res) => {
+//       try {
+//         const hotel_name = req.body.hotel_id;
+//         const room_type = req.body.room_type;
+//         const room_id = req.body.room_id;
+//         const result = await userFuncs.addRoom(hotel_name, room_type, room_id);
+//         req.flash(result);
+//         return res.redirect(200).redirect("/hotel_management");
+//       } catch (e) {
+//         e.code = e.code ? e.code : 500;
+//         req.session.errorMessage = e.message;
+//         res.redirect("/hotel_management");
+//       }
+//     }
+//   )
+//   //TODO: delete room
+// router.route("/user/dashboard/:username/hotel_management/:hotel_id/room/:room_id")
+//   .delete((req, res, next) => {
+//     if (!req.isAuthenticated()) {
+//       return res.redirect("/user/login");
+//     }
+//     if (req.user && req.user.identity === "user") {
+//       req.session.status = 403;
+//       req.session.errorMessage = "You are not allow to access this page";
+//       return res.redirect(`/user/dashboard/${req.user.username}/hotel_management/${hotel_id}/room`);
+//     }
+//     next();
+//   },
+//   async (req, res) => {
+//     try {
+//       const hotel_id = req.params.hotel_id;
+//       const room_id = req.params.room_id;
+//       const result = await hotelFuncs.deleteRoom(room_id, hotel_id);
+//       req.flash({ successMessage: "Room deleted successfully" });
+//       return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
+//     }
+//     catch (e) {
+//       e.code = e.code ? e.code : 500;
+//       req.session.errorMessage = e.message;
+//       return res.redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
+//     }
+//   }
+//   )
+//   .patch((req, res, next) => {
+//     if (!req.isAuthenticated()) {
+//       return res.redirect("/user/login");
+//     }
+//     if (req.user && req.user.identity === "user") {
+//       req.session.status = 403;
+//       req.session.errorMessage = "You are not allow to access this page";
+//       return res.redirect(`/user/dashboard/${req.user.username}/hotel_management/${hotel_id}/room`);
+//     }
+//     next();
+//   },
+//   async (req, res) => {
+//     try {
+//       const hotel_id = req.params.hotel_id;
+//       const room_id = req.params.room_id;
+//       const result = await hotelFuncs.updateRoom(room_id, hotel_id);
+//       req.flash({ successMessage: "Room updated successfully" });
+//       return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
+//     }
+//     catch (e) {
+//       e.code = e.code ? e.code : 500;
+//       req.session.errorMessage = e.message;
+//       return res.redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
+//     }
+//   }
+//   )
 
 
   //TODO: update room
