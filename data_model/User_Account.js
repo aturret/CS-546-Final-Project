@@ -763,7 +763,7 @@ export async function createRequest(...args) {
     throw CustomException("Invalid facilities.", true);
   }
   args[9] = args[9]
-    ? args[9].map((manager) => helper.checkId(manager, true))
+    ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))
     : undefined;
 
   const tempAccount = await Account();
@@ -796,9 +796,9 @@ export async function createRequest(...args) {
   };
 
   const requestInfo = await tempRequest.insertOne(newRequest);
-  if (requestInfo.insertedCount.n === 0)
+  if (requestInfo.insertedCount === 0)
     throw CustomException(`Could not add the request.`, true);
-
+  console.log(requestInfo);
   return { message: "Request submit, wait for approval" };
 }
 

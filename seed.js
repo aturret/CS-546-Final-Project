@@ -283,76 +283,77 @@ try
         console.log(user)
         userInfo = await create(user.identity, user.username, user.avatar, user.firstName, user.lastName, user.phone, user.password, user.email);
         if(!userInfo) throw "Failed to create user";
-
-        if (i != 3, 4, 5){
+        if (i !== 3 && i !== 4 && i !== 5)
+        {
         //create manager
-            user = managerGenerator.next().value;
-            console.log(user.password)
-            userInfo = await create(user.identity, user.username, user.avatar, user.firstName, user.lastName, user.phone, user.password, user.email);
-            if(!userInfo) throw "Failed to create manager";
-            manager_id = userInfo.insertedId.toString();
+          user = managerGenerator.next().value;
+          console.log(user.password)
+          userInfo = await create(user.identity, user.username, user.avatar, user.firstName, user.lastName, user.phone, user.password, user.email);
+          if(!userInfo) throw "Failed to create manager";
+          manager_id = userInfo.insertedId.toString();
 
-            //create hotel
-            hotelInfo = hotelGenerator.next().value;
-            hotelInfo.facilities = [];
-            hotelInfo.managers = [manager_id];
-            console.log(hotelInfo)
-            hotelInfo = await addHotel(hotelInfo.name, hotelInfo.street, hotelInfo.city, hotelInfo.state, hotelInfo.zip_code, hotelInfo.phone, hotelInfo.email, hotelInfo.pictures, hotelInfo.facilities, hotelInfo.managers);
-            if(!hotelInfo) throw "Failed to create hotel";
-            hotel_id = hotelInfo.insertedId.toString();
-            //create room type
-            t = faker.datatype.number(0, 5);
-            
-            roomType = roomTypeGenerator.next().value;
-            console.log("roomType")
-            roomType.hotel_id = hotelInfo.insertedId.toString();
-            roomType.name = room_types[t];
-            roomType.rooms = [];
-            console.log(roomType)
-            roomType = await addRoomType( roomType.hotel_id, roomType.name, roomType.pictures, roomType.price, roomType.rooms);
-            if(!roomType) throw "Failed to create room type";
-            roomType_id = roomType.insertedId.toString();
-            //create room
-            for (let j = 0; j < 2; j++){
-                room = roomGenerator.next(t).value;
-                room.room_type = room_types[t];
-                console.log(room)
-                room.hotel_id = hotelInfo.insertedId.toString();
-                room = await addRoom(room.hotel_id, room.room_number, room.room_type, room.floor, room.pictures);
-                if(!room) throw "Failed to create room";
-                room_id = room.insertedId.toString();
-                console.log("room created")
-            }
-            //create order
-            order = orderGenerator.next().value;
-            order.user_id = userInfo.insertedId.toString();
-            order.hotel_id = hotel_id;
-            order.room_id = room_id;
-            order.hotelName = "hotel" + ref[i]
-            console.log(order)
-            order = await addOrder(order.user_id, order.hotel_id, order.room_id, order.hotelName, order.checkin_date, order.checkout_date, order.guest, order.price, order.status);
-            if(!order) throw "Failed to create order";
+          //create hotel
+          hotelInfo = hotelGenerator.next().value;
+          hotelInfo.facilities = [];
+          hotelInfo.managers = [manager_id];
+          console.log(hotelInfo)
+          hotelInfo = await addHotel(hotelInfo.name, hotelInfo.street, hotelInfo.city, hotelInfo.state, hotelInfo.zip_code, hotelInfo.phone, hotelInfo.email, hotelInfo.pictures, hotelInfo.facilities, hotelInfo.managers);
+          if(!hotelInfo) throw "Failed to create hotel";
+          hotel_id = hotelInfo.insertedId.toString();
+          //create room type
+          t = faker.datatype.number(0, 5);
+          
+          roomType = roomTypeGenerator.next().value;
+          console.log("roomType")
+          roomType.hotel_id = hotelInfo.insertedId.toString();
+          roomType.name = room_types[t];
+          roomType.rooms = [];
+          console.log(roomType)
+          roomType = await addRoomType( roomType.hotel_id, roomType.name, roomType.pictures, roomType.price, roomType.rooms);
+          if(!roomType) throw "Failed to create room type";
+          roomType_id = roomType.insertedId.toString();
+          //create room
+          for (let j = 0; j < 2; j++){
+              room = roomGenerator.next(t).value;
+              room.room_type = room_types[t];
+              console.log(room)
+              room.hotel_id = hotelInfo.insertedId.toString();
+              room = await addRoom(room.hotel_id, room.room_number, room.room_type, room.floor, room.pictures);
+              if(!room) throw "Failed to create room";
+              room_id = room.insertedId.toString();
+              console.log("room created")
+          }
+          //create order
+          order = orderGenerator.next().value;
+          order.user_id = userInfo.insertedId.toString();
+          order.hotel_id = hotel_id;
+          order.room_id = room_id;
+          order.hotelName = "hotel" + ref[i]
+          console.log(order)
+          order = await addOrder(order.user_id, order.hotel_id, order.room_id, order.hotelName, order.checkin_date, order.checkout_date, order.guest, order.price, order.status);
+          if(!order) throw "Failed to create order";
 
-            //create review
-            review = reviewGenerator.next().value;
-            review.user_id = userInfo.insertedId.toString();
-            review.hotel_id = hotel_id;
-            review.order_id = order.insertedId.toString();
-            console.log(review)
-            review = await userFuncs.addReview(review.order_id, review.hotel_id, review.user_id, review.comment, review.rating);
-            if(!review) throw "Failed to create review";
-            }
-            else{
+          //create review
+          review = reviewGenerator.next().value;
+          review.user_id = userInfo.insertedId.toString();
+          review.hotel_id = hotel_id;
+          review.order_id = order.insertedId.toString();
+          console.log(review)
+          review = await userFuncs.addReview(review.order_id, review.hotel_id, review.user_id, review.comment, review.rating);
+          if(!review) throw "Failed to create review";
+      }
+      else{
               //create hotel
-                hotelInfo = hotelGenerator.next().value;
-                hotelInfo.facilities = [];
-                hotelInfo.managers = [userInfo.insertedId];
-                
+              hotelInfo = hotelGenerator.next().value;
+              hotelInfo.facilities = [];
+              hotelInfo.managers = [userInfo.insertedId.toString()];
+              console.log(hotelInfo)
               //create request
-                await userFuncs.addRequest(hotelInfo.name, hotelInfo.street, hotelInfo.city, hotelInfo.state, hotelInfo.zip_code, hotelInfo.phone, hotelInfo.email, hotelInfo.pictures, hotelInfo.facilities, hotelInfo.managers);
-            }
+              await userFuncs.createRequest(hotelInfo.name, hotelInfo.street, hotelInfo.city, hotelInfo.state, hotelInfo.zip_code, hotelInfo.phone, hotelInfo.email, hotelInfo.pictures, hotelInfo.facilities, hotelInfo.managers);
+              console.log("request created")
+      }
 
-        }
+    }
 
 }
 catch(e)
