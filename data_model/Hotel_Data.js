@@ -200,7 +200,7 @@ export async function deleteHotel(id) {
 
 export async function hotelSearch(...args) {
   const hotelCollection = await hotelReg();
-
+  
   let query = {};
   const name = helper.checkString(args[0], "hotel name", true);
   query.name = { $regex: new RegExp(name, "i") };
@@ -212,11 +212,13 @@ export async function hotelSearch(...args) {
   query.state = { $regex: new RegExp(state, "i") };
 
   const zipCode = helper.checkZip(args[3], true);
-  query.zipCode = { $regex: new RegExp(zipCode, "i") };
+  query.zip_code = { $regex: new RegExp(zipCode, "i") };
 
+  console.log(query);
   let hotelList = await hotelCollection.find(query).toArray();
-  if (!hotelList) throw CustomException("Hotel not found", false);
-
+  console.log(hotelList);
+  if (hotelList.length===0) throw CustomException("Hotel not found", false);
+  console.log(hotelList)
   hotelList = hotelList.map((element) => {
     element._id = element._id.toString();
     return element;

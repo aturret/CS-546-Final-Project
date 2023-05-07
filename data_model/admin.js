@@ -16,7 +16,7 @@ import * as userFuncs from "./User_Account.js";
 // }
 
 export async function getAllReq() {
-  const mgrReqCollection = await mgrReqs();
+  const mgrReqCollection = await mgrReq();
   let reqList = await mgrReqCollection.find({}).toArray();
   reqList = reqList.map((element) => {
     element._id = element._id.toString();
@@ -81,7 +81,7 @@ export async function reqApprove(reqId, response) {
   if (request.status !== 'pending') throw CustomException(`The request with ID ${reqId} is already closed`);
   
   const reqCollection = await mgrReq();
-  if (!response) {
+  if (response === 'reject') {
     const requestUpdateInfo = await reqCollection.findOneUpdate(
       { _id: new ObjectId(reqId) },
       { $set: { status: 'reject' } },

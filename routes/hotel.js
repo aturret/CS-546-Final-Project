@@ -9,12 +9,6 @@ import isAuth from "./user.js";
 
 const router = express.Router();
 
-// export const isAuth = (req, res, next) => {
-//   if (!req.isAuthenticated()) {
-//     return res.redirect("/user/login");
-//   }
-//   next();
-// };
 
 export const isMgr = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -60,22 +54,18 @@ router
   })
   //search hotel
   .post(async (req, res) => {
-    const hotel_name = req.body.name;
-    const hotel_city = req.body.city;
-    const hotel_state = req.body.state;
-    const hotel_zip = req.body.zip;
+    const hotel_name = req.body.hotelNameInput;
+    const hotel_city = req.body.hotelCityInput;
+    const hotel_state = req.body.hotelStateInput;
+    const hotel_zip = req.body.hotelZipcodeInput;
     try{
       const result = await hotelFuncs.hotelSearch(hotel_name, hotel_city, hotel_state, hotel_zip);
-      return res.status(200).render("searchHotelResult", { hotels: result });
+      return res.status(200).render("searchHotelsResult", { hotels: result });
     }
     catch(e){
-      const code = req.session && req.session.status ? req.session.status : 200;
-      const error =
-        req.session && req.session.errorMessage
-          ? req.session.errorMessage
-          : undefined;
-      if (req.session) req.session.errorMessage = undefined;
-      if (req.session) req.session.status = undefined;
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      return res.redirect("/");
     }
   });
 
