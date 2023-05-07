@@ -761,6 +761,8 @@ router
 //   }
 // })
 
+// render the single review page by Jichen.
+
 router
   .route("/hotel/:hotelId/hotelManagement/review")
   .get(isMgr, async (req, res) => {
@@ -769,6 +771,7 @@ router
       const hotelReviews = await hotelFuncs.getHotelReview(hotelId);
       hotelReviews.title = `Review Control Panel`;
       res.render('hotelReviews', hotelReviews);
+      res.render('hotelReviews', {hotelReviews: hotelReviews, title: `Review Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
