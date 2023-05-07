@@ -30,7 +30,7 @@
         <p>Phone: {{request.phone}} Email: {{request.email}}</p>
     </div>
 </div>
-
+{{#if (eq request.status "pending")}}
 <div class="requestApplication">
     <div class="application box">
         <div class="left">
@@ -47,6 +47,7 @@
         </div>
     </div>
 </div>
+{{/if}}
 
 <div class="adminPage">
     <a href="/admin">Admin Main Page</a>
