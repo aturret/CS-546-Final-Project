@@ -49,8 +49,8 @@ router
     else req.session = {};
 
 
-    if (errorMessage) return res.status(status).render("landpage", { errorMessage: errorMessage });
-    return res.status(status).render("landpage");
+    if (errorMessage) return res.status(status).render("landpage", { errorMessage: errorMessage,title:"HotelFinder" });
+    return res.status(status).render("landpage",{title:"HotelFinder"});
   })
   //search hotel
   .post(async (req, res) => {
@@ -60,7 +60,36 @@ router
     const hotel_zip = req.body.hotelZipcodeInput;
     try{
       const result = await hotelFuncs.hotelSearch(hotel_name, hotel_city, hotel_state, hotel_zip);
-      return res.status(200).render("searchHotelsResult", { hotels: result });
+      const hotelList = [];
+      const hotelInfo = {};
+      let price = undefined;
+      let roomTypeInfo = undefined
+      for (let i = 0; i < result.length; i++){
+        for(let j = 0; j < result[i].room_types.length; j++){
+          roomTypeInfo = await hotelFuncs.getHotelRoomType(result[i]._id);
+          if(price === undefined) {
+             price = roomTypeInfo[j].price;
+          }
+          else if(roomTypeInfo.price < price){
+            price = roomTypeInfo.price;
+          }
+        }
+        hotelInfo.hotelPrice = price;
+        hotelInfo.hotelId = result[i]._id;
+        hotelInfo.hotelAddress = result[i].street + ", " + result[i].city + ", " + result[i].state + ", " + result[i].zip_code;
+        hotelInfo.hotelName = result[i].name;
+        hotelInfo.hotelId = result[i]._id;
+        hotelInfo.hotelPicture = result[i].pictures;
+        hotelInfo.hotelPhone = result[i].phone;
+        hotelInfo.hotelEmail = result[i].email;
+        hotelInfo.hotelRoom = result[i].rooms;
+        hotelInfo.hotelRoomTypes = result[i].room_types;
+        hotelInfo.hotelReviewNumber = result[i].reviews.length;
+        hotelInfo.hotelRating = result[i].overall_rating;
+        hotelList.push(hotelInfo);
+      }
+      console.log(hotelList);
+      return res.status(200).render("searchHotelsResult", { hotels: hotelList});
     }
     catch(e){
       req.session.status = e.code ? e.code : 500;
@@ -85,23 +114,31 @@ router
     //TODO: get hotel information
     //get hotel information
     try{
+      const user = req.user;
+      let manageable = "false";
+      if (user){
+        if ((user.identity === 'manager' && user.hotel !== hotel_id) || user.identity === 'admin'){
+          manageable = "true";
+        }
+      }
       const hotel = await hotelFuncs.getHotel(hotel_id);
       const hotelInfo = {};
-      hotelInfo.hotelId = hotel.hotelId;
-      hotelInfo.hotelName = hotel.hotel_name;
+      hotelInfo.hotelId = hotel._id;
+      hotelInfo.hotelName = hotel.name;
       hotelInfo.hotelPhoto = hotel.pictures;
       hotelInfo.hotelRating = hotel.rating;
-      hotelInfo.hotelAddress = hotel.address + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code;
+      hotelInfo.hotelAddress = hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code;
       hotelInfo.hotelPhone = hotel.phone;
       hotelInfo.hotelEmail = hotel.email;
       hotelInfo.roomType = hotel.room_type;
+      hotelInfo.manageable = manageable;
       //get hotel room
       const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
       hotelInfo.roomType = roomTypes;
       //get hotel review
       const reviews = await hotelFuncs.getHotelReview(hotel_id);
       hotelInfo.reviews = reviews;
-      return res.status(status).render("hotel", hotelInfo);
+      return res.status(status).render("hotel", {hotelInfo, title: hotel.name});
     }
     catch(e){
       req.session.status = e.code ? e.code : 500;
@@ -139,7 +176,7 @@ router
       //get hotel review
       const reviews = await hotelFuncs.getHotelReview(hotel_id);
       hotelInfo.reviews = reviews;
-      return res.status(status).render("hotel", hotelInfo);
+      return res.status(status).render("hotel", {hotelInfo, title: hotel.name});
     }
     catch(e){
       req.session.status = e.code ? e.code : 500;
@@ -157,7 +194,7 @@ router
       const checkout = helper.checkDate(req.body.checkout, true);
 
       const searchResult = await hotelFuncs.checkRoomAvailabilityOrder(hotelId, checkin, checkout); 
-      res.render('searchRoomsResult', {searchResult: searchResult});
+      res.render('searchRoomsResult', {searchResult: searchResult,title:"Room Search Result"});
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -225,7 +262,7 @@ router
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotel = await hotelFuncs.getHotel(hotelId);
-      res.render('hotel_management', {hotel: hotel});
+      res.render('hotel_management', {hotel: hotel, title: `Hotel Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -290,7 +327,7 @@ router
     const hotelId = helper.checkId(req.params.hotelId, true);
     const rooms = await hotelFuncs.getHotelRoom(hotelId);
     const roomTypes = await hotelFuncs.getHotelRoomType(hotelId);
-    res.render('rooms', {rooms: rooms, roomTypes: roomTypes});
+    res.render('rooms', {rooms: rooms, roomTypes: roomTypes, title: `Room Control Panel`});
   })
   .post(isMgr, async (req, res) => {
     try {
@@ -319,7 +356,7 @@ router
     try {
       const roomId = helper.checkId(req.params.roomId, true);
       const room = await hotelFuncs.getRoom(roomId);
-      res.render('singleRoom', {room: room});
+      res.render('singleRoom', {room: room, title: `Room Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -367,7 +404,7 @@ router
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const roomTypes = await hotelFuncs.getHotelRoomType(hotelId);
-      res.render('roomtTypes', {roomTypes: roomTypes});
+      res.render('roomtTypes', {roomTypes: roomTypes, title: `Room Type Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -433,7 +470,7 @@ router
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotel = await hotelFuncs.getHotel(hotelId);
-      res.render('orders', {orders: hotel.orders});
+      res.render('orders', {orders: hotel.orders, title: `Order Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -490,7 +527,7 @@ router
     try {
       const orderId = helper.checkId(req.params.orderId, true);
       const order = await userFuncs.getOrderById(orderId);
-      res.render('singleOrder', {orders: order});
+      res.render('singleOrder', {orders: order, title: `Order Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -539,7 +576,7 @@ router
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotelReviews = await hotelFuncs.getHotelReview(hotelId);
-      res.render('reviews', {hotelReviews: hotelReviews});
+      res.render('reviews', {hotelReviews: hotelReviews, title: `Review Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -602,7 +639,7 @@ router
       const hotelId = helper.checkId(req.params.hotelId, true);
 
       const hotel = await hotelFuncs.getHotel(hotelId);
-      res.render('reviews', {managers: hotel.managers});
+      res.render('hotelManagers', {managers: hotel.managers, title: `Manager Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;

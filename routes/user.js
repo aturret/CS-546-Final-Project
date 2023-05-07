@@ -29,7 +29,7 @@ router
     (req, res) => {
       const error = req.flash("error");
       console.log(error);
-      return res.render("login");
+      return res.render("login",{title: "Login", errorMessage: error});
     }
   )
   .post(
@@ -53,7 +53,7 @@ router
         : undefined;
     if (req.session) req.session.errorMessage = undefined;
     if (req.session) req.session.status = undefined;
-    return res.status(code).render("register", { errorMessage: error });
+    return res.status(code).render("register", { errorMessage: error , title: "Register"});
   })
   .post(async (req, res) => {
     const user = req.body;
@@ -110,7 +110,7 @@ router.route("/dashboard/:username").get(isAuth, async (req, res) => {
       req.session.errorMessage = null;
       const status = req.session.status;
       req.session.status = null;
-      return res.status(status).render("dashboard", user);
+      return res.status(status).render("dashboard", {user, title: "Dashboard"});
     }
     return res.status(200).render("dashboard", user);
   } catch (e) {
@@ -130,7 +130,7 @@ router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) 
     const username = helper.checkString(req.params.username, "username", true);
     const user = await userFuncs.getUser(req.user.username);
     const orders = await userFuncs.getOrder(username);
-    return res.status(200).render("order_history", { user: user, orders: orders });
+    return res.status(200).render("orders", { user: user, orders: orders, title: "Order History" });
   } catch (e) {
     if (!e.code) {
       req.session.status = 500;
@@ -247,11 +247,13 @@ router.route("/dashboard/:username/logout").get(
     if (!req.isAuthenticated()) {
       return res.redirect("/user/login");
     }
-    next();
+    else{
+      req.logout();
+      req.session.destroy();
+      res.redirect("/user/login");
+    }
   },
   (req, res) => {
-    req.logout();
-    req.session.destroy();
     res.redirect("/user/login");
   }
 );
@@ -262,7 +264,7 @@ router
   .get(isAuth, async (req, res) => {
     try {
       const orders = await userFuncs.getOrders(req.user.username);
-      return res.status(200).render("bookings", { orders: orders });
+      return res.status(200).render("bookings", { orders: orders, title: "Bookings" });
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -334,7 +336,7 @@ router.route("/dashboard/:username/hotel_orders")
         }
       */
 
-      return res.status(200).render("order", { order: orders });
+      return res.status(200).render("order", { order: orders, title: "Hotel Orders" });
     } catch {
       if (!e.code) {
         req.session.status = 500;
@@ -421,7 +423,7 @@ router.route("/dashboard/:username/hotel_management").get(
         req.session.errorMessage = null;
       }
       const hotel = await hotelFuncs.getMgrHotel(req.user.username);
-      return res.status(200).render("hotel_management", hotel);
+      return res.status(200).render("hotel_management", {hotel, title: "Hotel Management"});
     } catch (e) {
       //customized error are thrown. if e.code exist its a customized error. Otherwise, its a server error.
       if (!e.code) {
@@ -504,7 +506,7 @@ async (req, res) => {
   try {
     const hotel_id = helper.checkId(req.params.hotel_id);
     const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
-    return res.status(200).render("roomsTypes", roomTypes);
+    return res.status(200).render("roomsTypes", { roomTypes, title: "Room Types Control Panel" });
   } catch (e) {
     //customized error are thrown. if e.code exist its a customized error. Otherwise, its a server error.
     if (!e.code) {
@@ -636,7 +638,7 @@ router
       try {
         const hotel_id = helper.checkId(req.params.hotel_id)
         const rooms = await hotelFuncs.getHotelRoom(hotel_id);
-        return res.status(200).render("rooms", rooms);
+        return res.status(200).render("rooms", {rooms, title: "Rooms Control Panel"});
       } catch (e) {
         if (!e.code) {
           req.session.status = 500;
@@ -740,7 +742,7 @@ router.route("/dashboard/:username/reviews")
     const username = helper.checkUserName(req.params.username, true)
     const reviews = await userFuncs.getReview(username)
     if (!reviews) throw new CustomException("Review not found", true);
-    return res.status(200).render("review", {review: reviews})
+    return res.status(200).render("review", {review: reviews, title: "Your Reviews"});
   }
   catch (e) {
     if (!e.code) {

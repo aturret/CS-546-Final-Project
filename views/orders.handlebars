@@ -16,7 +16,9 @@ order has status: pending, completed, cancelled.
 </div>
 {{/if}}
 <h2>Search Result</h2>
+
 <div class="userOrders">
+    {{#if order}}
     <ol>
         {{#each order}}
         <li>
@@ -48,6 +50,9 @@ order has status: pending, completed, cancelled.
         </li>
        {{/each}}
     </ol>
+    {{else}}
+    <p>No order found. Go to <a href="/">find your own vacation place!</a></p>
+    {{/if}}
 </div>
 <div class="error" id="client">
     <p id="client-error"></p>
