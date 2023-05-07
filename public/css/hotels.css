@@ -121,10 +121,6 @@ section.content{
   display: flex;
   justify-content: center;
   align-items: center;
-<<<<<<< HEAD
-  flex-direction: column;
-  text-align: center;
-=======
 } */
 .adminFunctions {
   display: flex;
@@ -159,7 +155,6 @@ section.content{
     /* border: 1px solid #f5c6cb; */
     font-size: 20px;
     font-style: bold;
->>>>>>> 3f144bf (update)
 }
 
 .adminFunctions div {
