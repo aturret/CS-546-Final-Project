@@ -37,7 +37,7 @@ export async function getAllReq() {
 //   return req;
 // }
 
-export async function getReqByID(id) {
+export async function getReqById(id) {
   id = helper.checkId(id, true);
 
   const mgrReqCollection = await mgrReq();
@@ -56,7 +56,7 @@ export async function getReqByID(id) {
 //   const hotelReqCollection = await hotelReqs();
 //   if (!response) {
 //     const requestUpdateInfo = await hotelReqCollection.findOneAndUpdate(
-//       { _id: ObjectId(id) },
+//       { _id: new ObjectId(id) },
 //       { $set: { status: 'reject' } },
 //       { returnDocument: "after" }
 //     );
@@ -77,7 +77,7 @@ export async function getReqByID(id) {
 
 export async function reqApprove(reqId, response) {
   reqId = helper.checkId(reqId, true);
-  let request = await getReqByID(reqId);
+  let request = await getReqById(reqId);
   if (request.status !== 'pending') throw CustomException(`The request with ID ${reqId} is already closed`);
   
   const reqCollection = await mgrReq();
@@ -109,7 +109,7 @@ export async function reqApprove(reqId, response) {
       request.username, 
       { 
         identity: 'manager',
-        hotel_id: ObjectId(newHotelId)
+        hotel_id: new ObjectId(newHotelId)
       }
     )
     
