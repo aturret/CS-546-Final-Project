@@ -7,7 +7,7 @@ const constructorMethod = app => {
     app.use("/admin", adminRouter)
     app.use("/", hotelRouter)
     app.use("*", (req, res) => {
-        res.status(404).json({Error: "Not found"});
+        res.status(404).render("error", {errorMessage: "Page not found"});
     })
 }
 

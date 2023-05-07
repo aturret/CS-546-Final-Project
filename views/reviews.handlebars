@@ -12,7 +12,6 @@ reviewUserId: the id of the user who wrote the review
     <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
-<h2>{{reviewTitle}}</h2>
 <div class="hotelInfo">
     <div class="hotelName">
         <p>{{hotelName}}</p>
@@ -44,17 +43,17 @@ reviewUserId: the id of the user who wrote the review
             <div class="reviewComment">
                 <p>{{reviewComment}}</p>
             </div>
-            {{#if (or(eq reviewUserId user.userId)(eq user.identity "admin"))}}
+            {{#if (or (eq reviewUserName user.userName) (eq user.identity "admin"))}}
             <div class="editReview">
                 <button id="editReviewButton" onclick="editReview()">Edit</button>
                 <div hidden="true" id="editReviewWindow">
                     {{#if (eq user.identity "admin")}}
-                    <form action="/hotel/{{hotel._id}}/hotelManagement/review" method="PUT">
+                    <form action="/hotel/{{hotelId}}/hotelManagement/review" method="PUT">
                     {{else}}
                     <form action="/reviews/{{reviewId}}" method="PUT">
                     {{/if}}
                         <label for="reviewTitle">Title</label>
-                        <input type="text" name="reviewTitle" placeholder="Review Title" value="{{reviewTitle}}">
+                        <input type="text" name="reviewTitle" placeholder="Review Title">
                         <label for="reviewRating">Rating</label>
                         <select name="reviewRating">
                             <option value="1" {{#if (eq reviewRating 1)}}selected{{/if}}>1</option>
@@ -72,7 +71,7 @@ reviewUserId: the id of the user who wrote the review
             </div>
             <div class="deleteReview">
                 {{#if (eq user.identity "admin")}}
-                <form action="/hotel/{{hotel._id}}/hotelManagement/review" method="DELETE">
+                <form action="/hotel/{{hotelId}}/hotelManagement/review" method="DELETE">
                 {{else}}
                 <form action="/reviews/{{reviewId}}" method="DELETE">
                 {{/if}}
@@ -87,7 +86,6 @@ reviewUserId: the id of the user who wrote the review
                 <p>Upvote: {{reviewUpvotes}}</p>
                 <p>Downvote: {{reviewDownvotes}}</p>
                 <form action="/reviews/{{reviewId}}" method="PATCH">
-                    <input type="hidden" name="hotelIdInput" value="{{hotelId}}">
                     <input type="hidden" name="reviewIdInput" value="{{reviewId}}">
                     <button type="submit" name="reviewVote" value="upvote">Yes</button>
                     <button type="submit" name="reviewVote" value="downvote">No</button>
