@@ -16,7 +16,7 @@ import * as userFuncs from "./User_Account.js";
 // }
 
 export async function getAllReq() {
-  const mgrReqCollection = await mgrReqs();
+  const mgrReqCollection = await mgrReq();
   let reqList = await mgrReqCollection.find({}).toArray();
   reqList = reqList.map((element) => {
     element._id = element._id.toString();
