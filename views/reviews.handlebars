@@ -51,7 +51,6 @@ reviewUserId: the id of the user who wrote the review
                     {{else}}
                     <form action="/reviews/{{reviewId}}" method="POST">
                     {{/if}}
-                    <input type="hidden" name="_method" value="PUT">
                         {{!-- <label for="reviewTitle">Title</label>
                         <input type="text" name="reviewTitle" placeholder="Review Title" value="{{reviewTitle}}"> --}}
                         <label for="reviewRating">Rating</label>
