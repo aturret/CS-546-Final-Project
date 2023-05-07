@@ -505,15 +505,15 @@ export async function getReview(username) {
 
   return reviews;
 }
-
-export async function getReviewById(review_id) {
-  review_id = helper.checkId(review_id, true);
-  const tempReview = await Review();
-  const review = await tempReview.findOne({ _id: new ObjectId(review_id) });
-  if (!review)
-    throw CustomException(`Could not find review with ID ${review_id}`, true);
-  return review;
-}
+// by Jichen. If you don't need this, you can just delete it.
+// export async function getReviewById(review_id) {
+//   review_id = helper.checkId(review_id, true);
+//   const tempReview = await Review();
+//   const review = await tempReview.findOne({ _id: new ObjectId(review_id) });
+//   if (!review)
+//     throw CustomException(`Could not find review with ID ${review_id}`, true);
+//   return review;
+// }
 
 export async function addReview(order_id, hotel_id, user_id, review, rating) {
   //rating is 1-5 stars
@@ -600,6 +600,7 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
 
 /*-------------get review by id------------*/
 export async function getReviewById(review_id) {
+  console.log("review_id: " + review_id);
   review_id = ObjectId(helper.checkId(review_id, true));
   const tempReview = await Review();
 
@@ -733,7 +734,8 @@ export async function deleteReview(review_id) {
   const tempHotel = await hotelReg();
   const hotelInfo = await tempHotel.findOneAndUpdate(
     { _id: new ObjectId(hotel_id) },
-    { $pull: { reviews: review_id } }
+    { $pull: { reviews: review_id } },
+    { returnDocument: "after"}
   );
   if (hotelInfo.lastErrorObject.n === 0)
     throw CustomException(`Could not update hotel with id ${hotel_id}`, true);
@@ -743,15 +745,16 @@ export async function deleteReview(review_id) {
     { _id: new ObjectId(hotel_id) },
     { reviews: 1 }
   );
-  if (hotelInfo.reviews.length === 0)
+  if (hotelInfo.value.reviews.length === 0)
     throw CustomException(`Could not find hotel with id ${hotel_id}`, true);
   let sum = 0;
-  for (let i of hotel_reviews) {
-    const tempReview = await tempReview.findOne(
+  for (let i of hotel_reviews.reviews) {
+    const tempReview = await Review();
+    const tempSingleReview = await tempReview.findOne(
       { _id: new ObjectId(i) },
       { rating: 1 }
     );
-    sum += tempReview.rating;
+    sum += tempSingleReview.rating;
   }
   let overallRating = sum / hotel_reviews.length;
   overallRating = overallRating.toFixed(2);
@@ -770,17 +773,18 @@ export async function deleteReview(review_id) {
   //delete review for order
   const tempOrder = await Order();
   const orderInfo = await tempOrder.findOneAndUpdate(
-    { review: review_id },
-    { $set: { review: "" } }
+    { review: new ObjectId(review_id)},
+    { $set: { review: "" } },
+    { returnDocument: "after" }
   );
   if (orderInfo.lastErrorObject.n === 0)
-    throw CustomException(`Could not update order with id ${order_id}`, true);
+    throw CustomException(`Could not update order with id ${orderInfo._id}`, true);
 
   const deleteInfo = await tempReview.deleteOne({
     _id: new ObjectId(review_id),
   });
   if (deleteInfo.deletedCount.n === 0)
-    throw CustomException(`Could not delete review with id ${review_id}`, true);
+    throw CustomException(`Could not delete review with id ${deleteInfo._id}`, true);
 
   return { message: "Review deleted." };
 }
