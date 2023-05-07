@@ -23,13 +23,13 @@ router
   .route('/')
   .get(isAdmin, async (req, res) => {
     try{
-      req.user.username = helper.checkString(req.user.username)
-      const user = await userFuncs.getUser(req.user.username)
-      return res.render('admin', user)
+      req.user.username = helper.checkString(req.user.username);
+      const user = await userFuncs.getUser(req.user.username);
+      return res.render('admin',{user, title: "Admin Control Panel" })
     }
     catch(e){
       if (!e.code){ 
-        res.status(404).render('/user/register', { errorMessage: e.message });
+        res.status(404).render('/user/register', { errorMessage: e.message,title: "404 Not Found" });
       }
       else
       {
@@ -43,7 +43,7 @@ router
   .route('/requests')
   .get(isAdmin, async (req, res) => {
     const reqList = await adminFuncs.getAllReq();
-    res.render('requests', { reqList: reqList });
+    res.render('requests', { reqList: reqList,title: "Hotel Application Processing Panel" });
   })
 
 router
@@ -52,7 +52,7 @@ router
     try {
       const requestId = helper.checkId(req.params.requestId, true);
       const request = await adminFuncs.getReq(requestId);
-      res.render('requestById', { request: request });
+      res.render('requestById', { request: request,title:"Hotel Application Processing Panel" });
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -87,7 +87,7 @@ router
     try {
       const username = helper.checkString(req.body.usernameInput, "username", true);
       const user = await userFuncs.getUser(username)
-      res.render('adminAccounts', { user: user });
+      res.render('adminAccounts', { user: user ,title:"User Management Panel"});
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -95,7 +95,7 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      return res.redirect("/account");
+      return res.redirect("/admin/accounts");
     }
   })
   .post(isAdmin, async (req, res) => {
@@ -159,7 +159,7 @@ router
       // }
 
       req.flash(newUserMessage);
-      return res.redirect("/admin/account");
+      return res.redirect("/admin/accounts");
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -167,7 +167,7 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      return res.redirect("/admin/account");
+      return res.redirect("/admin/accounts");
     }
   })
   .put(isAdmin, async (req, res) => {
@@ -255,7 +255,7 @@ router
 router
   .route('/createHotel')
   .get(isAdmin, async (req, res) => {
-    res.render('adminHotel', {});
+    res.render('adminHotel', {title:"Hotel Creating Panel"});
   })
   .post(isAdmin, async (req, res) => {
     try {
