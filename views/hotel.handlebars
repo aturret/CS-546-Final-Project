@@ -26,7 +26,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
             <img src="{{hotelPhoto}}">
         </div>
         <div class="hotelRating">
-            <p>Rating: {{overall_rating}}</p>
+            <p>Rating: {{hotelRating}}</p>
         </div>
     </div>
     <div class="hotelIntro">
@@ -54,7 +54,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
     </div>
     {{else}}
     <div class="booking">
-        <p>Please <a href="/register">log in</a> to book a room.</p>
+        <p>Please <a href="/user/login">log in</a> to book a room.</p>
     </div>
     {{/if}}
 </div>
@@ -70,7 +70,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
                     <div class="reviewUserItem">
                         <div class="reviewUserPhoto"><img src="{{this.userAvatar}}"></div>
                         <div class="reviewUserName">
-                            <p><a href="/reviews/{{this._id}}">{{this.userName}}</a></p>
+                            <p><a href="/hotel/{{hotelId}}/reviews/{{this._id}}">{{this.userName}}</a></p>
                         </div>
                     </div>
                     <div class="reviewContentItem">

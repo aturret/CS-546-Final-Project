@@ -510,8 +510,8 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
   review = helper.checkString(review, "review", true);
   rating = helper.checkRating(rating, true);
   const newReview = {
-    hotel_id: hotel_id,
-    user_id: user_id,
+    hotel_id: new ObjectId(hotel_id),
+    user_id: new ObjectId(user_id),
     comment: review,
     rating: rating,
     upvote: 0,

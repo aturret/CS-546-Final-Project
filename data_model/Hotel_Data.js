@@ -229,44 +229,31 @@ export async function getHotelReview(id) {
   id = new ObjectId(helper.checkId(id, true));
   const tempHotel = await hotelReg();
 
-  const reviewInfo = tempHotel.aggregate([
-    { $match: { _id: id } },
-    {
-      $lookup: {
-        from: "reviews",
-        localField: "reviews",
-        foreignField: "_id",
-        as: "reviews"
-      }
-    },
-    { $unwind: "$reviews" },
-    {
-      $lookup: {
-        from: "users",
-        localField: "reviews.user_id",
-        foreignField: "_id",
-        as: "user"
-      }
-    },
-    {
-      $addFields: {
-        "reviews.user": { $arrayElemAt: ["$user", 0] },
-      }
-    },
-    {
-      $project: {
-        _id: "$reviews._id",
-        rating: "$reviews.rating",
-        comment: "$reviews.comment",
-        upVote: "$reviews.upvote",
-        downVote: "$reviews.downvote",
-        userAvatar: "$reviews.user.avatar",
-        username: "$reviews.user.username"
-      }
-    }
-  ]).toArray();
+  //get hotel review
+  const reviewInfo = await tempHotel.findOne({ _id: id }, { reviews: 1 });
+  const reviewId = reviewInfo.reviews;
+
+  //get review
+  const tempReview = await Review();
+  const reviewList = await tempReview.find({ _id: { $in: reviewId } }).toArray();
+  if (reviewList.length === 0) throw CustomException("Review not found", false);
+
+  //get user 
+  console.log(reviewList)
+  const tempAccount = await Account();
+  for (let i of reviewList)
+  {
+    const userInfo = await tempAccount.findOne({ _id: i.user_id }, { username: 1, avatar: 1 });
+    i.upVote = i.upvote
+    i.downVote = i.downvote
+    i.upvote = null
+    i.downvote = null
+    i.userName = userInfo.username;
+    i.userAvatar = userInfo.avatar;
+  }
+  console.log(reviewList)
   if (!reviewInfo) throw CustomException("Hotel not found", false);
-  return reviewInfo;
+  return reviewList;
 }
 
 

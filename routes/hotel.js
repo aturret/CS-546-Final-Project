@@ -48,8 +48,8 @@ router
     }
     else req.session = {};
 
-
     if (errorMessage) return res.status(status).render("landpage", { errorMessage: errorMessage,title:"HotelFinder" });
+
     return res.status(status).render("landpage",{title:"HotelFinder"});
   })
   //search hotel
@@ -89,7 +89,7 @@ router
         hotelList.push(hotelInfo);
       }
       console.log(hotelList);
-      return res.status(200).render("searchHotelsResult", { hotels: hotelList});
+      return res.status(200).render("searchHotelsResult", { hotels: hotelList, title: "Hotel search result" });
     }
     catch(e){
       req.session.status = e.code ? e.code : 500;
@@ -98,6 +98,26 @@ router
     }
   });
 
+//TODO: Hotel searching result page
+router
+  .route("/hotel/:hotelId/reviews/:reviewId")
+  .get(async (req, res) =>
+  {
+    const hotel_id = ObjectId(req.params.hotelId);
+    const review_id = ObjectId(req.params.reviewId);
+    const errorMessage = req.session && req.session.errorMessage || null;
+    const status = req.session && req.session.status || 200;
+    if (req.session) {
+      req.session.status = null;
+      req.session.errorMessage = null;
+    }
+    if (errorMessage)
+    {
+      return res.status(status).render("hotelReview", { errorMessage: errorMessage, title: "Review" });
+    }
+    return res.status(status).render("hotelReview", { title: "Review" });
+    
+  });
 //TODO: Hotel detail page
 router
   .route("/hotel/:hotelId")
@@ -126,7 +146,7 @@ router
       hotelInfo.hotelId = hotel._id;
       hotelInfo.hotelName = hotel.name;
       hotelInfo.hotelPhoto = hotel.pictures;
-      hotelInfo.hotelRating = hotel.rating;
+      hotelInfo.HotelRating = hotel.overall_rating;
       hotelInfo.hotelAddress = hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code;
       hotelInfo.hotelPhone = hotel.phone;
       hotelInfo.hotelEmail = hotel.email;
@@ -137,8 +157,10 @@ router
       hotelInfo.roomType = roomTypes;
       //get hotel review
       const reviews = await hotelFuncs.getHotelReview(hotel_id);
+      console.log(reviews);
       hotelInfo.reviews = reviews;
-      return res.status(status).render("hotel", {hotelInfo, title: hotel.name});
+      hotelInfo.title = hotel.name;
+      return res.status(status).render("hotel", hotelInfo);
     }
     catch(e){
       req.session.status = e.code ? e.code : 500;
@@ -193,8 +215,9 @@ router
       const checkin = helper.checkDate(req.body.checkin, true);
       const checkout = helper.checkDate(req.body.checkout, true);
 
-      const searchResult = await hotelFuncs.checkRoomAvailabilityOrder(hotelId, checkin, checkout); 
-      res.render('searchRoomsResult', {searchResult: searchResult,title:"Room Search Result"});
+      const searchResult = await hotelFuncs.checkRoomAvailabilityOrder(hotelId, checkin, checkout);
+      searchResult.title =  "Room Search Result"
+      res.render('searchRoomsResult', {searchResult: searchResult});
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
