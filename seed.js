@@ -70,8 +70,8 @@ async function create(...args) {
   args[6] = helper.checkPassword(args[6], true);
   user.email = helper.checkEmail(args[7], true);
   user.hotel_id = "";
-  user.orders = [];
-  user.voteId = [];
+  user.orders = {};
+
   user.password = await bcrypt.hash(args[6], saltRounds);
 
   const tempAccount = await Account();
@@ -176,7 +176,7 @@ export async function addRoom(...args) {
   if (!/^\d{1,5}$/.test(room_number))
     throw CustomException(`Invalid room number.`, true);
   const room_type = helper.checkString(args[2], "room type", true);
-  const orders = [];
+  const order = {};
 
   //check if hotel exists
   const tempHotel = await hotelReg();
@@ -197,7 +197,7 @@ export async function addRoom(...args) {
     hotel_id: hotel_id,
     room_number: room_number,
     room_type: room_type,
-    order: orders,
+    order: order,
   };
 
   //check if room exists
@@ -359,7 +359,7 @@ try {
 
       //create hotel
       hotelInfo = hotelGenerator.next().value;
-      hotelInfo.facilities = ["wifi", "parking", "pool", "gym"];
+      hotelInfo.facilities = [];
       hotelInfo.managers = [manager_id];
       console.log(hotelInfo);
       hotelInfo = await addHotel(

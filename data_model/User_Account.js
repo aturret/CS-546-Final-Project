@@ -73,7 +73,7 @@ export async function create(...args) {
   args[6] = helper.checkPassword(args[6], true);
   user.email = helper.checkEmail(args[7], true);
   user.hotel_id = "";
-  user.orders = [];
+  user.orders = {};
 
   user.password = await bcrypt.hash(args[6], saltRounds);
 
@@ -404,7 +404,6 @@ export async function getOrderById(orderId) {
 }
 
 export async function addOrder(...args) {
-  console.log(args.length)
   if (args.length < 9) throw CustomException("Missing inputs.");
   let set = {};
   set.hotel_id = new ObjectId(helper.checkId(args[0]), true);
@@ -427,8 +426,7 @@ export async function addOrder(...args) {
   //update user account, and add order to order database
   const tempOrder = await Order();
   const tempAccount = await Account();
-  const orderInfo = await tempOrder.insertOne(set);
-  console.log(orderInfo)
+  const orderInfo = tempOrder.insertOne(set);
   if (!orderInfo) throw CustomException(`Could not add the order.`, true);
   const updateInfo = await tempAccount.findOneAndUpdate(
     { _id: set.user_id },
@@ -441,15 +439,14 @@ export async function addOrder(...args) {
       true
     );
 
-  //update room = await Room();
+  //update room
   const tempRoom = await Room();
   const roomInfo = await tempRoom.findOneAndUpdate(
-    { _id: set.room_id },
-    { $addToSet: { order: orderInfo.insertedId } },
+    { _id: new ObjectId(args.room_id) },
+    { $addToSet: { orders: orderInfo.insertedId } },
     { returnDocument: "after" }
   );
-  console.log(roomInfo)
-  if (!roomInfo.lastErrorObject.updatedExisting)
+  if (!roomInfo)
     throw CustomException(
       `Could not update the room with id ${set.room_id}`,
       true
@@ -545,15 +542,6 @@ export async function getReview(username) {
 
   return reviews;
 }
-// by Jichen. If you don't need this, you can just delete it.
-// export async function getReviewById(review_id) {
-//   review_id = helper.checkId(review_id, true);
-//   const tempReview = await Review();
-//   const review = await tempReview.findOne({ _id: new ObjectId(review_id) });
-//   if (!review)
-//     throw CustomException(`Could not find review with ID ${review_id}`, true);
-//   return review;
-// }
 
 
 export async function addReview(order_id, hotel_id, user_id, review, rating) {
@@ -644,7 +632,7 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
 /*-------------get review by id------------*/
 export async function getReviewById(review_id) {
   console.log("review_id: " + review_id);
-  review_id = ObjectId(helper.checkId(review_id, true));
+  review_id = helper.checkId(review_id, true)
   const tempReview = await Review();
 
   //get review
@@ -788,28 +776,31 @@ export async function deleteReview(review_id) {
   );
   if (hotelInfo.value.reviews.length === 0)
     throw CustomException(`Could not find hotel with id ${hotel_id}`, true);
-  let sum = 0;
-  for (let i of hotel_reviews.reviews) {
-    const tempReview = await Review();
-    const tempSingleReview = await tempReview.findOne(
-      { _id: new ObjectId(i) },
-      { rating: 1 }
-    );
-    sum += tempSingleReview.rating;
-  }
-  let overallRating = sum / hotel_reviews.length;
-  overallRating = overallRating.toFixed(2);
-  overallRating = parseFloat(overallRating);
-  const updateHotel = await tempHotel.findOneAndUpdate(
-    { _id: new ObjectId(hotel_id) },
-    { $set: { overall_rating: overallRating } },
-    { returnDocument: "after" }
-  );
-  if (updateHotel.lastErrorObject.n === 0)
-    throw CustomException(
-      `Could not update the hotel with id ${hotel_id}`,
-      true
-    );
+  
+  //recalculate overall rating
+  recalculateOverall(hotel_id);
+  // let sum = 0;
+  // for (let i of hotel_reviews.reviews) {
+  //   const tempReview = await Review();
+  //   const tempSingleReview = await tempReview.findOne(
+  //     { _id: new ObjectId(i) },
+  //     { rating: 1 }
+  //   );
+  //   sum += tempSingleReview.rating;
+  // }
+  // let overallRating = sum / hotel_reviews.length;
+  // overallRating = overallRating.toFixed(2);
+  // overallRating = parseFloat(overallRating);
+  // const updateHotel = await tempHotel.findOneAndUpdate(
+  //   { _id: new ObjectId(hotel_id) },
+  //   { $set: { overall_rating: overallRating } },
+  //   { returnDocument: "after" }
+  // );
+  // if (updateHotel.lastErrorObject.n === 0)
+  //   throw CustomException(
+  //     `Could not update the hotel with id ${hotel_id}`,
+  //     true
+  //   );
 
   //delete review for order
   const tempOrder = await Order();

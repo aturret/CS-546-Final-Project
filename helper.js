@@ -38,10 +38,7 @@ export function checkArray(arr, key, flag){
 }
 
 export function checkDate(date, flag){
-    console.log(date)
     if(!date || typeof date !== "string" || date.trim().length === 0) throw new CustomException("Date must exist and must be a non empty string.", flag);
-    date = date.replace(/-/g, '/')
-    console.log(date)
     if(!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw new CustomException("Date must be a valid date.", flag);
     date = date.trim();
     let temp = +date.split("/")[0];
@@ -104,7 +101,7 @@ export function checkGuests(obj, flag)
     if (!obj || !Array.isArray(obj)) throw new CustomException("Object must exist and must be an object.", flag);
     for (let guest of obj){
         guest.firstName = checkNameString(guest.firstName, "First name", true)
-        guest.lastName = checkNameString(guest.lastName, "Last name", true)
+        guest.lastName = checkNameString(guest.lastName, "last name", true)
     }
 
     return obj

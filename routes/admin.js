@@ -103,9 +103,8 @@ router
     }
   })
   .patch(isAdmin, async (req, res) => {
-    let searchedUsername = req.body.searchedUsername;
     let username = req.body.usernameInput;
-    // let avatar = req.body.avatarInput;
+    let avatar = req.body.avatarInput;
     let firstName = req.body.firstNameInput;
     let lastName = req.body.lastNameInput;
     let phone = req.body.phoneInput;
@@ -116,11 +115,7 @@ router
       if (password !== confirmPassword) {
         throw CustomException("Password and confirm password do not match.", true);
       }
-      searchedUsername = helper.checkString(
-        searchedUsername, 
-        "searched username", 
-        true
-      );
+      const searchedUsername = helper.checkString(req.body.searchedUsername, "searched username", true);
       username = helper.checkString(
         username,
         "username",
@@ -141,7 +136,7 @@ router
       email = helper.checkEmail(email, true);
       const set = {
         username: username,
-        // avatar: avatar,
+        avatar: avatar,
         firstName: firstName,
         lastName: lastName,
         phone: phone,
@@ -150,9 +145,8 @@ router
       };
       const updatedUser = await userFuncs.updateUser(searchedUsername, set);
 
-      const researchedUser = await userFuncs.getUser(username);
       req.flash('Update User sucessfully');
-      return res.render('adminAccounts', { searchedUsername: username, searchedUser: researchedUser ,title:"User Management Panel"});
+      return res.redirect(`/admin/accounts`); //Jichen: if you use redirect, it would be a get request.
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -180,7 +174,7 @@ router
     }
   })
 
-  router
+router
   .route('/accounts/createNewAccount')
   .get(isAdmin, (req, res) => {
     const code = req.session && req.session.status ? req.session.status : 200;

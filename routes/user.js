@@ -249,10 +249,7 @@ router.route("/dashboard/:username/logout").get(
       return res.redirect("/user/login");
     }
     else{
-      req.logout(function(err) {
-        if (err) { return next(err); }
-        res.redirect('/');
-      });
+      req.logout();
       req.session.destroy();
       res.redirect("/user/login");
     }
