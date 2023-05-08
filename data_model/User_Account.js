@@ -19,6 +19,7 @@ async function recalculateOverall(hotel_id) {
   const tempHotel = await hotelReg();
   const tempReview = await Review();
   let sum = 0;
+  let overallRating = 0;
   if (newHotel.reviews.length === 0) { overallRating = NaN }
   else {
     for (let i = 0; i < newHotel.reviews.length; i++) {
