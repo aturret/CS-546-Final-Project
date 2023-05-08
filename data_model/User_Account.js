@@ -608,7 +608,7 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
     throw CustomException(`Could not find hotel with id ${hotel_id}`, true);
 
   //calculate overall rating
-  recalculateOverall(hotel_id);
+  await recalculateOverall(hotel_id);
 //   let sum = 0;
 //   for (let i = 0; i < newHotel.reviews.length; i++) {
 //     const reviewInfo = await tempReview.findOne(
@@ -723,7 +723,7 @@ export async function updateReview(review_id, review, rating) {
   );
   if (hotelInfo.reviews.length === 0)
     throw CustomException(`Could not find hotel with id ${hotel_id}`, true);
-    recalculateOverall(hotel_id);
+  await recalculateOverall(hotel_id);
   // let sum = 0;
   // for (let i of hotel_reviews) {
   //   const tempReview = await tempReview.findOne(
@@ -778,7 +778,7 @@ export async function deleteReview(review_id) {
     throw CustomException(`Could not find hotel with id ${hotel_id}`, true);
   
   //recalculate overall rating
-  recalculateOverall(hotel_id);
+  await recalculateOverall(hotel_id);
   // let sum = 0;
   // for (let i of hotel_reviews.reviews) {
   //   const tempReview = await Review();
