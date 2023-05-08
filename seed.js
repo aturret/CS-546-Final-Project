@@ -70,7 +70,7 @@ async function create(...args) {
   args[6] = helper.checkPassword(args[6], true);
   user.email = helper.checkEmail(args[7], true);
   user.hotel_id = "";
-  user.orders = {};
+  user.orders = [];
 
   user.password = await bcrypt.hash(args[6], saltRounds);
 

@@ -426,6 +426,7 @@ export async function addOrder(...args) {
   const tempAccount = await Account();
   const orderInfo = await tempOrder.insertOne(set);
   if (!orderInfo) throw CustomException(`Could not add the order.`, true);
+  console.log(orderInfo)
   const updateInfo = await tempAccount.findOneAndUpdate(
     { _id: set.user_id },
     { $addToSet: { orders: orderInfo.insertedId } },
