@@ -51,7 +51,7 @@ router
   .get(isAdmin, async (req, res) => {
     try {
       const requestId = helper.checkId(req.params.requestId, true);
-      const request = await adminFuncs.getReq(requestId);
+      const request = await adminFuncs.getReqById(requestId);
       res.render('requestById', { request: request,title:"Hotel Application Processing Panel" });
     } catch (e) {
       if (!e.code) {
@@ -60,7 +60,7 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      return res.redirect("/request");
+      return res.redirect("/admin/requests");
     }
   })
   .post(isAdmin, async (req, res) => {
@@ -68,8 +68,9 @@ router
       const requestId = helper.checkId(req.params.requestId, true);
       const response = req.body.response;
       const message = await adminFuncs.reqApprove(requestId, response);
+      
       req.flash(message);
-      return res.redirect("/request");
+      return res.redirect("/admin/requests");
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -77,89 +78,20 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      return res.redirect("/request/:requestId");
+      return res.redirect("/admin/requests/:requestId");
     }
   })
 
 router
   .route('/accounts')
   .get(isAdmin, async (req, res) => {
-    try {
-      const username = helper.checkString(req.body.usernameInput, "username", true);
-      const user = await userFuncs.getUser(username)
-      res.render('adminAccounts', { user: user ,title:"User Management Panel"});
-    } catch (e) {
-      if (!e.code) {
-        req.session.status = 500;
-      } else {
-        req.session.status = e.code;
-      }
-      req.session.errorMessage = e.message;
-      return res.redirect("/admin/accounts");
-    }
+    res.render('adminAccounts', { title:"User Management Panel" });
   })
   .post(isAdmin, async (req, res) => {
-    // let identity = req.body.identityInput;
-    let username = req.body.usernameInput;
-    let avatar = req.body.avatarInput;
-    let firstName = req.body.firstNameInput;
-    let lastName = req.body.lastNameInput;
-    let phone = req.body.phoneInput;
-    let password = req.body.passwordInput;
-    let email = req.body.emailInput;
     try {
-      username = helper.checkString(username, "username", true);
-      role = helper
-        .checkRole(role, "identity", true)
-        .toLowerCase();
-      if (["manager", "user", "admin"].every((obj) => obj !== role))
-        throw CustomException("Invalid identity.", true);
-        avatar = avatar
-        ? helper.checkWebsite(avatar, true)
-        : undefined;
-      firstName = helper.checkNameString(
-        firstName,
-        "first name",
-        true
-      );
-      lastName = helper.checkNameString(
-        lastName,
-        "last name",
-        true
-      );
-      phone = phone ? helper.checkPhone(phone, true) : undefined;
-      password = helper.checkPassword(password, true);
-      email = helper.checkEmail(email, true);
-      
-      const args = [
-        'user',
-        username,
-        avatar,
-        firstName,
-        lastName,
-        phone,
-        password,
-        email,
-        []
-      ]
-
-      const newUserMessage = await userFuncs.create(args);
-
-      // if (identity === 'manager') {
-      //   const hotel = {};
-      //   hotel.name = helper.checkString(req.body.nameInput, "hotel name", true);
-      //   hotel.street = helper.checkString(req.body.streetInput, "street", true);
-      //   hotel.city = helper.checkString(req.body.cityInput, "city", true);
-      //   hotel.state = helper.checkString(req.body.stateInput, "state", true);
-      //   hotel.zip_code = helper.checkZip(req.body.zip_codeInput, true);
-
-      //   const addMgrMessage = await adminFuncs.addMgr(req.user.username, username, hotel);
-      //   req.flash(addMgrMessage);
-      //   return res.redirect("/admin/account");
-      // }
-
-      req.flash(newUserMessage);
-      return res.redirect("/admin/accounts");
+      const searchedUsername = helper.checkString(req.body.usernameInput, "username", true);
+      const searchedUser = await userFuncs.getUser(searchedUsername)
+      res.render('adminAccounts', { searchedUsername: searchedUsername, searchedUser: searchedUser ,title:"User Management Panel"});
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -170,24 +102,26 @@ router
       return res.redirect("/admin/accounts");
     }
   })
-  .put(isAdmin, async (req, res) => {
-    // let identity = req.body.identityInput;
+  .patch(isAdmin, async (req, res) => {
     let username = req.body.usernameInput;
     let avatar = req.body.avatarInput;
     let firstName = req.body.firstNameInput;
     let lastName = req.body.lastNameInput;
     let phone = req.body.phoneInput;
     let email = req.body.emailInput;
+    let password = req.body.passwordInput;
+    let confirmPassword = req.body.confirmPasswordInput;
     try {
-      if (["manager", "user", "admin"].every((obj) => obj !== identity))
-        throw CustomException("Invalid identity.", true);
-
+      if (password !== confirmPassword) {
+        throw CustomException("Password and confirm password do not match.", true);
+      }
+      const searchedUsername = helper.checkString(req.body.searchedUsername, "searched username", true);
       username = helper.checkString(
         username,
         "username",
         true
       );
-      avatar = helper.checkWebsite(avatar, true);
+      // avatar = helper.checkWebsite(avatar, true);
       firstName = helper.checkNameString(
         firstName,
         "first name",
@@ -209,22 +143,10 @@ router
         password: password,
         email: email
       };
-      const updatedUser = await userFuncs.updateUser(req.user.username, set);
+      const updatedUser = await userFuncs.updateUser(searchedUsername, set);
 
-      // if (identity === 'manager') {
-      //   const hotel = {};
-      //   hotel.name = helper.checkString(req.body.nameInput, "hotel name", true);
-      //   hotel.street = helper.checkString(req.body.streetInput, "street", true);
-      //   hotel.city = helper.checkString(req.body.cityInput, "city", true);
-      //   hotel.state = helper.checkString(req.body.stateInput, "state", true);
-      //   hotel.zip_code = helper.checkZip(req.body.zip_codeInput, true);
-
-      //   const addMgrMessage = await adminFuncs.addMgr(req.user.username, username, hotel);
-      //   req.flash(addMgrMessage);
-      //   return res.redirect("/admin/account");
-      // }
-      req.flash('Update sucessfully');
-      return res.redirect(`/admin/accounts`);
+      req.flash('Update User sucessfully');
+      return res.redirect(`/admin/accounts`); //Jichen: if you use redirect, it would be a get request.
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -237,8 +159,8 @@ router
   })
   .delete(isAdmin, async (req, res) => {
     try {
-      const username = helper.checkString(req.params.username, "username", true);
-      const deleteMessage = await userFuncs.deleteAccount(username);
+      const searchedUsername = helper.checkString(req.body.searchedUsername, "searched username", true);
+      const deleteMessage = await userFuncs.deleteAccount(searchedUsername);
       req.flash(deleteMessage)
       res.redirect("/admin/accounts");
     } catch (e) {
@@ -251,6 +173,63 @@ router
       return res.redirect("/admin/accounts");
     }
   })
+
+router
+  .route('/accounts/createNewAccount')
+  .get(isAdmin, (req, res) => {
+    const code = req.session && req.session.status ? req.session.status : 200;
+    const error =
+      req.session && req.session.errorMessage
+        ? req.session.errorMessage
+        : undefined;
+    if (req.session) req.session.errorMessage = undefined;
+    if (req.session) req.session.status = undefined;
+    return res.status(code).render("createNewAccount", { errorMessage: error , title: "Create new user"});
+  })
+  .post(isAdmin, async (req, res) => {
+    const user = req.body;
+    try {
+      user.username = helper.checkString(user.username, "username", true);
+      
+      user.avatar = user.avatar
+        ? helper.checkWebsite(user.avatar, true)
+        : undefined;
+      user.firstNameInput = helper.checkNameString(
+        user.firstNameInput,
+        "first name",
+        true
+      );
+      user.lastNameInput = helper.checkNameString(
+        user.lastNameInput,
+        "last name",
+        true
+      );
+      user.phone = user.phone ? helper.checkPhone(user.phone, true) : undefined;
+      user.passwordInput = helper.checkPassword(user.passwordInput, true);
+      user.emailAddressInput = helper.checkEmail(user.emailAddressInput, true);
+
+      const createNewAccountMessage = await userFuncs.create(
+        'user',
+        user.username,
+        user.avatar,
+        user.firstNameInput,
+        user.lastNameInput,
+        user.phone,
+        user.passwordInput,
+        user.emailAddressInput
+      );
+      req.flash(createNewAccountMessage);
+      return res.redirect("/admin/accounts");
+    } catch (e) {
+      if (!e.code) {
+        req.session.status = 500;
+      } else {
+        req.session.status = e.code;
+      }
+      req.session.errorMessage = e.message;
+      return res.redirect("/admin/accounts/createNewAccount");
+    }
+  });
 
 router
   .route('/createHotel')
@@ -281,8 +260,8 @@ router
         throw CustomException("Invalid facilities.", true);
       }
       args[9] = [];
-      const addHotelMessage = await hotelFuncs.addHotel(args);
-      req.flash(addHotelMessage);
+      const addHotelId = await hotelFuncs.addHotel(args);
+      req.flash('Create hotel successfully');
       res.redirect("/admin/createHotel");
     } catch (e) {
       if (!e.code) {

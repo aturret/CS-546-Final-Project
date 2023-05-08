@@ -37,12 +37,12 @@ export async function getAllReq() {
 //   return req;
 // }
 
-export async function getReq(id) {
+export async function getReqById(id) {
   id = helper.checkId(id, true);
 
   const mgrReqCollection = await mgrReq();
 
-  let req = await mgrReqCollection.find({_id: new ObjectId(id)});
+  let req = await mgrReqCollection.findOne({_id: new ObjectId(id)});
 
   if (!req) throw CustomException(`No manager request with ID ${id}`);
   req._id = req._id.toString();
@@ -55,8 +55,8 @@ export async function getReq(id) {
   
 //   const hotelReqCollection = await hotelReqs();
 //   if (!response) {
-//     const requestUpdateInfo = await hotelReqCollection.findOneUpdate(
-//       { _id: ObjectId(id) },
+//     const requestUpdateInfo = await hotelReqCollection.findOneAndUpdate(
+//       { _id: new ObjectId(id) },
 //       { $set: { status: 'reject' } },
 //       { returnDocument: "after" }
 //     );
@@ -66,7 +66,7 @@ export async function getReq(id) {
 
 //   const newHotelMessage = hotelData.addHotel(req)
 
-//   const requestUpdateInfo = await hotelReqCollection.findOneUpdate(
+//   const requestUpdateInfo = await hotelReqCollection.findOneAndUpdate(
 //     { _id: new ObjectId(id) },
 //     { $set: { status: 'approve' } },
 //     { returnDocument: "after" }
@@ -77,32 +77,48 @@ export async function getReq(id) {
 
 export async function reqApprove(reqId, response) {
   reqId = helper.checkId(reqId, true);
-  let request = getReq(reqId);
+  let request = await getReqById(reqId);
   if (request.status !== 'pending') throw CustomException(`The request with ID ${reqId} is already closed`);
   
   const reqCollection = await mgrReq();
-  if (response === 'reject') {
-    const requestUpdateInfo = await reqCollection.findOneUpdate(
+  if (response === 'false') {
+    const requestUpdateInfo = await reqCollection.findOneAndUpdate(
       { _id: new ObjectId(reqId) },
       { $set: { status: 'reject' } },
       { returnDocument: "after" }
     );
     if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with id ${reqId}`, true);
     return {message: "Request reject"};
+  } else if (response === 'true') {
+    request.managers = [request.managers[0].toString()];
+    
+    const newHotelId = await hotelFuncs.addHotel(
+      request.name,
+      request.street,
+      request.city,
+      request.state,
+      request.zip_code,
+      request.phone,
+      request.email,
+      request.pictures,
+      request.facilities,
+      request.managers
+    );
+
+    const newMgrMessage = await userFuncs.updateUser(
+      request.username, 
+      { 
+        identity: 'manager',
+        hotel_id: new ObjectId(newHotelId)
+      }
+    )
+    
+    const requestUpdateInfo = await reqCollection.findOneAndUpdate(
+      { _id: new ObjectId(reqId) },
+      { $set: { status: 'approve' } },
+      { returnDocument: "after" }
+    );
+    if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with reqId ${reqId}`, true);
+    return { message: "Request approve. Add new hotel and upgrate user to manager successfully" };
   }
-
-  const newMgrMessage = userFuncs.updateUser(
-    request.username, 
-    { identity: 'manager' }
-  )
-
-  const newHotelMessage = hotelFuncs.addHotel(request.args);
-
-  const requestUpdateInfo = await reqCollection.findOneUpdate(
-    { _id: ObjectId(reqId) },
-    { $set: { status: 'approve' } },
-    { returnDocument: "after" }
-  );
-  if (requestUpdateInfo.lastErrorObject.n === 0) throw CustomException(`Could not update the request with reqId ${reqId}`, true);
-  return { message: "Request approve. Add new hotel and upgrate user to manager successfully" };
 }

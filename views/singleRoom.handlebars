@@ -25,8 +25,8 @@ roomTypes collection, or you can just calculate its availability and set it as a
             </div>
 {{#if (eq roomStatus "available")}}
 <div class="deleteRoom">
-    <form action="/user/dashboard/{{username}}/hotel/{{hotelId}}/room/{{roomId}}/delete" method="DELETE">
-        <button type="submit">Delete the room</button>
+    <form action="/hotel/{{hotelId}}/hotelManagement/room/{{roomId}}?_method=DELETE" method="POST">
+        <button type="submit" class="danger">Delete the room</button>
     </form>
 </div>
 {{/if}}
@@ -35,7 +35,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
         <button class="editRoom" onclick="editRoom()">Edit the room</button>
     </div>
     <div class="editRoomWindow" hidden="true" id="edit">
-        <form action="/user/dashboard/{{username}}/hotel/{{hotelId}}/room/{{roomId}}/edit" method="PATCH" id="editRoom-form" class="my-form">
+        <form action="/hotel/{{hotelId}}/hotelManagement/room/{{roomId}}?_method=PUT" method="POST" id="editRoom-form" class="my-form">
             <label id="roomNumberInput-label">
                 Room Number:
                 <input type="text" name="roomNumberInput">

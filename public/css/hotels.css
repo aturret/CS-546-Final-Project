@@ -86,7 +86,7 @@ header {
   color: white;
 }
 
-section.content{
+section.content {
   margin-top: 100px;
 }
 
@@ -223,6 +223,14 @@ input {
 }
 
 form.my-form {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: left;
+}
+
+form.search-form {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;

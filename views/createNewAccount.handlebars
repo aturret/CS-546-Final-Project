@@ -1,0 +1,45 @@
+{{#if errorMessage}}
+<div class="error">
+    <p>Error code{{status}}: {{errorMessage}}</p>
+</div>
+{{/if}}
+
+<p>Please fill up this form and register your account.</p>
+<form action="/admin/accounts/createNewAccount" method="POST" id="registration-form" class="my-form">
+    <label for="username" id="username-label">
+        Username:
+    </label>
+    <input type="text" name="username" id="username" value="{{username}}">
+    <label for="firstNameInput" id="firstNameInput-label">
+        First Name:
+    </label>
+    <input type="text" name="firstNameInput" id="firstNameInput" value="{{firstNameInput}}">
+    <label for="lastNameInput" id="lastNameInput-label">
+        Last Name:
+    </label>
+    <input type="text" name="lastNameInput" id="lastNameInput" value="{{lastNameInput}}">
+
+    <label for="emailAddressInput" id="emailAddressInput-label">
+        Email:
+        <input type="email" name="emailAddressInput" id="emailAddressInput" value="{{emailAddressInput}}">
+    </label>
+
+    <label>
+        Phone:
+        <input type="phone" name="phone" id="phone" value="{{phone}}">
+    </label>
+
+    <label for="passwordInput" id="passwordInput-label" >
+        Password:
+        <input type="password" name="passwordInput" id="passwordInput" class="PasswordInput" value="{{passwordInput}}">
+    </label>
+
+    <label for="confirmPasswordInput" id="confirmPasswordInput-label">
+        Confirm Password:
+    </label>
+    <input type="password" name="confirmPasswordInput" id="confirmPasswordInput" class="confirmPasswordInput" value="{{confirmPasswordInput}}">
+    <button type="submit" id="register-button">Register</button>
+</form>
+<p class="error" id="client-error">
+    {{errorMessage}}
+</p>

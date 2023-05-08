@@ -6,8 +6,7 @@ import faker from 'faker';
 
 
 export function CustomException(message, flag) {
-    const error = new Error(message);
-  
+    const error = new Error(message);  
     error.code = flag? 400 : 404;
     return error;
 }
@@ -136,6 +135,15 @@ export function checkUserName(username, flag) {
     if (/\s/.test(username)) throw CustomException("Error: Username cannot contain spaces", flag);
     return username;
 }
+// calculator functions
+export function calculateOverallRating(reviews) {
+    let sum = 0;
+    for (let review of reviews) {
+        sum += review.rating;
+    }
+    return sum / reviews.length;
+}
+
 
 
 /* ------------------------------------------- seed functions ------------------------------------------- */

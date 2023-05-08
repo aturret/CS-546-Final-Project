@@ -1,20 +1,13 @@
-{{!--
-
-registration handelbars
-
---}}
-{{!--
-<script src="../public/js/lab10.js"></script> --}}
 {{#if errorMessage}}
 <div class="error">
     <p>Error code{{status}}: {{errorMessage}}</p>
 </div>
+{{/if}}
 <div class="adminUsers box">
     <div class="allUsers left">
-        {{/if}}
         <div class="searchUser">
             <h2>Search User</h2>
-            <form action="/admin/account" method="GET" id="searchUsers-form" class="my-form">
+            <form action="/admin/accounts/" method="POST" id="searchUsers-form" class="my-form">
                 <label for="usernameInput" id="username-label">
                     Search user by username:
                 </label>
@@ -35,48 +28,110 @@ registration handelbars
                     <p>Identity: {{searchedUser.identity}}</p>
                 </div>
             </div>
-            <div class="editUser">
-                <button id="editUserButton"></button>
+            <div class="editInformation">
+                <button id="editInformationButton" onclick="editInformation()">Edit Account</button>
+                <div id="editInformationWindow" hidden="true">
+                    <form action="/admin/accounts?_method=PATCH" method="POST" id="editInformation-form"
+                        class="my-form">
+                        <input type="hidden" name="searchedUsername" id="searchedUsername" value="{{searchedUsername}}">
+
+                        <label for="usernameInput" id="usernameInput-label">
+                            Username:
+                            <input type="text" name="usernameInput" id="usernameInput">
+                        </label>
+
+                        <label for="firstNameInput" id="firstNameInput-label">
+                            First Name:
+                            <input type="text" name="firstNameInput" id="firstNameInput">
+                        </label>
+
+                        <label for="lastNameInput" id="lastNameInput-label">
+                            Last Name:
+                            <input type="text" name="lastNameInput" id="lastNameInput">
+                        </label>
+
+                        <label for="emailInput" id="emailInput-label">
+                            Email:
+                            <input type="email" name="emailInput" id="emailInput">
+                        </label>
+
+                        <label>
+                            Phone:
+                            <input type="phone" name="phoneInput" id="phoneInput">
+                        </label>
+
+                        <label for="passwordInput" id="passwordInput-label">
+                            Password:
+                            <input type="password" name="passwordInput" id="passwordInput" class="PasswordInput">
+                        </label>
+
+                        <label for="confirmPasswordInput" id="confirmPasswordInput-label">
+                            Confirm Password:
+                            <input type="password" name="confirmPasswordInput" id="confirmPasswordInput"
+                                class="confirmPasswordInput">
+                        </label>
+
+                        <button type="submit" id="editInformation">Submit</button>
+                    </form>
+                </div>
+                {{!-- <div class="editUser">
+                    <button id="editUserButton">Edit Account</button>
+                </div> --}}
+                {{#if (ne searchedUser.identity "admin")}}
+                <div class="deleteUser">
+                    <form action="/admin/accounts?_method=DELETE" method="POST" id="deleteUser-form" class="my-form">
+                        <input type="hidden" name="searchedUsername" id="searchedUsername" value="{{searchedUsername}}">
+                        <button type="submit" id="deleteUser" class="danger">Delete Account</button>
+                    </form>
+                </div>
+                {{/if}}
             </div>
-            <div class="deleteUser"></div>
+            {{else}}
+            <div class="userInfo">
+                <p>Search result:</p>
+                <div class="searchedUserResult">
+                    <p>No user found.</p>
+                </div>
+            {{/if}}
+            
+
         </div>
-        {{/if}}
+        <a href="/admin/accounts/createNewAccount">Create New Account</a>
+        {{!-- <div class="newUser right">
+            <p>Create a new user.</p>
+            <form action="/admin/account/" method="POST" id="registration-form" class="my-form">
+                <label for="usernameInput" id="username-label">
+                    Username:
+                </label>
+                <input type="text" name="usernameInput" id="username">
+                <label for="firstNameInput" id="firstNameInput-label">
+                    First Name:
+                </label>
+                <input type="text" name="firstNameInput" id="firstNameInput">
+                <label for="lastNameInput" id="lastNameInput-label">
+                    Last Name:
+                </label>
+                <input type="text" name="lastNameInput" id="lastNameInput">
+                <label for="emailAddressInput" id="emailAddressInput-label">
+                    Email:
+                    <input type="email" name="emailAddressInput" id="emailAddressInput">
+                </label>
+                <label>
+                    Phone:
+                    <input type="phone" name="phone" id="phone">
+                </label>
+                <label for="passwordInput" id="passwordInput-label">
+                    Password:
+                    <input type="password" name="passwordInput" id="passwordInput">
+                </label>
+                <label for="confirmPasswordInput" id="confirmPasswordInput-label">
+                    Confirm Password:
+                </label>
+                <input type="password" name="confirmPasswordInput" id="confirmPasswordInput">
+                <button type="submit" id="register-button">Register</button>
+            </form>
+        </div> --}}
     </div>
-    <div class="newUser right">
-        <p>Create a new user.</p>
-        <form action="/admin/account" method="POST" id="registration-form" class="my-form">
-            <label for="usernameInput" id="username-label">
-                Username:
-            </label>
-            <input type="text" name="usernameInput" id="username">
-            <label for="firstNameInput" id="firstNameInput-label">
-                First Name:
-            </label>
-            <input type="text" name="firstNameInput" id="firstNameInput">
-            <label for="lastNameInput" id="lastNameInput-label">
-                Last Name:
-            </label>
-            <input type="text" name="lastNameInput" id="lastNameInput">
-            <label for="emailAddressInput" id="emailAddressInput-label">
-                Email:
-                <input type="email" name="emailAddressInput" id="emailAddressInput">
-            </label>
-            <label>
-                Phone:
-                <input type="phone" name="phone" id="phone">
-            </label>
-            <label for="passwordInput" id="passwordInput-label">
-                Password:
-                <input type="password" name="passwordInput" id="passwordInput">
-            </label>
-            <label for="confirmPasswordInput" id="confirmPasswordInput-label">
-                Confirm Password:
-            </label>
-            <input type="password" name="confirmPasswordInput" id="confirmPasswordInput">
-            <button type="submit" id="register-button">Register</button>
-        </form>
-    </div>
-</div>
-<p class="error" id="client">
-    {{errorMessage}}
-</p>
+    <p class="error" id="client-error">
+        {{errorMessage}}
+    </p>

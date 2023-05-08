@@ -5,25 +5,44 @@
 console.log('client-side JS loaded!');
 
 const forms = document.querySelectorAll('.my-form');
+const searchForms = document.querySelectorAll('.search-form');
 const clientError = document.getElementById('client-error');
 const clientErrorDiv = document.getElementById('client');
+
+searchForms.forEach(form => {
+    form.addEventListener('submit', async (event) => {
+        const textInputs = document.querySelectorAll('input[type="text"]');
+        const selectInputs = document.querySelectorAll('select');
+        const allInputs = textInputs.concat(selectInputs);
+        try{
+            allInputs.forEach(input => {
+                if(input.value.trim() !== '') input.value = checkString(input.value, input.name);
+            })
+        }
+        catch(e){
+            event.preventDefault();
+            clientError.innerHTML = e;
+        }
+    })
+})
 
 
 forms.forEach(form => {
     console.log('hi');
     form.addEventListener('submit', async (event) => {
-        const textInputs = document.querySelectorAll('input[type="text"]');
-        const roomTypeInputs = document.querySelectorAll('select[class="roomType"]');
-        const hotelStateInputs = document.querySelectorAll('select[id="hotelState"]');
-        const passwordInputs = document.querySelectorAll('input[type="password"]');
-        const dateInputs = document.querySelectorAll('input[type="date"]');
-        const emailInputs = document.querySelectorAll('input[type="email"]');
-        const phoneInputs = document.querySelectorAll('input[class="phone"]');
-        const textareas = document.querySelectorAll('textarea');
-        const picInputs = document.querySelectorAll('input[type="file"]');
+        const textInputs = form.querySelectorAll('input[type="text"]');
+        const roomTypeInputs = form.querySelectorAll('select[class="roomType"]');
+        const hotelStateInputs = form.querySelectorAll('select[id="hotelState"]');
+        const passwordInputs = form.querySelectorAll('input[type="password"]');
+        const dateInputs = form.querySelectorAll('input[type="date"]');
+        const emailInputs = form.querySelectorAll('input[type="email"]');
+        const phoneInputs = form.querySelectorAll('input[class="phone"]');
+        const textareas = form.querySelectorAll('textarea');
+        const picInputs = form.querySelectorAll('input[type="file"]');
         try {
             textInputs.forEach(input => {
-                console.log('text checking');             
+                console.log('text checking');
+                console.log(input.value);        
                 input.value = checkString(input.value, input.name, false);
             })
             roomTypeInputs.forEach(input => {                
@@ -74,6 +93,7 @@ function checkString(s, key){
     if(!s || typeof s !== 'string' || s.trim().length === 0) throw `${key} must exist and must be a non empty string`;
     return s.trim();
 }
+
 
 function checkDate(date) {
     if (!date || typeof date !== "string" || date.trim().length === 0) throw "releaseDate must exist and must be a non empty string.";

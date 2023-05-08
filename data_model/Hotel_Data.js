@@ -10,6 +10,48 @@ import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
 import { Review } from "../Mongo_Connections/mongoCollections.js";
 import * as userFuncs from "./User_Account.js";
+import e from "connect-flash";
+
+// helper functions
+
+export async function searchHotel( name, city, state, zip_code ) {
+  const tempHotel = await hotelReg();
+  if (state==='Select a State') state = undefined;
+  if (city==='') city = undefined;
+  else city = helper.checkString(city, "city", true).toLowerCase();
+  if (name === '') name = undefined;  
+  else name = helper.checkString(name, "hotel name", true).toLowerCase();
+  if (zip_code === '') zip_code = undefined;
+  else zip_code = helper.checkZip(zip_code, true);
+  // if all parameters are undefined, return all hotels
+  if (!name && !city && !state && !zip_code) {    
+    var hotelList = await tempHotel.find({}).toArray();    
+  } else {
+    // Create a dynamic filter object based on the provided parameters
+    const filter = {};
+    if (name) filter.name = { $regex: new RegExp(name, "i") };
+    if (city) filter.city = { $regex: new RegExp(city, "i") };
+    if (state) filter.state = state;
+    if (zip_code) filter.zip_code = zip_code;
+    try{
+    var hotelResult = await tempHotel.find(filter);
+      }
+    catch(e){
+      throw CustomException("Hotel not found", false);
+    }
+    var hotelList = await hotelResult.toArray()
+  }
+  if (hotelList.length === 0) {
+    throw CustomException("Hotel not found", false);
+  }
+  hotelList = hotelList.map((element) => {
+    element._id = element._id.toString();
+    return element;
+  });
+  console.log('Search results:', hotelList);
+  return hotelList;
+}
+
 
 export async function getAllHotels() {
   const hotelCollection = await hotelReg();
@@ -52,7 +94,7 @@ export async function getHotel(id) {
 export async function getHotelMgr(hotelId) {
   hotelId = helper.checkId(hotelId, true);
   const tempHotel = await hotelReg();
-  const hotel = await tempHotel.findOne({ hotelId: ObjectId(hotelId) }, { _id: 0, managers: 1 });
+  const hotel = await tempHotel.findOne({ hotelId: new ObjectId(hotelId) }, { _id: 0, managers: 1 });
   if (!hotel) throw CustomException(`No hotel with username ${username}`, true);
 
   let mgrInfoList = []
@@ -97,7 +139,7 @@ export async function addHotel(...args) {
     throw CustomException("Invalid facilities.", true);
   }
   newHotel.managers = args[9]
-    ? args[9].map((manager) => helper.checkId(manager, true))
+    ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))
     : undefined;
   newHotel.reviews = [];
 
@@ -105,8 +147,8 @@ export async function addHotel(...args) {
   const insertInfo = await tempHotel.insertOne(newHotel);
   if (insertInfo.insertedCount === 0)
     throw CustomException("Insert hotel failed.", true);
-
-  return { message: `${newHotel.name} Hotel added successfully.` };
+  const newHotelId = insertInfo.insertedId.toString();
+  return newHotelId;
 }
 
 export async function updateHotel(...args) {
@@ -122,24 +164,14 @@ export async function updateHotel(...args) {
   updateHotel.picture = args[8]
     ? args[8].map((web) => helper.checkWebsite(web, false))
     : undefined;
-  updateHotel.rooms = args[9] ? args[9].map((room) => helper.checkId(room, false)) : [];
-  if (args[8] && Array.isArray(args[8])) {
-    updateHotel.facilities = args[8] ? args[8].map((facility) =>
+  if (args[9] && Array.isArray(args[9])) {
+    updateHotel.facilities = args[9] ? args[9].map((facility) =>
       helper.checkString(facility, "facility", false)) : [];
-  } else if (!args[8]) {
+  } else if (!args[9]) {
     updateHotel.facilities = [];
   } else {
     throw CustomException("Invalid facilities.", true);
   }
-  updateHotel.managers = args[10]
-    ? args[10].map((manager) => helper.checkId(manager, false))
-    : [];
-  updateHotel.roomTypes = args[11]
-    ? args[11].map((roomType) => helper.checkString(roomType, false))
-    : [];
-  updateHotel.reviews = args[12]
-    ? args[12].map((reviews) => helper.checkString(reviews, false))
-    : [];
 
   const tempHotel = await hotelReg();
   const updateInfo = await tempHotel.findOneAndUpdate(
@@ -157,7 +189,7 @@ export async function deleteHotel(id) {
   id = helper.checkId(id, true);
   const tempHotel = await hotelReg();
 
-  const temp = await tempHotel.findOne({ _id: new new ObjectId(id) }, { reviews: 1, room_types: 1, rooms: 1 });
+  const temp = await tempHotel.findOne({ _id: new ObjectId(id) }, { reviews: 1, room_types: 1, rooms: 1 });
 
   if (temp.deletedCount === 0) throw CustomException(`Delete hotel with id ${id} failed.`, true);
 
@@ -190,7 +222,7 @@ export async function deleteHotel(id) {
   }
 
   //delete Hotel
-  const deleteInfo = await tempHotel.deleteOne({ _id: new new ObjectId(id) });
+  const deleteInfo = await tempHotel.deleteOne({ _id: new ObjectId(id) });
   if (deleteInfo.deletedCount === 0)
     throw CustomException(`Delete hotel with id ${id} failed.`, true);
 
@@ -198,74 +230,60 @@ export async function deleteHotel(id) {
   return { message: `Hotel with id ${id} deleted successfully.` };
 }
 
-export async function hotelSearch(...args) {
-  const hotelCollection = await hotelReg();
+// export async function hotelSearch(...args) {
+//   const hotelCollection = await hotelReg();
   
-  let query = {};
-  const name = helper.checkString(args[0], "hotel name", true);
-  query.name = { $regex: new RegExp(name, "i") };
+//   let query = {};
+//   const name = helper.checkString(args[0], "hotel name", true);
+//   query.name = { $regex: new RegExp(name, "i") };
 
-  const city = helper.checkString(args[1], "city", true);
-  query.city = { $regex: new RegExp(city, "i") };
+//   const city = helper.checkString(args[1], "city", true);
+//   query.city = { $regex: new RegExp(city, "i") };
 
-  const state = helper.checkString(args[2], "state", true);
-  query.state = { $regex: new RegExp(state, "i") };
+//   const state = helper.checkString(args[2], "state", true);
+//   query.state = { $regex: new RegExp(state, "i") };
 
-  const zipCode = helper.checkZip(args[3], true);
-  query.zip_code = { $regex: new RegExp(zipCode, "i") };
+//   const zipCode = helper.checkZip(args[3], true);
+//   query.zip_code = { $regex: new RegExp(zipCode, "i") };
 
-  let hotelList = await hotelCollection.find(query).toArray();
-  if (hotelList.length===0) throw CustomException("Hotel not found", false);
-  hotelList = hotelList.map((element) => {
-    element._id = element._id.toString();
-    return element;
-  });
-  return hotelList;
-}
+//   let hotelList = await hotelCollection.find(query).toArray();
+//   if (hotelList.length===0) throw CustomException("Hotel not found", false);
+//   hotelList = hotelList.map((element) => {
+//     element._id = element._id.toString();
+//     return element;
+//   });
+//   return hotelList;
+// }
 
 //get hotel review
 export async function getHotelReview(id) {
   id = new ObjectId(helper.checkId(id, true));
   const tempHotel = await hotelReg();
 
-  const reviewInfo = tempHotel.aggregate([
-    { $match: { _id: id } },
-    {
-      $lookup: {
-        from: "reviews",
-        localField: "reviews",
-        foreignField: "_id",
-        as: "reviews"
-      }
-    },
-    { $unwind: "$reviews" },
-    {
-      $lookup: {
-        from: "users",
-        localField: "reviews.user_id",
-        foreignField: "_id",
-        as: "user"
-      }
-    },
-    {
-      $addFields: {
-        "reviews.user": { $arrayElemAt: ["$user", 0] },
-      }
-    },
-    {
-      $project: {
-        _id: "$reviews._id",
-        rating: "$reviews.rating",
-        comment: "$reviews.comment",
-        upVote: "$reviews.upvote",
-        downVote: "$reviews.downvote",
-        userAvatar: "$reviews.user.avatar",
-        username: "$reviews.user.username"
-      }
-    }
-  ]).toArray();
+  //get hotel review
+  const reviewInfo = await tempHotel.findOne({ _id: id }, { reviews: 1 });
+  const reviewId = reviewInfo.reviews;
+
+  //get review
+  const tempReview = await Review();
+  const reviewList = await tempReview.find({ _id: { $in: reviewId } }).toArray();
+  if (reviewList.length === 0) throw CustomException("Review not found", false);
+
+  //get user 
+  console.log(reviewList)
+  const tempAccount = await Account();
+  for (let i of reviewList) {
+    const userInfo = await tempAccount.findOne({ _id: new ObjectId(i.user_id) }, { username: 1, avatar: 1 });
+    i.upVote = i.upvote
+    i.downVote = i.downvote
+    i.upvote = null
+    i.downvote = null
+    i.userName = userInfo.username
+    i.userAvatar = userInfo.avatar 
+  }
+  console.log(reviewList)
   if (!reviewInfo) throw CustomException("Hotel not found", false);
-  return reviewInfo;
+  return reviewList;
 }
 
 

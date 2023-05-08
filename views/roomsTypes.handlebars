@@ -31,16 +31,16 @@ new variable.
                 </div>
             </div>
             <div class="deleteRoomType">
-                <form action="/hotel/{{hotelId}}/hotelManagement/roomType/{{this._id}}" method="DELETE"
+                <form action="/hotel/{{hotelId}}/hotelManagement/roomType/{{this._id}}?_method=DELETE" method="POST"
                     id="deleteRoomType-form" class="my-form">
                     <input type="hidden" name="hotelId" value="{{hotelId}}">
-                    <button type="submit" id="deleteRoomType-button" class="delete">Delete</button>
+                    <button type="submit" id="deleteRoomType-button" class="danger">Delete</button>
                 </form>
             </div>
             <div class="editRoomType">
                 <button id="editRoomTypeButton-{{this._id}}" onclick="editRoomType({{this._id}})">Edit</button>
                 <div hidden="true" id="edit-{{this._id}}">
-                    <form action="/hotel/{{hotelId}}/hotelManagement/roomType/{{this._id}}" method="PATCH"
+                    <form action="/hotel/{{hotelId}}/hotelManagement/roomType/{{this._id}}?_method=PUT" method="POST"
                         id="editRoomType-form" class="my-form">
                         <label for="roomTypeName" id="roomTypeName-label">
                             Room Type:
@@ -53,6 +53,7 @@ new variable.
                         <label for="roomTypePictures" id="roomTypePictures-label">
                             Room Pictures:
                         </label>
+                        <input type="file" name="roomTypePictures" id="roomTypePictures" accept="image/*" multiple>
                         <input type="hidden" name="hotelId" value="{{hotelId}}">
                         <button type="submit" id="editRoomType-button">Edit</button>
                     </form>

@@ -18,7 +18,7 @@
 
 <div class="hotelInfo">
     <div class="hotelName">
-        <p>Hotel Name: {{request.hotelName}}</p>
+        <p>Hotel Name: {{request.name}}</p>
     </div>
     <div class="hotelPhoto">
         <img src="{{request.photo}}" alt="hotel photo">
@@ -26,21 +26,30 @@
     <div class="hotelAddress">
         <p>Hotel Address: {{request.street}}, {{request.city}}, {{request.state}}, {{request.zip_code}}</p>
     </div>
-    <div class="hotelContact">
-        <p>Phone: {{request.phone}} Email: {{request.email}}</p>
+    <div class="hotelPhone">
+        <p>Phone: {{request.phone}}</p>
+    </div>
+    <div class="hotelEmail">
+        <p>Email: {{request.email}}</p>
+    </div>
+    <div class="hotelfacilities">
+        <p>Facilities: {{request.Facilities}}</p>
+    </div>
+    <div class="hotelManagers">
+        <p>Managers ID: {{#each request.managers }} {{this}} {{/each}}</p>
     </div>
 </div>
 {{#if (eq request.status "pending")}}
 <div class="requestApplication">
     <div class="application box">
         <div class="left">
-            <form action="/request/{{request._id}}" method="POST" id="approve" class="my-form">
+            <form action="/admin/requests/{{request._id}}" method="POST" id="approve" class="my-form">
                 <input type="hidden" name="response" value="true">
                 <button type="submit" id="approve-button">Approve</button>
             </form>
         </div>
         <div class="right">
-            <form action="/request/{{request._id}}" method="POST" id="reject" class="my-form">
+            <form action="/admin/requests/{{request._id}}" method="POST" id="reject" class="my-form">
                 <input type="hidden" name="response" value="false">
                 <button type="submit" id="reject-button">Reject</button>
             </form>
