@@ -1,10 +1,3 @@
-{{!--
-
-registration handelbars
-
---}}
-{{!--
-<script src="../public/js/lab10.js"></script> --}}
 {{#if errorMessage}}
 <div class="error">
     <p>Error code{{status}}: {{errorMessage}}</p>
@@ -15,7 +8,7 @@ registration handelbars
         {{/if}}
         <div class="searchUser">
             <h2>Search User</h2>
-            <form action="/admin/account" method="GET" id="searchUsers-form" class="my-form">
+            <form action="/admin/accounts/" method="POST" id="searchUsers-form" class="my-form">
                 <label for="usernameInput" id="username-label">
                     Search user by username:
                 </label>
@@ -36,16 +29,61 @@ registration handelbars
                     <p>Identity: {{searchedUser.identity}}</p>
                 </div>
             </div>
-            <div class="editUser">
-                <button id="editUserButton"></button>
-            </div>
+            <div class="editInformation">
+                <button id="editInformationButton" onclick="editInformation()">Edit Account</button>
+                <div id="editInformationWindow" hidden="true">
+                    <form action="/admin/accounts/?_method=PATCH" method="POST" id="editInformation-form" class="my-form">
+                        <input type="hidden" name="searchedUsername" id="searchedUsername" value="{{searchedUsername}}">
+                        
+                        <label for="usernameInput" id="usernameInput-label">
+                            Username:
+                        <input type="text" name="usernameInput" id="usernameInput" value="{{usernameInput}}">
+                        </label>
+
+                        <label for="firstNameInput" id="firstNameInput-label">
+                            First Name:
+                            <input type="text" name="firstNameInput" id="firstNameInput" value="{{firstNameInput}}">
+                        </label>
+
+                        <label for="lastNameInput" id="lastNameInput-label">
+                            Last Name:
+                            <input type="text" name="lastNameInput" id="lastNameInput" value="{{lastNameInput}}">
+                        </label>
+
+                        <label for="emailInput" id="emailInput-label">
+                            Email:
+                            <input type="email" name="emailInput" id="emailInput" value="{{emailInput}}">
+                        </label>
+
+                        <label>
+                            Phone:
+                            <input type="phone" name="phone" id="phone" value="{{phone}}">
+                        </label>
+
+                        <label for="passwordInput" id="passwordInput-label" >
+                            Password:
+                            <input type="password" name="passwordInput" id="passwordInput" class="PasswordInput" value="{{passwordInput}}">
+                        </label>
+
+                        <label for="confirmPasswordInput" id="confirmPasswordInput-label">
+                            Confirm Password:
+                            <input type="password" name="confirmPasswordInput" id="confirmPasswordInput" class="confirmPasswordInput" value="{{confirmPasswordInput}}">
+                        </label>
+
+                        <button type="submit" id="editInformation">Submit</button>
+                    </form>
+                </div>
+            {{!-- <div class="editUser">
+                <button id="editUserButton">Edit Account</button>
+            </div> --}}
             <div class="deleteUser"></div>
         </div>
         {{/if}}
     </div>
-    <div class="newUser right">
+    <a href="/admin/accounts/createNewAccount">Create New Account</a>
+    {{!-- <div class="newUser right">
         <p>Create a new user.</p>
-        <form action="/admin/account" method="POST" id="registration-form" class="my-form">
+        <form action="/admin/account/" method="POST" id="registration-form" class="my-form">
             <label for="usernameInput" id="username-label">
                 Username:
             </label>
@@ -76,7 +114,7 @@ registration handelbars
             <input type="password" name="confirmPasswordInput" id="confirmPasswordInput">
             <button type="submit" id="register-button">Register</button>
         </form>
-    </div>
+    </div> --}}
 </div>
 <p class="error" id="client">
     {{errorMessage}}

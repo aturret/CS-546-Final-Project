@@ -94,7 +94,7 @@ export async function getHotel(id) {
 export async function getHotelMgr(hotelId) {
   hotelId = helper.checkId(hotelId, true);
   const tempHotel = await hotelReg();
-  const hotel = await tempHotel.findOne({ hotelId: ObjectId(hotelId) }, { _id: 0, managers: 1 });
+  const hotel = await tempHotel.findOne({ hotelId: new ObjectId(hotelId) }, { _id: 0, managers: 1 });
   if (!hotel) throw CustomException(`No hotel with username ${username}`, true);
 
   let mgrInfoList = []
@@ -139,7 +139,7 @@ export async function addHotel(...args) {
     throw CustomException("Invalid facilities.", true);
   }
   newHotel.managers = args[9]
-    ? args[9].map((manager) => ObjectId(helper.checkId(manager, true)))
+    ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))
     : undefined;
   newHotel.reviews = [];
 
@@ -189,7 +189,7 @@ export async function deleteHotel(id) {
   id = helper.checkId(id, true);
   const tempHotel = await hotelReg();
 
-  const temp = await tempHotel.findOne({ _id: new new ObjectId(id) }, { reviews: 1, room_types: 1, rooms: 1 });
+  const temp = await tempHotel.findOne({ _id: new ObjectId(id) }, { reviews: 1, room_types: 1, rooms: 1 });
 
   if (temp.deletedCount === 0) throw CustomException(`Delete hotel with id ${id} failed.`, true);
 
@@ -222,7 +222,7 @@ export async function deleteHotel(id) {
   }
 
   //delete Hotel
-  const deleteInfo = await tempHotel.deleteOne({ _id: new new ObjectId(id) });
+  const deleteInfo = await tempHotel.deleteOne({ _id: new ObjectId(id) });
   if (deleteInfo.deletedCount === 0)
     throw CustomException(`Delete hotel with id ${id} failed.`, true);
 
