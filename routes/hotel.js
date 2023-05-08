@@ -351,9 +351,7 @@ router
       const days = moment(checkout).diff(moment(checkin), 'days');
       const price = roomType.price * days;
       const status = 'pending';
-
-      const args = [hotelId, userId, roomId, hotelName, checkin, checkout, guests, price, status];
-      const addOrder = await userFuncs.addOrder(args);
+      const addOrder = await userFuncs.addOrder(hotelId, userId, roomId, hotelName, checkin, checkout, guests, price, status);
       if (addOrder) req.flash('Add order successfullly');
       res.redirect('/hotel/:hotelId/searchResult');
     } catch (e) {
