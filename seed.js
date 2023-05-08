@@ -425,8 +425,8 @@ try {
       order.hotelName = "hotel" + ref[i];
       console.log(order);
       order = await addOrder(
-        order.user_id,
         order.hotel_id,
+        order.user_id,
         order.room_id,
         order.hotelName,
         order.checkin_date,
