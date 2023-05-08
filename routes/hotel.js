@@ -653,7 +653,7 @@ router
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel';
+      const previousUrl = req.headers.referer || '/hotel/:hotelId/hotelManagement';
       res.redirect(previousUrl);
     }
   })
@@ -667,7 +667,7 @@ router
 
       const hotelReviews = await userFuncs.addReview(orderId, hotelId, username, review, rating);
       if (hotelReviews) req.flash('Add review successfully');
-      res.redirect('/hotel/:hotelId/hotelManagement/review');
+      res.redirect('/hotel/:hotelId/hotelManagement/reviews');
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -683,11 +683,11 @@ router
 
       const updateOrderMessage = await userFuncs.updateReview(reviewId, review, rating);
       req.flash(updateOrderMessage);
-      res.redirect('/hotel/:hotelId/hotelManagement/review');
+      res.redirect('/hotel/:hotelId/hotelManagement/reviews');
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel';
+      const previousUrl = req.headers.referer || '/hotel/:hotelId/hotelManagement/reviews';
       res.redirect(previousUrl);
     }
   })
@@ -696,23 +696,22 @@ router
       const reviewId = helper.checkId(req.body.reviewIdInput, true);
       const deleteReviewMessage = await userFuncs.deleteReview(reviewId);
       req.flash(deleteReviewMessage);
-      res.redirect('/hotel/:hotelId/hotelManagement/review');
+      res.redirect('/hotel/:hotelId/hotelManagement/reviews');
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel';
+      const previousUrl = req.headers.referer || '/hotel/:hotelId/hotelManagement/reviews';
       res.redirect(previousUrl);
     }
   })
 
 router
-  .route("/hotel/:hotelId/hotelManagement/manager")
+  .route("/hotel/:hotelId/hotelManagement/managers")
   .get(isMgr, async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
-
-      const hotel = await hotelFuncs.getHotel(hotelId);
-      res.render('hotelManagers', {managers: hotel.managers, title: `Manager Control Panel`});
+      const mgrList = await hotelFuncs.getHotelMgr(hotelId);
+      res.render('hotelManagers', {managers: mgrList, title: `Manager Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -738,16 +737,16 @@ router
   })
   .delete(isMgr, async (req, res) => {
     try {
-      const respondentName = helper.checkNameString(req.body.respondentNameInput, "user username", true);
+      const userNameInput = helper.checkNameString(req.body.userNameInput, "user username", true);
       const hotelId = helper.checkId(req.params.hotelId, true);
 
-      const deleteReviewMessage = await userFuncs.deleteMgr(req.user.username, respondentName, hotelId);
+      const deleteReviewMessage = await userFuncs.deleteMgr(req.user.username, userNameInput, hotelId);
       req.flash(deleteReviewMessage);
-      res.redirect('/hotel/:hotelId/hotelManagement/review');
+      res.redirect('/hotel/:hotelId/hotelManagement/manager');
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel';
+      const previousUrl = req.headers.referer || '/hotel/:hotelId/hotelManagement/managers';
       res.redirect(previousUrl);
     }
   })

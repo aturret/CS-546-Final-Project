@@ -178,7 +178,7 @@ export async function addMgr(mgrName, userName, hotelId) {
     );
 
   const hotelInfo = await tempHotel.findOne(
-    { _id: Object(hotelId) },
+    { _id: new ObjectId(hotelId) },
     { _id: 1 }
   );
   if (hotelInfo === null)
@@ -213,7 +213,7 @@ export async function deleteMgr(applicantName, respondentName, hotelId) {
   if (respondentInfo === null) throw CustomException(`Could not find user with username ${respondentName}`, true);
   if (userInfo.identity !== 'manager' && userInfo.hotel === null) throw CustomException(`User ${userName} is not a manager, could not upgrade`, true);
 
-  const hotelInfo = await tempHotel.findOne({ _id: Object(hotelId) }, { _id: 1 });
+  const hotelInfo = await tempHotel.findOne({ _id: new ObjectId(hotelId) }, { _id: 1 });
   if (hotelInfo === null) throw CustomException(`Could not find hotel with ID ${hotelId}`, true);
   if (hotelInfo._id !== userInfo.hotel) throw CustomException(`Could not find user with username ${respondentName} who is the manager of hotel ${hotelId}`, true);
 
@@ -226,14 +226,14 @@ export async function deleteMgr(applicantName, respondentName, hotelId) {
   )
 
   const hoteldeleteMgrInfo = await tempHotel.findOneAndUpdate(
-    { _id: Object(hotelId) },
-    { $pull: { manager: Object(respondentInfo._id) } },
+    { _id: new ObjectId(hotelId) },
+    { $pull: { manager: new ObjectId(respondentInfo._id) } },
     { returnDocument: "after" }
   );
   if (!hoteldeleteMgrInfo)
     throw CustomException(`Update hotel with id ${hotelId} failed.`, true);
 
-  return { message: `delete a manager ${userName} from hotel ${hotelId}` };
+  return { message: `delete a manager ${respondentName} from hotel ${hotelId}` };
 }
 
 //delete account

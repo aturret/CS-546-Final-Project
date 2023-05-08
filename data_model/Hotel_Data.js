@@ -95,22 +95,27 @@ export async function getHotelMgr(hotelId) {
   hotelId = helper.checkId(hotelId, true);
   const tempHotel = await hotelReg();
   const hotel = await tempHotel.findOne({ hotelId: new ObjectId(hotelId) }, { _id: 0, managers: 1 });
-  if (!hotel) throw CustomException(`No hotel with username ${username}`, true);
+  if (!hotel) throw CustomException(`No hotel with hotel ID ${hotelId}`, true);
 
   let mgrInfoList = []
   const tempAccount = await Account();
   hotel.managers.forEach(async mgrId => {
-    const mgrInfo = await tempAccount.findOne({ _id: mgrId }, { _id: 0, username: 1 });
-    mgrInfoList.push({
-      _id: mgrId,
-      username: mgrInfo.username
-    });
+    const mgrInfo = await tempAccount.findOne({ _id: mgrId });
     if (!mgrInfo) throw "No manager with ID " + mgrId;
+    mgrInfoList.push({
+      _id: mgrId.toString(),
+      avatar: mgrInfo.avatar,
+      username: mgrInfo.username,
+      firstName: mgrInfo.firstName,
+      lastName: mgrInfo.lastName,
+      email: mgrInfo.email,
+      phone: mgrInfo.phone,
+    });
   });
 
-  if (!hotelInfo) throw CustomException(`No hotel with ID ${hotel.hotel}`, true);
-  hotelInfo._id = hotelInfo._id.toString();
-  return hotelInfo;
+  // if (!hotelInfo) throw CustomException(`No hotel with ID ${hotel.hotel}`, true);
+  // hotelInfo._id = hotelInfo._id.toString();
+  return mgrInfoList;
 }
 
 //need fix order for input
@@ -413,7 +418,7 @@ export async function getHotelRoom(id) {
   const tempRoom = await Room();
 
   const room_ids = await tempHotel.findOne({ _id: id }, { rooms: 1 });
-  const roomInfo = await tempRoom.find({ _id: { $in: room_ids } }).toArray();
+  const roomInfo = await tempRoom.find({ _id: { $in: room_ids.rooms } }).toArray();
   if (!roomInfo) throw CustomException("Hotel not found", false);
   return roomInfo;
 }

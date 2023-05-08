@@ -18,14 +18,17 @@ roomTypes collection, or you can just calculate its availability and set it as a
         <li>
             <div class="searchResultItem">
                 <div class="roomNumber">
-                    <p><a href="/hotel/:hotelId/hotelManagement/rooms/{{roomId}}">{{roomNumber}}</a></p>
+                    <p><a href="/hotel/:hotelId/hotelManagement/rooms/{{this._id}}">{{this.room_number}}</a></p>
+                </div>
+                <div class="roomId">
+                    <p>{{this._id}}</p>
                 </div>
                 <div class="roomType">
-                    <p>{{roomType}}</p>
+                    <p>{{this.room_type}}</p>
                 </div>
-                <div class="roomStatus">
-                    <p>{{roomStatus}}</p>
-                </div>
+                {{!-- <div class="roomStatus">
+                    <p>{{room_status}}</p>
+                </div> --}}
             </div>
         </li>
         {{/each}}

@@ -76,7 +76,7 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
         <a href="/hotel/{{hotel._id}}/hotelManagement/orders">Hotel orders</a>
         <a href="/hotel/{{hotel._id}}/hotelManagement/reviews">Hotel Reviews</a>
         {{#if (eq user.userIdentity "admin")}}        
-        <a href="/hotel/{{hotel._id}}/hotelManagement/manager">Hotel Managers</a>
+        <a href="/hotel/{{hotel._id}}/hotelManagement/managers">Hotel Managers</a>
         {{/if}}
     </div>
     {{#if (eq user.userIdentity "admin")}}
