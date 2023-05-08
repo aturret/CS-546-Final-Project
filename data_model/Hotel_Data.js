@@ -10,6 +10,48 @@ import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
 import { Review } from "../Mongo_Connections/mongoCollections.js";
 import * as userFuncs from "./User_Account.js";
+import e from "connect-flash";
+
+// helper functions
+
+export async function searchHotel( name, city, state, zip_code ) {
+  const tempHotel = await hotelReg();
+  if (state==='Select a State') state = undefined;
+  if (city==='') city = undefined;
+  else city = helper.checkString(city, "city", true).toLowerCase();
+  if (name === '') name = undefined;  
+  else name = helper.checkString(name, "hotel name", true).toLowerCase();
+  if (zip_code === '') zip_code = undefined;
+  else zip_code = helper.checkZip(zip_code, true);
+  // if all parameters are undefined, return all hotels
+  if (!name && !city && !state && !zip_code) {    
+    var hotelList = await tempHotel.find({}).toArray();    
+  } else {
+    // Create a dynamic filter object based on the provided parameters
+    const filter = {};
+    if (name) filter.name = { $regex: new RegExp(name, "i") };
+    if (city) filter.city = { $regex: new RegExp(city, "i") };
+    if (state) filter.state = state;
+    if (zip_code) filter.zip_code = zip_code;
+    try{
+    var hotelResult = await tempHotel.find(filter);
+      }
+    catch(e){
+      throw CustomException("Hotel not found", false);
+    }
+    var hotelList = await hotelResult.toArray()
+  }
+  if (hotelList.length === 0) {
+    throw CustomException("Hotel not found", false);
+  }
+  hotelList = hotelList.map((element) => {
+    element._id = element._id.toString();
+    return element;
+  });
+  console.log('Search results:', hotelList);
+  return hotelList;
+}
+
 
 export async function getAllHotels() {
   const hotelCollection = await hotelReg();
@@ -188,30 +230,30 @@ export async function deleteHotel(id) {
   return { message: `Hotel with id ${id} deleted successfully.` };
 }
 
-export async function hotelSearch(...args) {
-  const hotelCollection = await hotelReg();
+// export async function hotelSearch(...args) {
+//   const hotelCollection = await hotelReg();
   
-  let query = {};
-  const name = helper.checkString(args[0], "hotel name", true);
-  query.name = { $regex: new RegExp(name, "i") };
+//   let query = {};
+//   const name = helper.checkString(args[0], "hotel name", true);
+//   query.name = { $regex: new RegExp(name, "i") };
 
-  const city = helper.checkString(args[1], "city", true);
-  query.city = { $regex: new RegExp(city, "i") };
+//   const city = helper.checkString(args[1], "city", true);
+//   query.city = { $regex: new RegExp(city, "i") };
 
-  const state = helper.checkString(args[2], "state", true);
-  query.state = { $regex: new RegExp(state, "i") };
+//   const state = helper.checkString(args[2], "state", true);
+//   query.state = { $regex: new RegExp(state, "i") };
 
-  const zipCode = helper.checkZip(args[3], true);
-  query.zip_code = { $regex: new RegExp(zipCode, "i") };
+//   const zipCode = helper.checkZip(args[3], true);
+//   query.zip_code = { $regex: new RegExp(zipCode, "i") };
 
-  let hotelList = await hotelCollection.find(query).toArray();
-  if (hotelList.length===0) throw CustomException("Hotel not found", false);
-  hotelList = hotelList.map((element) => {
-    element._id = element._id.toString();
-    return element;
-  });
-  return hotelList;
-}
+//   let hotelList = await hotelCollection.find(query).toArray();
+//   if (hotelList.length===0) throw CustomException("Hotel not found", false);
+//   hotelList = hotelList.map((element) => {
+//     element._id = element._id.toString();
+//     return element;
+//   });
+//   return hotelList;
+// }
 
 //get hotel review
 export async function getHotelReview(id) {

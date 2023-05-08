@@ -12,7 +12,7 @@ import isAuth from "./user.js";
 
 const router = express.Router();
 
-
+// functions for checking session authentication
 export const isMgr = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.redirect("/user/login");
@@ -38,6 +38,9 @@ export const isAdmin = (req, res, next) => {
   }
   next();
 };
+//helper functions
+
+
 
 //TODO: Hotel searching main page
 router
@@ -61,9 +64,8 @@ router
     const hotel_state = req.body.hotelStateInput;
     const hotel_zip = req.body.hotelZipcodeInput;
     try{
-      const result = await hotelFuncs.hotelSearch(hotel_name, hotel_city, hotel_state, hotel_zip);
-      const hotelList = [];
-      const hotelInfo = {};
+      const result = await hotelFuncs.searchHotel(hotel_name, hotel_city, hotel_state, hotel_zip);
+      const hotelList = [];      
       let price = undefined;
       let roomTypeInfo = undefined
       for (let i = 0; i < result.length; i++){
@@ -76,6 +78,7 @@ router
             price = roomTypeInfo.price;
           }
         }
+        let hotelInfo = {};
         hotelInfo.hotelPrice = price;
         hotelInfo.hotelId = result[i]._id;
         hotelInfo.hotelAddress = result[i].street + ", " + result[i].city + ", " + result[i].state + ", " + result[i].zip_code;

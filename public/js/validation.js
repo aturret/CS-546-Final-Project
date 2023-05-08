@@ -5,8 +5,26 @@
 console.log('client-side JS loaded!');
 
 const forms = document.querySelectorAll('.my-form');
+const searchForms = document.querySelectorAll('.search-form');
 const clientError = document.getElementById('client-error');
 const clientErrorDiv = document.getElementById('client');
+
+searchForms.forEach(form => {
+    form.addEventListener('submit', async (event) => {
+        const textInputs = document.querySelectorAll('input[type="text"]');
+        const selectInputs = document.querySelectorAll('select');
+        const allInputs = textInputs.concat(selectInputs);
+        try{
+            allInputs.forEach(input => {
+                if(input.value.trim() !== '') input.value = checkString(input.value, input.name);
+            })
+        }
+        catch(e){
+            event.preventDefault();
+            clientError.innerHTML = e;
+        }
+    })
+})
 
 
 forms.forEach(form => {
@@ -74,6 +92,7 @@ function checkString(s, key){
     if(!s || typeof s !== 'string' || s.trim().length === 0) throw `${key} must exist and must be a non empty string`;
     return s.trim();
 }
+
 
 function checkDate(date) {
     if (!date || typeof date !== "string" || date.trim().length === 0) throw "releaseDate must exist and must be a non empty string.";
