@@ -6,8 +6,7 @@ import faker from 'faker';
 
 
 export function CustomException(message, flag) {
-    const error = new Error(message);
-  
+    const error = new Error(message);  
     error.code = flag? 400 : 404;
     return error;
 }

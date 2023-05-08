@@ -53,16 +53,16 @@
                 <input type="hidden" name="checkInDateInput" value="{{checkInDate}}">
                 <input type="hidden" name="checkOutDateInput" value="{{checkOutDate}}">
                 <input type="hidden" name="status" value="pending">
-                <div class="summary">
-                    <p>start date: {{checkInDate}}</p>
-                    <p>end date: {{checkOutDate}}</p>
-                    <p>room type:<span id="roomType"></span></p>
-                    <p>total days:<span id="totalDays"></span></p>
-                    <p id="totalPriceDiv">Total Price: <span id="totalPrice"></span></p>
-                </div>
                 <button type="submit" id="book-button">Book</button>
             </div>
         </form>
+        <div class="summary">
+            <p>start date: {{checkInDate}}</p>
+            <p>end date: {{checkOutDate}}</p>
+            <p>room type:<span id="roomType"></span></p>
+            <p>total days:<span id="totalDays"></span></p>
+            <p id="totalPriceDiv">Total Price: <span id="totalPrice"></span></p>
+        </div>
     </div>
     {{/if}}
     {{#if noRoom}}
