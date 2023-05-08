@@ -10,48 +10,7 @@ import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
 import { Review } from "../Mongo_Connections/mongoCollections.js";
 import * as userFuncs from "./User_Account.js";
-import e from "connect-flash";
-
-// helper functions
-
-export async function searchHotel( name, city, state, zip_code ) {
-  const tempHotel = await hotelReg();
-  if (state==='Select a State') state = undefined;
-  if (city==='') city = undefined;
-  else city = helper.checkString(city, "city", true).toLowerCase();
-  if (name === '') name = undefined;  
-  else name = helper.checkString(name, "hotel name", true).toLowerCase();
-  if (zip_code === '') zip_code = undefined;
-  else zip_code = helper.checkZip(zip_code, true);
-  // if all parameters are undefined, return all hotels
-  if (!name && !city && !state && !zip_code) {    
-    var hotelList = await tempHotel.find({}).toArray();    
-  } else {
-    // Create a dynamic filter object based on the provided parameters
-    const filter = {};
-    if (name) filter.name = { $regex: new RegExp(name, "i") };
-    if (city) filter.city = { $regex: new RegExp(city, "i") };
-    if (state) filter.state = state;
-    if (zip_code) filter.zip_code = zip_code;
-    try{
-    var hotelResult = await tempHotel.find(filter);
-      }
-    catch(e){
-      throw CustomException("Hotel not found", false);
-    }
-    var hotelList = await hotelResult.toArray()
-  }
-  if (hotelList.length === 0) {
-    throw CustomException("Hotel not found", false);
-  }
-  hotelList = hotelList.map((element) => {
-    element._id = element._id.toString();
-    return element;
-  });
-  console.log('Search results:', hotelList);
-  return hotelList;
-}
-
+import moment from "moment";
 
 export async function getAllHotels() {
   const hotelCollection = await hotelReg();
@@ -404,7 +363,17 @@ export async function updateRoomType(id, hotel_id, roomType, price, picture) {
   return { message: `Room type with id ${id} updated successfully.` };
 }
 
+//get room type
+export async function getRoomType(id) {
+  id = new ObjectId(helper.checkId(id, true));
+  const tempRoomType = await RoomType();
 
+  const roomTypeInfo = await tempRoomType.findOne({_id: id});
+
+  if (!roomTypeInfo) throw CustomException("Room type not found", false);
+  roomTypeInfo._id = roomTypeInfo._id.toString();
+  return roomTypeInfo;
+}
 
 //get hotel room
 export async function getHotelRoom(id) {
@@ -485,7 +454,7 @@ export async function addRoom(...args) {
   const room_number = helper.checkString(args[1], "room number", true);
   if (!/^\d{1,5}$/.test(room_number)) throw CustomException(`Invalid room number.`, true);
   const room_type = helper.checkString(args[2], "room type", true);
-  const order = {};
+  const orders = [];
 
   //check if hotel exists
   const tempHotel = await hotelReg();
@@ -501,7 +470,7 @@ export async function addRoom(...args) {
     hotel_id: hotel_id,
     room_number: room_number,
     room_type: room_type,
-    orders: order
+    orders: orders
   };
 
   //check if room exists
@@ -633,97 +602,133 @@ export async function updateRoom(hotel_id, room_id, typeNme, roomNum) {
 //TODO: get room
 export async function checkRoomAvailabilityOrder(...args) {
   const hotel_id = new ObjectId(helper.checkId(args[0], "hotel id", true));
-  const checkin_date = moment(helper.checkDate(args[1], true), "YYYY-MM-DD");
-  const checkout_date = moment(helper.checkDate(args[2], true), "YYYY-MM-DD");
+  const checkin_date = moment(helper.checkDate(args[1], true), "YYYY/MM/DD");
+  const checkout_date = moment(helper.checkDate(args[2], true), "YYYY/MM/DD");
   const returnInfo = new Set();
+
+  if (checkin_date.isAfter(checkout_date)) throw CustomException(`Checkin date cannot be after checkout date.`, true);
   //get all room
   const tempHotel = await hotelReg();
   const roomInfo = await tempHotel.findOne({ _id: hotel_id }, { _id: 0, rooms: 1 });
   const roomsId = [];
   for (let i of roomInfo.rooms) {
-    roomsId.push(i.map(obj => new ObjectId(obj)));
+    roomsId.push(i);
   }
+  console.log(roomsId);
   //find orders of rooms
   const tempRoom = await Room();
   let roomsOrders = [];
   for (let i of roomsId) {
-    roomsOrders.push(tempRoom.find({ _id: { $in: roomInfo } }, { orders: 1 }).toArray());
+    console.log(roomsOrders)
+    roomsOrders.push(await tempRoom.findOne({ _id: i}, { orders: 1 }));
   }
-
+  console.log(roomsOrders);
   if (!roomsOrders) throw CustomException(`Room does not exist.`, true);
   //if the target room has no orders return the true.
   //[{[]}, {[]}, {[]}]
   let ordersPerRoom = []; // [[], [], []]
   let roomAvailable = new Set();
   for (let i of roomsOrders) {
-    if (i.orders.length === 0) roomAvailable.add(i._id);
-    ordersPerRoom.push(i.orders.map((order) => new ObjectId(order)));
-  }
-
-  //get all orders' checkin findOneAndUpdate checkout date
-  let temp = [];
-  for (let i of roomsOrders) {
-    temp.push(
-      await tempOrder.find(
-        { _id: { $in: i.orders } },
-        { _id: 0, checkin_date: 1, checkout_date: 1, status: 1 }
-      )
-    );
-    if (
-      temp.every(
-        (order) =>
-          order.status === "canceled" ||
-          checkin_date.isAfter(moment(order.checkout_date, "YYYY/MM/DD")) ||
-          checkout_date.isBefore(moment(order.checkin_date, "YYYY/MM/DD"))
-      )
-    ) {
+    if (i.order  || i.order.length === 0) 
+    {
+      console.log(i._id)
       roomAvailable.add(i._id);
     }
+    else{
+      console.log(i.order);
+      ordersPerRoom.push(i.order);
+    }
+  }
+  //get all orders' checkin findOneAndUpdate checkout date
+  if (ordersPerRoom.length !== 0)
+  {
+    let temp = [];
+    for (let i of ordersPerRoom) {
+      temp.push(
+        await tempOrder.find(
+          { _id: { $in: i.order } },
+          { _id: 0, checkin_date: 1, checkout_date: 1, status: 1 }
+        )
+      );
+      if (
+        temp.every(
+          (order) =>
+            order.status === "canceled" ||
+            checkin_date.isAfter(moment(order.checkout_date, "YYYY/MM/DD")) ||
+            checkout_date.isBefore(moment(order.checkin_date, "YYYY/MM/DD"))
+        )
+      ) {
+        roomAvailable.add(i._id);
+      }
+   }
+ }
 
     //get room type
     const tempRoomType = await RoomType();
-    for (let i of roomAvailable) {
-      const roomTypeInfo = await tempRoomType.find({ hotel_id: hotel_id, rooms: { $elemMatch: i } });
-      returnInfo.add(roomTypeInfo.name);
+    const roomTypeInfo = await tempRoomType.find({ hotel_id: hotel_id}).toArray();
+    if (!Array.isArray(roomTypeInfo)) {
+      roomTypeInfo = [roomTypeInfo];
+    }
+
+    for (let i of roomAvailable.values()) {
+      for (let j of roomTypeInfo) {
+        console.log(j)
+        j.rooms = j.rooms.map((room => room.toString()));
+        console.log(j.rooms)
+        console.log(i.toString())
+        if (j.rooms.includes(i.toString())) {
+          console.log(j.rooms)
+          console.log(i)
+          returnInfo.add(j);
+          break;
+        }
+      }
+      console.log(returnInfo)
     }
     if (!returnInfo) throw CustomException(`No room available.`, true);
+    console.log(returnInfo)
     return returnInfo;
-  }
 
   //get all orders' checkin findOneAndUpdate checkout date
-
 }
 
 export async function addOrderByRoomType(...args) {
   const roomTypeId = new ObjectId(helper.checkId(args[0], "hotel id", true));
-  const checkin_date = moment(helper.checkDate(args[1], true), "YYYY-MM-DD");
-  const checkout_date = moment(helper.checkDate(args[2], true), "YYYY-MM-DD");
+  const checkin_date = moment(helper.checkDate(args[1], true), "YYYY/MM/DD");
+  const checkout_date = moment(helper.checkDate(args[2], true), "YYYY/MM/DD");
 
   //get all room
   const tempRoomType = await RoomType();
-  const roomTypeInfo = await tempRoomType.findOne({ _id: roomTypeId }, { _id: 0, rooms: 1 }).toArray();
-  if (!roomTypeInfo.hasNext()) throw CustomException(`Room type does not exist.`, true);
+  const roomTypeInfo = await tempRoomType.findOne({ _id: roomTypeId }, { _id: 0, rooms: 1 });
+  if (!roomTypeInfo) throw CustomException(`Room type does not exist.`, true);
 
   //find orders of rooms
   const tempRoom = await Room();
   let roomsOrders = [];
+  let tempOrders = undefined;
   for (let i of roomTypeInfo.rooms) {
-    roomsOrders.push(await tempRoom.findOne({ _id: i }, { orders: 1 }));
+    tempOrders = await tempRoom.findOne({ _id: i }, { orders: 1 })
+    if(!tempOrders) throw Error(`Room ${i} does not exist.`);
+    roomsOrders.push(tempOrders);
   }
 
   const tempOrder = await Order();
-
+  let orderInfo = undefined;
+  let orderList = [];
+  console.log(roomsOrders)
   for (let i of roomsOrders) {
-    if (i.orders.length === 0) {
+    if (i.order.length === 0) {
       return i._id;
     }
     else {
-      let temp = await tempOrder.find(
-        { _id: { $in: i.orders } },
-        { _id: 0, checkin_date: 1, checkout_date: 1, status: 1 }
-      );
+      orderList = [];
+      for (let order of i.order) {
+        orderInfo = await tempOrder.findOne({ _id: order });
+        if(!orderInfo) throw Error(`Order ${order} does not exist.`);
+        orderList.push(orderInfo);
+      }
       if (
-        temp.every(
+        orderList.every(
           (order) =>
             order.status === "canceled" ||
             checkin_date.isAfter(moment(order.checkout_date, "YYYY/MM/DD")) ||

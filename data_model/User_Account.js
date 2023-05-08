@@ -69,7 +69,7 @@ export async function create(...args) {
   args[6] = helper.checkPassword(args[6], true);
   user.email = helper.checkEmail(args[7], true);
   user.hotel_id = "";
-  user.orders = {};
+  user.orders = [];
 
   user.password = await bcrypt.hash(args[6], saltRounds);
 
@@ -400,6 +400,7 @@ export async function getOrderById(orderId) {
 }
 
 export async function addOrder(...args) {
+  console.log(args.length)
   if (args.length < 9) throw CustomException("Missing inputs.");
   let set = {};
   set.hotel_id = new ObjectId(helper.checkId(args[0]), true);
@@ -422,7 +423,8 @@ export async function addOrder(...args) {
   //update user account, and add order to order database
   const tempOrder = await Order();
   const tempAccount = await Account();
-  const orderInfo = tempOrder.insertOne(set);
+  const orderInfo = await tempOrder.insertOne(set);
+  console.log(orderInfo)
   if (!orderInfo) throw CustomException(`Could not add the order.`, true);
   const updateInfo = await tempAccount.findOneAndUpdate(
     { _id: set.user_id },
@@ -435,14 +437,15 @@ export async function addOrder(...args) {
       true
     );
 
-  //update room
+  //update room = await Room();
   const tempRoom = await Room();
   const roomInfo = await tempRoom.findOneAndUpdate(
-    { _id: new ObjectId(args.room_id) },
-    { $addToSet: { orders: orderInfo.insertedId } },
+    { _id: set.room_id },
+    { $addToSet: { order: orderInfo.insertedId } },
     { returnDocument: "after" }
   );
-  if (!roomInfo)
+  console.log(roomInfo)
+  if (!roomInfo.lastErrorObject.updatedExisting)
     throw CustomException(
       `Could not update the room with id ${set.room_id}`,
       true
