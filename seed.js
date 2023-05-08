@@ -98,7 +98,7 @@ async function addHotel(...args) {
     : [];
   newHotel.rooms = [];
   newHotel.room_types = [];
-  newHotel.overall_rating = 0;
+  newHotel.overall_rating = NaN;
   if (args[8] !== undefined && Array.isArray(args[8])) {
     newHotel.facilities = args[8].map((facility) =>
       helper.checkString(facility, "facility", true)
