@@ -18,7 +18,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
         <li>
             <div class="searchResultItem">
                 <div class="roomNumber">
-                    <p><a href="/hotel/{{hotelId}}/room/{{roomId}}">{{roomNumber}}</a></p>
+                    <p><a href="/hotel/:hotelId/hotelManagement/rooms/{{roomId}}">{{roomNumber}}</a></p>
                 </div>
                 <div class="roomType">
                     <p>{{roomType}}</p>
@@ -31,7 +31,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
         {{/each}}
     </ol>
     <div class="addNewRoom">
-        <form action="/hotel/{{hotelId}}/room/add" method="POST" id="addNewRoom-form" class="my-form">
+        <form action="/hotel/:hotelId/hotelManagement/rooms" method="POST" id="addNewRoom-form" class="my-form">
             <label for="newRoomNumberInput" id="newRoomNumberInput-label">
                 Room Number:
             </label>
