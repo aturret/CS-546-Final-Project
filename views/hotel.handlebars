@@ -59,6 +59,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
     {{/if}}
 </div>
 <div class="reviewSection">
+    <h2>All Reviews</h2>
     <div class="reviewResult">
         {{#if userHasReviewed}}
         <a href="/review/{{reviewID}}">to your review</a>
@@ -97,4 +98,6 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
+{{#if (ne user.identity "guest")}}
 <a href="/user/register">Click here to register!</a>
+{{/if}}

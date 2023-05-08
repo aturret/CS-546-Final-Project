@@ -39,6 +39,8 @@ forms.forEach(form => {
         const phoneInputs = form.querySelectorAll('input[class="phone"]');
         const textareas = form.querySelectorAll('textarea');
         const picInputs = form.querySelectorAll('input[type="file"]');
+        const date1 = form.querySelectorAll('input[name="startDate"]')[0];
+        const date2 = form.querySelectorAll('input[name="endDate"]')[0];
         try {
             textInputs.forEach(input => {
                 console.log('text checking');
@@ -68,7 +70,10 @@ forms.forEach(form => {
                 if (!file) throw "No file selected";
                 if (!file.type.startsWith('image/')) throw "Picture file must be an image";
                 input.value = file.name;
-            })            
+            })
+            if (date1 && date2) {
+                    checkLaterDate(date1.value, date2.value);
+            }
             if (document.getElementById('confirmPasswordInput')) {    
                 const confirmPasswordInput = document.getElementsByClassName('confirmPasswordInput')[0];
                 const PasswordInput = document.getElementsByClassName('PasswordInput')[0];
@@ -76,6 +81,7 @@ forms.forEach(form => {
             }
         }
         catch (e) {
+            console.log(`Ooops..${e}`);
             event.preventDefault();
             clientError.innerHTML = e;
         }
@@ -94,17 +100,26 @@ function checkString(s, key){
     return s.trim();
 }
 
-
 function checkDate(date) {
-    if (!date || typeof date !== "string" || date.trim().length === 0) throw "releaseDate must exist and must be a non empty string.";
-    if (!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw "releaseDate must be a valid date.";
-    date = date.trim();
-    let temp = +date.split("/")[-1];
-    if (temp < 1900 || temp > 2023)
-        throw "The year of release of the album must be between 1900 and 2024.";
-
+    const today = new Date().toISOString().split("T")[0];
+    if(date<today) throw "Date must be in the future";
     return date
 }
+
+function checkLaterDate(date1,date2) {
+    if(date1>date2) throw "Date must be later than the start date";
+}
+
+// function checkDate(date) {
+//     if (!date || typeof date !== "string" || date.trim().length === 0) throw "releaseDate must exist and must be a non empty string.";
+//     if (!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw "releaseDate must be a valid date.";
+//     date = date.trim();
+//     let temp = +date.split("/")[-1];
+//     if (temp < 1900 || temp > 2023)
+//         throw "The year of release of the album must be between 1900 and 2024.";
+
+//     return date
+// }
 function checkEmail(email) {
     email = email.trim()
     if (!email || typeof email !== 'string') throw "Email must exist and must be a string type";
