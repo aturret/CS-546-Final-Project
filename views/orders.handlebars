@@ -16,7 +16,18 @@ order has status: pending, completed, cancelled.
 </div>
 {{/if}}
 <h2>Search Result</h2>
-
+{{#if (or (eq user.identity "admin") (eq user.identity "manager"))}}
+<div class="searchBar">
+    <h2>Search Order</h2>
+    <form action="/admin/accounts/" method="POST" id="searchOrders-form" class="my-form">
+        <label for="orderIdInput" id="orderIdInput-label">
+            Search user by Order ID:
+        </label>
+        <input type="text" name="orderIdInput" id="orderIdInput">
+        <button type="submit" id="searchOrders-button">Search</button>
+    </form>
+</div>
+{{/if}}
 <div class="userOrders">
     {{#if order}}
     <ol>
@@ -28,27 +39,38 @@ order has status: pending, completed, cancelled.
                     <div class="roomType">
                         <p><a href="/order/{{_id}}">{{roomType}}</a></p>
                     </div>
+                    <div class="orderId">
+                        <p>Order ID: {{_id}}</p>
+                    </div>
                     <div class="orderPrice">
-                        <p>{{orderPrice}}</p>
+                        <p>Order Price: {{orderPrice}}</p>
                     </div>
                     <div class="startDate">
-                        <p>{{startDate}}</p>
+                        <p>Start date: {{startDate}}</p>
                     </div>
                     <div class="endDate">
-                        <p>{{endDate}}</p>
+                        <p>End date: {{endDate}}</p>
                     </div>
                     <div class="orderGuests">
-                        <p>Guests:</p>                        
+                        <p>Guests:</p>
                         <p>{{guest1.firstName}} {{guests1.lastName}}</p>
                         <p>{{guest2.firstName}} {{guests2.lastName}}</p>
                     </div>
                     <div class="orderStatus">
                         <p>Current Status: {{status}}</p>
                     </div>
-                </div>             
+                </div>
+                {{#if (or (eq user.identity "admin") (eq user.identity "manager"))}}
+                <div class="deleteOrder">
+                    <form action="/order/{{_id}}?_method=DELETE" method="POST" id="deleteOrder-form" class="my-form">
+                        <input type="hidden" name="orderId" value="{{_id}}">
+                        <button type="submit" id="deleteOrder-button" class="danger">Delete</button>
+                    </form>
+                </div>
+                {{/if}}
             </div>
         </li>
-       {{/each}}
+        {{/each}}
     </ol>
     {{else}}
     <p>No order found. Go to <a href="/">find your own vacation place!</a></p>
