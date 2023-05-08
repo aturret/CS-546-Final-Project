@@ -51,7 +51,7 @@ router
   .get(isAdmin, async (req, res) => {
     try {
       const requestId = helper.checkId(req.params.requestId, true);
-      const request = await adminFuncs.getReqById(requestId);
+      const request = await adminFuncs.getReq(requestId);
       res.render('requestById', { request: request,title:"Hotel Application Processing Panel" });
     } catch (e) {
       if (!e.code) {
@@ -85,13 +85,74 @@ router
 router
   .route('/accounts')
   .get(isAdmin, async (req, res) => {
-    res.render('adminAccounts', { title:"User Management Panel" });
+    try {
+      const username = helper.checkString(req.body.usernameInput, "username", true);
+      const user = await userFuncs.getUser(username)
+      res.render('adminAccounts', { user: user ,title:"User Management Panel"});
+    } catch (e) {
+      if (!e.code) {
+        req.session.status = 500;
+      } else {
+        req.session.status = e.code;
+      }
+      req.session.errorMessage = e.message;
+      return res.redirect("/admin/accounts");
+    }
   })
   .post(isAdmin, async (req, res) => {
     try {
-      const searchedUsername = helper.checkString(req.body.usernameInput, "username", true);
-      const searchedUser = await userFuncs.getUser(searchedUsername)
-      res.render('adminAccounts', { searchedUsername: searchedUsername, searchedUser: searchedUser ,title:"User Management Panel"});
+      username = helper.checkString(username, "username", true);
+      role = helper
+        .checkRole(role, "identity", true)
+        .toLowerCase();
+      if (["manager", "user", "admin"].every((obj) => obj !== role))
+        throw CustomException("Invalid identity.", true);
+        avatar = avatar
+        ? helper.checkWebsite(avatar, true)
+        : undefined;
+      firstName = helper.checkNameString(
+        firstName,
+        "first name",
+        true
+      );
+      lastName = helper.checkNameString(
+        lastName,
+        "last name",
+        true
+      );
+      phone = phone ? helper.checkPhone(phone, true) : undefined;
+      password = helper.checkPassword(password, true);
+      email = helper.checkEmail(email, true);
+      
+      const args = [
+        'user',
+        username,
+        avatar,
+        firstName,
+        lastName,
+        phone,
+        password,
+        email,
+        []
+      ]
+
+      const newUserMessage = await userFuncs.create(args);
+
+      // if (identity === 'manager') {
+      //   const hotel = {};
+      //   hotel.name = helper.checkString(req.body.nameInput, "hotel name", true);
+      //   hotel.street = helper.checkString(req.body.streetInput, "street", true);
+      //   hotel.city = helper.checkString(req.body.cityInput, "city", true);
+      //   hotel.state = helper.checkString(req.body.stateInput, "state", true);
+      //   hotel.zip_code = helper.checkZip(req.body.zip_codeInput, true);
+
+      //   const addMgrMessage = await adminFuncs.addMgr(req.user.username, username, hotel);
+      //   req.flash(addMgrMessage);
+      //   return res.redirect("/admin/account");
+      // }
+
+      req.flash(newUserMessage);
+      return res.redirect("/admin/accounts");
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
