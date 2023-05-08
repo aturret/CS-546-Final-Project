@@ -30,18 +30,19 @@ searchForms.forEach(form => {
 forms.forEach(form => {
     console.log('hi');
     form.addEventListener('submit', async (event) => {
-        const textInputs = document.querySelectorAll('input[type="text"]');
-        const roomTypeInputs = document.querySelectorAll('select[class="roomType"]');
-        const hotelStateInputs = document.querySelectorAll('select[id="hotelState"]');
-        const passwordInputs = document.querySelectorAll('input[type="password"]');
-        const dateInputs = document.querySelectorAll('input[type="date"]');
-        const emailInputs = document.querySelectorAll('input[type="email"]');
-        const phoneInputs = document.querySelectorAll('input[class="phone"]');
-        const textareas = document.querySelectorAll('textarea');
-        const picInputs = document.querySelectorAll('input[type="file"]');
+        const textInputs = form.querySelectorAll('input[type="text"]');
+        const roomTypeInputs = form.querySelectorAll('select[class="roomType"]');
+        const hotelStateInputs = form.querySelectorAll('select[id="hotelState"]');
+        const passwordInputs = form.querySelectorAll('input[type="password"]');
+        const dateInputs = form.querySelectorAll('input[type="date"]');
+        const emailInputs = form.querySelectorAll('input[type="email"]');
+        const phoneInputs = form.querySelectorAll('input[class="phone"]');
+        const textareas = form.querySelectorAll('textarea');
+        const picInputs = form.querySelectorAll('input[type="file"]');
         try {
             textInputs.forEach(input => {
-                console.log('text checking');             
+                console.log('text checking');
+                console.log(input.value);        
                 input.value = checkString(input.value, input.name, false);
             })
             roomTypeInputs.forEach(input => {                

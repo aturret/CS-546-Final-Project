@@ -109,14 +109,19 @@ router
     let lastName = req.body.lastNameInput;
     let phone = req.body.phoneInput;
     let email = req.body.emailInput;
+    let password = req.body.passwordInput;
+    let confirmPassword = req.body.confirmPasswordInput;
     try {
+      if (password !== confirmPassword) {
+        throw CustomException("Password and confirm password do not match.", true);
+      }
       const searchedUsername = helper.checkString(req.body.searchedUsername, "searched username", true);
       username = helper.checkString(
         username,
         "username",
         true
       );
-      avatar = helper.checkWebsite(avatar, true);
+      // avatar = helper.checkWebsite(avatar, true);
       firstName = helper.checkNameString(
         firstName,
         "first name",
@@ -141,7 +146,7 @@ router
       const updatedUser = await userFuncs.updateUser(searchedUsername, set);
 
       req.flash('Update User sucessfully');
-      return res.redirect('/admin/accounts/:searchedUsername');
+      return res.redirect(`/admin/accounts`); //Jichen: if you use redirect, it would be a get request.
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -154,7 +159,7 @@ router
   })
   .delete(isAdmin, async (req, res) => {
     try {
-      const searchedUsername = helper.checkString(req.params.searchedUsername, "searched username", true);
+      const searchedUsername = helper.checkString(req.body.searchedUsername, "searched username", true);
       const deleteMessage = await userFuncs.deleteAccount(searchedUsername);
       req.flash(deleteMessage)
       res.redirect("/admin/accounts");
