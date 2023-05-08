@@ -8,6 +8,7 @@ import * as userFuncs from "../data_model/User_Account.js";
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
 import * as helper from "../helper.js";
 import isAuth from "./user.js";
+import moment from "moment";
 
 
 const router = express.Router();
@@ -107,49 +108,79 @@ router
 // -> review page
 router
   .route("/reviews/:reviewId")
-  .get(async (req, res) => {
-    try {
-      const theUser = req.user;
-      const reviewId = helper.checkId(req.params.reviewId, true);
-      
-      const review = await userFuncs.getReviewById(reviewId);
-      const user = await userFuncs.getUserById(review.user_id);
-      const hotel = await hotelFuncs.getHotel(review.hotel_id);
-      let editable = false;
-      if(theUser){
-      const theUserId = await userFuncs.getUser(theUser.username);
-      if(theUser.identity==='admin' || review.user_id === theUserId._id){
-        editable = true;
-      }}
-      const reviewInfo = {
-        reviewId: review._id,
-        orderId: review.order_id,
-        reviewRating: review.rating,
-        reviewUpvotes: review.upvote,
-        reviewDownvotes: review.downvote,
-        hotelName: hotel.name,
-        hotelPhoto: hotel.pictures,
-        hotelRating: hotel.overall_rating,
-        hotelAddress: hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code,
-        hotelPhone: hotel.phone,
-        hotelEmail: hotel.email,
-        reviewTitle: `${user.username}'s Review`,
-        hotelId: review.hotel_id,
-        reviewComment: review.comment,
-        username: user.username,
-        userAvatar: user.avatar,
-        reviewUserId: review.user_id,
-        title: 'Review Control Panel',
-        editable: editable
-      };
-      res.render('reviews', reviewInfo);
-    } catch (e) {
-      console.log(e.message);
-      req.session.status = e.code ? e.code : 500;
-      req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel';
-      res.redirect(previousUrl);
-    }
+  .get(async (req, res) =>
+  {
+    const reviewId = req.params.reviewId;
+    try{
+      let review = undefined;
+      if (!req.session)
+      {
+        req.session = {};
+        review = await userFuncs.getReviewById(reviewId);
+        console.log(review);
+      }
+      else{
+        const tempReview = await Review();
+        review = await tempReview.findOne({_id: new ObjectId(reviewId)});
+        review.reviewRating = review.rating;
+        review.rating = null;
+        review.reviewComment = review.comment;
+        review.comment = null;
+        review.reviewUpvotes = review.upvote;
+        review.upvote = null;
+        review.reviewDownvotes = review.downvote;
+        review.hotelId = review.hotel_id;
+        review.reviewId = review._id;
+        if (req.session.hotelInfo && req.session.hotelInfo.reviewList && req.session.hotelInfo.reviewList.includes(reviewId)) {
+          review = Object.assign(review, req.session.hotelInfo);
+        }
+        else{
+          req.session.hotelInfo = {};
+          //get hotel info
+          const hotelInfo = await hotelFuncs.getHotel(review.hotel_id);
+          review.hotelName = hotelInfo.name;
+          review.hotelPhoto = hotelInfo.pictures;
+          review.hotelRating = hotelInfo.overall_rating;
+          review.hotelAddress = hotelInfo.street + ", " + hotelInfo.city + ", " + hotelInfo.state + ", " + hotelInfo.zip_code;
+          review.hotelPhone = hotelInfo.phone;
+          review.hotelEmail = hotelInfo.email;
+        }
+        if (req.session.userInfo && req.session.userInfo.reviewList && req.session.userInfo.reviewList.includes(reviewId)) {
+          review = Object.assign(review, req.session.userInfo);
+        }
+        else{
+          //get user info
+          req.session.userInfo = {};
+          const tempAccount = await Account();
+          const userInfo = await tempAccount.findOne({_id: new ObjectId(review.user_id)});
+          review.user_id = null;
+          review.userAvatar= userInfo.avatar;
+          review.reviewUserName = userInfo.username;
+        }
+        review.title = "Review";
+      }
+      const errorMessage = req.session && req.session.errorMessage || null;
+      const status = req.session && req.session.status || 200;
+      if (req.session) {
+        req.session.status = null;
+        req.session.errorMessage = null;
+      }
+      if (errorMessage)
+      {
+        review.status = status;
+        review.errorMessage = errorMessage;
+        return res.status(status).render("reviews", review);
+      }
+      review.reviewId = reviewId;
+      review._id = null;
+      console.log(review)
+      return res.status(status).render("reviews", review);
+  }
+  catch(e){
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    return res.redirect("/");
+  }
   })
   .put(isAuth, async (req, res) => {
     const reviewId = req.params.reviewId;
@@ -206,8 +237,8 @@ router
   .route("/hotel/:hotelId")
   .get(async (req, res) => {
     const hotel_id = req.params.hotelId;
-    const errorMessage = req.session && req.session.errorMessage || null;
-    const status = req.session && req.session.status || 200;
+    const errorMessage = req.session && req.session.errorMessage ? req.session.errorMessage : null;
+    const status = req.session && req.session.status ? req.session.status : 200;
     if (req.session) {
       req.session.status = null;
       req.session.errorMessage = null;
@@ -287,6 +318,7 @@ router
       //get hotel review
       const reviews = await hotelFuncs.getHotelReview(hotel_id);
       hotelInfo.reviews = reviews;
+      if(errorMessage) hotelInfo.errorMessage = errorMessage;
       return res.status(status).render("hotel", {hotelInfo, title: hotel.name});
     }
     catch(e){
@@ -296,18 +328,41 @@ router
     }
   })
 
+
+//book room
 router
   .route("/hotel/:hotelId/searchResult")
-  .get(async (req, res) => {
+  .post(async (req, res) => {
     try {
+      console.log(req.params.hotelId)
       const hotelId = helper.checkId(req.params.hotelId, true);
-      const checkin = helper.checkDate(req.body.checkin, true);
-      const checkout = helper.checkDate(req.body.checkout, true);
+      console.log("pass Id check")
+      const checkin = helper.checkDate(req.body.startDate, true);
+      const checkout = helper.checkDate(req.body.endDate, true);
 
+      console.log(hotelId)
       const searchResult = await hotelFuncs.checkRoomAvailabilityOrder(hotelId, checkin, checkout);
+      let returnInfo = {};
+      let roomType = [];
+      if(searchResult.size > 0)
+      {
+      for (let i of searchResult) {
+        i._id = i._id.toString();
+        i.roomPrice = i.price;
+        i.roomTypeName = i.name;
+        i.roomPhoto = i.pictures;
+        roomType.push(i);
+      }
+      returnInfo.roomType = roomType;
+      returnInfo.hotelId = hotelId;
+      returnInfo.checkInDate = checkin;
+      returnInfo.checkOutDate = checkout;
+      returnInfo.hotelRoom = true;
+      returnInfo.noRoom = false;
       searchResult.title =  "Room Search Result"
       res.render('searchRoomsResult', searchResult);
-    } catch (e) {
+    } }
+    catch (e) {
       if (!e.code) {
         req.session.status = 500;
       } else {
@@ -317,25 +372,34 @@ router
       return res.redirect("/hotel/:hotelId");
     }
   })
+  //post search room TODO: 
+router.route("/hotel/:hotelId/searchResult/order")
   .post(isAuth, async (req, res) => {
+    console.log(req.body)
+
+    const hotelId = helper.checkId(req.params.hotelId, true);
     try {
-      const roomTypeId = helper.checkId(req.body.roomTypeIdInput, true);
-
-      const hotelId = helper.checkId(req.params.hotelId, true);
-      const userId = helper.checkId(req.body.userIdInput, true);
-
+      //get user Id
+      const roomTypeId = helper.checkId(req.body.roomCheckInput, true);
+      const hotelId = helper.checkId(req.body.hotelIdInput, true);
+      req.user.username = helper.checkString(req.user.username, true);
+      console.log(req.user.username)
+      const tempAccount = await Account();
+      let userId = await tempAccount.findOne({username: req.user.username})
+      console.log(userId)
+      userId = userId._id.toString();
       const hotel = await hotelFuncs.getHotel(hotelId);
       const hotelName = hotel.name;
+      console.log(hotel)
+      const checkin = helper.checkDate(req.body.checkInDateInput, true);
+      const checkout = helper.checkDate(req.body.checkOutDateInput, true);
+      const guest1FisrtName = helper.checkString(req.body.guestFirstNameInputA, "GuestA firstname", true);
+      const guest1LastName = helper.checkString(req.body.guestLastNameInputA, "GuestA lastname", true);
+      const guest2FisrtName = helper.checkString(req.body.guestFirstNameInputB, "GuestB firstname", true);
+      const guest2LastName = helper.checkString(req.body.guestLastNameInputB, "GuestB lastname", true);
 
-      const checkin = helper.checkId(req.body.checkinInput, true);
-      const checkout = helper.checkId(req.body.checkoutInput, true);
-      const guest1FisrtName = helper.checkString(req.params.guest1FisrtNameInput, true);
-      const guest1LastName = helper.checkString(req.params.guest1LastNameInput, true);
-      const guest2FisrtName = helper.checkString(req.params.guest2FisrtNameInput, true);
-      const guest2LastName = helper.checkString(req.params.guest2LastNameInput, true);
-
-      const roomId = hotelFuncs.addOrderByRoomType(roomTypeId, checkin, checkout); 
-
+      const roomId = await hotelFuncs.addOrderByRoomType(roomTypeId, checkin, checkout); 
+      console.log(roomId)
       const guests = [
         {
           firstName: guest1FisrtName,
@@ -346,16 +410,16 @@ router
           lastName: guest2LastName
         }
       ];
-
-      const roomType = await hotelFuncs.getHotelRoomType(roomTypeId);
-      const days = moment(checkout).diff(moment(checkin), 'days');
+      const roomType = await hotelFuncs.getRoomType(roomTypeId)
+      const days = moment(checkout, "YYYY/MM/DD").diff(moment(checkin, "YYYY/MM/DD"), 'days');
+      console.log(days);
+      console.log(roomType.price)
       const price = roomType.price * days;
-      const status = 'pending';
+      const status = 'accepted';
 
-      const args = [hotelId, userId, roomId, hotelName, checkin, checkout, guests, price, status];
-      const addOrder = await userFuncs.addOrder(args);
+      const addOrder = await userFuncs.addOrder(hotelId, userId, roomId.toString(), hotelName, checkin, checkout, guests, price, status);
       if (addOrder) req.flash('Add order successfullly');
-      res.redirect('/hotel/:hotelId/searchResult');
+      res.redirect(`/hotel/${hotelId}`);
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -363,9 +427,9 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      return res.redirect("/hotel/:hotelId/searchResult");
+      console.log(e);
+      return res.redirect(`/hotel/${hotelId}`);
     }
-
   })
 
 router
@@ -681,9 +745,6 @@ router
       res.redirect(previousUrl);
     }
   })
-
-// render the single review page
-
 router
   .route("/hotel/:hotelId/hotelManagement/review")
   .get(isMgr, async (req, res) => {
