@@ -176,7 +176,7 @@ export async function addRoom(...args) {
   if (!/^\d{1,5}$/.test(room_number))
     throw CustomException(`Invalid room number.`, true);
   const room_type = helper.checkString(args[2], "room type", true);
-  const order = {};
+  const order = [];
 
   //check if hotel exists
   const tempHotel = await hotelReg();
@@ -262,7 +262,7 @@ export async function addOrder(...args) {
   //update user account, and add order to order database
   const tempOrder = await Order();
   const tempAccount = await Account();
-  const orderInfo = tempOrder.insertOne(set);
+  const orderInfo = await tempOrder.insertOne(set);
   if (!orderInfo) throw CustomException(`Could not add the order.`, true);
   console.log(set.user_id);
   const updateInfo = await tempAccount.findOneAndUpdate(
@@ -279,8 +279,8 @@ export async function addOrder(...args) {
   //update room
   const tempRoom = await Room();
   const roomInfo = await tempRoom.findOneAndUpdate(
-    { _id: new ObjectId(args.room_id) },
-    { $addToSet: { orders: orderInfo.insertedId } },
+    { _id: set.room_id},
+    { $addToSet: { order: orderInfo.insertedId } },
     { returnDocument: "after" }
   );
   if (!roomInfo)

@@ -40,7 +40,7 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
     {{#if (ne user.identity "guest")}}
     <div class="booking">
         <p>Please choose the date and search if there are rooms available during your schedule.</p>
-        <form action="/hotel/{{hotelId}}/result" method="POST" id="registration-form" class="my-form">
+        <form action="/hotel/{{hotelId}}" method="POST" id="registration-form" class="my-form">
             <label for="startDate" id="startDate-label">
                 Start Date:
             </label>

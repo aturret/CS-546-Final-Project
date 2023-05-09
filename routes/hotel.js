@@ -8,6 +8,7 @@ import * as userFuncs from "../data_model/User_Account.js";
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
 import * as helper from "../helper.js";
 import isAuth from "./user.js";
+import moment from "moment";
 
 
 const router = express.Router();
@@ -167,7 +168,6 @@ router
     }
   })
   .patch(isAuth, async (req, res) => {
-    console.log("patch vote fired") 
     const reviewId = req.params.reviewId;
     const reviewVote= req.body.voteInput;
     let reviewVoteSign = 0
@@ -258,53 +258,23 @@ router
     }
   })
   .post(isAuth, async (req, res) => {
-    const hotel_id = req.params.hotelId;
-    const errorMessage = req.session && req.session.errorMessage || null;
-    const status = req.session && req.session.status || 200;
-    if (req.session) {
-      req.session.status = null;
-      req.session.errorMessage = null;
-    }
-    else req.session = {};
-
-    //TODO: get hotel information
-    //get hotel information
-    try{
-      const hotel = await hotelFuncs.getHotel(hotel_id);
-      const hotelInfo = {};
-      hotelInfo.hotelId = hotel.hotel_id;
-      hotelInfo.hotelName = hotel.hotel_name;
-      hotelInfo.hotelPhoto = hotel.pictures;
-      hotelInfo.hotelRating = hotel.rating;
-      hotelInfo.hotelAddress = hotel.address + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip;
-      hotelInfo.hotelPhone = hotel.phone;
-      hotelInfo.hotelEmail = hotel.email;
-      hotelInfo.roomType = hotel.room_type;
-      //get hotel room
-      const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
-      hotelInfo.roomType = roomTypes;
-
-      //get hotel review
-      const reviews = await hotelFuncs.getHotelReview(hotel_id);
-      hotelInfo.reviews = reviews;
-      return res.status(status).render("hotel", {hotelInfo, title: hotel.name});
-    }
-    catch(e){
-      req.session.status = e.code ? e.code : 500;
-      req.session.errorMessage = e.message;
-      return res.redirect("/");
-    }
-  })
-
-router
-  .route("/hotel/:hotelId/searchResult")
-  .get(async (req, res) => {
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
-      const checkin = helper.checkDate(req.body.checkin, true);
-      const checkout = helper.checkDate(req.body.checkout, true);
-
+      const checkin = helper.checkDate(req.body.startDate, true);
+      const checkout = helper.checkDate(req.body.endDate, true);
       const searchResult = await hotelFuncs.checkRoomAvailabilityOrder(hotelId, checkin, checkout);
+      if(searchResult.roomType.length === 0){
+        searchResult.hotelRoom = false;
+        searchResult.noRoom = true;
+      }
+      else{
+        searchResult.hotelRoom = true;
+        searchResult.noRoom = false;
+        searchResult.checkInDate = checkin;
+        searchResult.checkOutDate = checkout;
+        searchResult.hotelId = hotelId;
+        
+      }
       searchResult.title =  "Room Search Result"
       res.render('searchRoomsResult', searchResult);
     } catch (e) {
@@ -317,43 +287,52 @@ router
       return res.redirect("/hotel/:hotelId");
     }
   })
+
+router
+  .route("/hotel/:hotelId/searchResult")
   .post(isAuth, async (req, res) => {
+    console.log(req.params)
+    const hotelId = helper.checkId(req.params.hotelId, true);
+    console.log(hotelId)
+    console.log(req.body)
     try {
-      const roomTypeId = helper.checkId(req.body.roomTypeIdInput, true);
 
-      const hotelId = helper.checkId(req.params.hotelId, true);
-      const userId = helper.checkId(req.body.userIdInput, true);
-
+      const roomTypeId = helper.checkId(req.body.roomCheckInput, true);
+      console.log(req.user.username)
+      const userId = await userFuncs.getUser(req.user.username);
+      console.log(userId)
       const hotel = await hotelFuncs.getHotel(hotelId);
+      console.log(hotel)
       const hotelName = hotel.name;
 
-      const checkin = helper.checkId(req.body.checkinInput, true);
-      const checkout = helper.checkId(req.body.checkoutInput, true);
-      const guest1FisrtName = helper.checkString(req.params.guest1FisrtNameInput, true);
-      const guest1LastName = helper.checkString(req.params.guest1LastNameInput, true);
-      const guest2FisrtName = helper.checkString(req.params.guest2FisrtNameInput, true);
-      const guest2LastName = helper.checkString(req.params.guest2LastNameInput, true);
+      const checkin = helper.checkDate(req.body.checkInDateInput, true);
+      const checkout = helper.checkDate(req.body.checkOutDateInput, true);
+      const guest1FirstName = req.body.guestFirstNameInputA? helper.checkString(req.body.guestFirstNameInputA, true): undefined;
+      const guest1LastName = req.body.guestLastNameInputA? helper.checkString(req.body.guestLastNameInputA, true): undefined;
+      const guest2FirstName = req.body.guestFirstNameInputB? helper.checkString(req.body.guestFirstNameInputB, true): undefined;
+      const guest2LastName = req.body.guestLastNameInputB? helper.checkString(req.body.guestLastNameInputB, true): undefined;
 
-      const roomId = hotelFuncs.addOrderByRoomType(roomTypeId, checkin, checkout); 
+      const roomId = await hotelFuncs.addOrderByRoomType(roomTypeId, checkin, checkout); 
 
       const guests = [
         {
-          firstName: guest1FisrtName,
+          firstName: guest1FirstName,
           lastName: guest1LastName
         },
         {
-          firstName: guest2FisrtName,
+          firstName: guest2FirstName,
           lastName: guest2LastName
         }
       ];
 
-      const roomType = await hotelFuncs.getHotelRoomType(roomTypeId);
+      const roomType = await hotelFuncs.getRoomType(roomTypeId);
+      
       const days = moment(checkout).diff(moment(checkin), 'days');
       const price = roomType.price * days;
-      const status = 'pending';
-      const addOrder = await userFuncs.addOrder(hotelId, userId, roomId, hotelName, checkin, checkout, guests, price, status);
+      const status = 'accepted';
+      const addOrder = await userFuncs.addOrder(hotelId, userId._id.toString(), roomId.toString(), hotelName, checkin, checkout, guests, price, status);
       if (addOrder) req.flash('Add order successfullly');
-      res.redirect('/hotel/:hotelId/searchResult');
+      res.redirect(`/hotel/${hotelId}/searchResult`);
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -361,7 +340,7 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      return res.redirect("/hotel/:hotelId/searchResult");
+      return res.redirect(`/hotel/${hotelId}`);
     }
 
   })
