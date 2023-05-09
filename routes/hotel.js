@@ -10,6 +10,7 @@ import * as helper from "../helper.js";
 import isAuth from "./user.js";
 import moment from "moment";
 import {upload} from '../helper.js'
+import { ro } from "faker/lib/locales.js";
 
 
 const router = express.Router();
@@ -408,15 +409,17 @@ router
       res.redirect(previousUrl);
     }
   })
-  .put(isMgr, upload. array("hotelPictures",10), async (req, res, next) => {
+  .put(isMgr,
+    upload.array("hotelPictures",10),
+    async (req, res, next) => {
     if(req.files.length > 0){
       req.body.hotelPictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
     }
     next();
-  }, async (req, res) => {
+  },
+  async (req, res) => {
     const hotelId = req.params.hotelId;
-    try {
-      
+    try {      
       const hotelName = req.body.hotelName;
       const hotelStreet = req.body.hotelStreet;
       const hotelCity = req.body.hotelCity;
@@ -443,7 +446,7 @@ router
         // reviews
       );
       req.flash(result);
-      return res.redirect(200).redirect(`/hotel/${hotelId}/hotelManagement`);
+      return res.redirect(`/hotel/${hotelId}/hotelManagement`);
     } catch (e) {
       console.log(e);
       e.code = e.code ? e.code : 500;
@@ -598,7 +601,7 @@ router
     }
   })
   .put(isMgr, upload.array("picturesInput", 10), async (req, res, next) => {
-    if(req.files.length > 0){
+    if (req.files.length > 0) {
       req.body.picturesInput = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
     }
     next();

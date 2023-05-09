@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/aturret/CS-546-Final-Project#readme",
   "dependencies": {
+    "@khanacademy/tota11y": "^0.2.0",
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "express": "^4.18.2",

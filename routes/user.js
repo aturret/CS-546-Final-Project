@@ -143,10 +143,12 @@ router.route("/dashboard/:username").get(isAuth, async (req, res) => {
     if (req.session && req.session.errorMessage) {
       user.errorMessage = req.session.errorMessage;
       req.session.errorMessage = null;
-      const status = req.session.status;
+      user.status = req.session.status;
       req.session.status = null;
-      return res.status(status).render("dashboard", {user, title: "Dashboard"});
+      user.title = "Dashboard";
+      return res.status(req.session.status).render("dashboard", {user});
     }
+    user.title = "Dashboard";
     return res.status(200).render("dashboard", user);
   } catch (e) {
     if (!e.code) {
@@ -163,9 +165,24 @@ router.route("/dashboard/:username").get(isAuth, async (req, res) => {
 router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) => {
   try {
     const username = helper.checkString(req.params.username, "username", true);
-    const user = await userFuncs.getUser(req.user.username);
     const orders = await userFuncs.getOrder(username);
-    return res.status(200).render("orders", { user: user, orders: orders, title: "Order History" });
+    for (let i of orders)
+    {
+      i.hotelId = i.hotel_id;
+      i.orderPrice = i.price;
+      i.startDate = i.checkin_date;
+      i.endDate = i.checkout_date;
+      if (i.guests && i.guests[0])
+      {
+        i.guest1 = i.guests[0];
+
+      }
+      if (i.guests && i.guests[1])
+      {
+        i.guest2 = i.guests[1];
+      }
+    }
+    return res.status(200).render("orders", { order: orders, title: "Order History" });
   } catch (e) {
     if (!e.code) {
       req.session.status = 500;
@@ -173,19 +190,22 @@ router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) 
       req.session.status = e.code;
     }
     req.session.errorMessage = e.message;
-    return res.redirect("/user/register");
+    return res.redirect(`/user/dashboard/${req.params.username}`);
   }
 });
 
 //TODO: ask which implementation is better   TODO: edit password as well
 router
   .route("/dashboard/:username/edit_info")
-  .put(isAuth, upload.single("avatar"), async (req, res, next) => {
+  .put(isAuth, 
+    upload.single("avatar"), 
+    async (req, res, next) => {
     if (req.file) {
       req.body.avatar = `http://localhost:3000/public/uploads/${req.file.filename}`;
     }
     next();
-  }, async (req, res) => {
+  }, 
+  async (req, res) => {
     try {
       req.body.username = helper.checkString(
         req.body.username,
@@ -212,7 +232,7 @@ router
         phone: req.body.userPhoneInput,
         email: req.body.userEmailInput,
       };
-      if (req.body.avatar === undefined || req.body.avatar === "") { delete set.avatar; }
+      // if (req.body.avatar === undefined || req.body.avatar === "") { delete set.avatar; }
       const user = await userFuncs.updateUser(req.user.username, set);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
@@ -227,6 +247,36 @@ router
     }
   });
 
+router
+  .route("/dashboard/:username/change_password")
+  .put(isAuth, async (req, res) => {
+    try {
+      req.body.userPasswordInput = helper.checkPassword( req.body.userPasswordInput, true);
+      req.body.userNewPasswordInput = helper.checkPassword( req.body.userNewPasswordInput, true);
+      req.body.userConfirmNewPasswordInput = helper.checkPassword( req.body.userConfirmNewPasswordInput, true);
+      if (req.body.userNewPasswordInput !== req.body.userConfirmNewPasswordInput) {
+        throw new CustomException("New password and confirm password do not match", true);
+      }
+      if (req.body.userPasswordInput === req.body.userNewPasswordInput) {
+        throw new CustomException("New password and old password are the same", true);
+      }
+      const password = await bcrypt.hash(req.body.userNewPasswordInput, 12);
+      let set = {
+        password: password
+      };
+      const user = await userFuncs.updateUser(req.user.username, set);
+      return res.redirect(`/user/dashboard/${req.user.username}`);
+    } catch (e) {
+      console.log(e);
+      if (!e.code) {
+        req.session.status = 500;
+      } else {
+        req.session.status = e.code;
+      }
+      req.session.errorMessage = e.message;
+      res.redirect(`/user/dashboard/${req.user.username}`);
+    }
+  });
 //TODO: this function suppose to create a new request to admin. You need to define a funciton in user_model to create a new collection for requests schema.
 router
   .route("/dashboard/:username/upgrade")
@@ -288,7 +338,7 @@ router
     }
   });
 
-router.route("/dashboard/:username/logout").get(
+router.route("/dashboard/logout").get(
   (req, res, next) => {
     if (!req.isAuthenticated()) {
       return res.redirect("/user/login");
@@ -296,6 +346,7 @@ router.route("/dashboard/:username/logout").get(
     else{
       req.logout(function (err) {
         if (err) {
+          console.log(err);
           return next(err);
         }
         req.session.destroy();

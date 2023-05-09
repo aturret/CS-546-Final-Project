@@ -299,7 +299,7 @@ export async function addRoomType(...args) {
   const hotel_id = new ObjectId(helper.checkId(args[0], true));
   const name = helper.checkString(args[1], "room type name", true);
   const pictures = args[2]
-    ? args[2].map((web) => helper.checkWebsite(web, true))
+    ? args[2].map((url) => helper.checkImageURL(url, true))
     : [];
   const price = helper.checkPrice(args[3], true);
   const rooms = args[4].length > 0 ? helper.checkArray(args[4], "rooms", true) : [];
@@ -378,7 +378,9 @@ export async function updateRoomType(id, hotel_id, roomType, price, picture) {
   roomType = helper.checkString(roomType, "room type", true);
   price = helper.checkPrice(price, true);
   picture = helper.checkWebsite(picture, true);
-
+  picture = picture
+    ? picture.map((url) => helper.checkImageURL(url, true))
+    : [];
   const updateInfo = {
     name: roomType,
     price: price,

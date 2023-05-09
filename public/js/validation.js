@@ -1,7 +1,7 @@
 // In this file, you must perform all client-side validation for every single form input (and the role dropdown) on your pages. The constraints for those fields are the same as they are for the data functions and routes. Using client-side JS, you will intercept the form's submit event when the form is submitted and If there is an error in the user's input or they are missing fields, you will not allow the form to submit to the server and will display an error on the page to the user informing them of what was incorrect or missing.  You must do this for ALL fields for the register form as well as the login form. If the form being submitted has all valid data, then you will allow it to submit to the server for processing. Don't forget to check that password and confirm password match on the registration form!
 
-import {moment} from 'https://momentjs.com/downloads/moment.js'
-
+// import {moment} from 'https://momentjs.com/downloads/moment.js'
+// import moment from "moment";
 console.log('client-side JS loaded!');
 
 const forms = document.querySelectorAll('.my-form');
@@ -14,12 +14,12 @@ searchForms.forEach(form => {
         const textInputs = document.querySelectorAll('input[type="text"]');
         const selectInputs = document.querySelectorAll('select');
         const allInputs = textInputs.concat(selectInputs);
-        try{
+        try {
             allInputs.forEach(input => {
-                if(input.value.trim() !== '') input.value = checkString(input.value, input.name);
+                if (input.value.trim() !== '') input.value = checkString(input.value, input.name);
             })
         }
-        catch(e){
+        catch (e) {
             event.preventDefault();
             clientError.innerHTML = e;
         }
@@ -44,40 +44,45 @@ forms.forEach(form => {
         try {
             textInputs.forEach(input => {
                 console.log('text checking');
-                console.log(input.value);        
+                console.log(input.value);
                 input.value = checkString(input.value, input.name, false);
             })
-            roomTypeInputs.forEach(input => {                
+            roomTypeInputs.forEach(input => {
                 input.value = checkString(input.value, input.name, false);
             })
-            phoneInputs.forEach(input => {                
+            phoneInputs.forEach(input => {
                 input.value = checkPhone(input.value, false);
             })
-            emailInputs.forEach(input => {                
+            emailInputs.forEach(input => {
                 input.value = checkEmail(input.value, false);
-            })            
-            passwordInputs.forEach(input => {               
+            })
+            passwordInputs.forEach(input => {
                 input.value = checkPassword(input.value, false);
             })
-            dateInputs.forEach(input => {                
+            dateInputs.forEach(input => {
                 input.value = checkDate(input.value, false);
             })
-            textareas.forEach(input => {                
+            textareas.forEach(input => {
                 input.value = checkString(input.value, input.name, false);
             })
             if (form.classList.contains('picForm')) {
-            picInputs.forEach(input => {
-                const file = input.files[0];
-                if (!file) throw "No file selected";
-                if (!file.type.startsWith('image/')) throw "Picture file must be an image";
-            })}
-            if (date1 && date2) {
-                    checkLaterDate(date1.value, date2.value);
+                picInputs.forEach(input => {
+                    const file = input.files[0];
+                    if (!file) throw "No file selected";
+                    if (!file.type.startsWith('image/')) throw "Picture file must be an image";
+                })
             }
-            if (document.getElementById('confirmPasswordInput')) {    
-                const confirmPasswordInput = document.getElementsByClassName('confirmPasswordInput')[0];
-                const PasswordInput = document.getElementsByClassName('PasswordInput')[0];
-                if (confirmPasswordInput.value !== PasswordInput.value) throw "Passwords do not match";
+            if (date1 && date2) {
+                checkLaterDate(date1.value, date2.value);
+            }
+            if (form.getElementsByClassName('confirmNewPasswordInput')) {
+                const confirmPasswordInput = form.getElementsByClassName('newPasswordInput')[0];
+                const PasswordInput = form.getElementsByClassName('confirmNewPasswordInput')[0];
+                const oldPasswordInput = form.getElementsByClassName('oldPasswordInput')[0];
+                if (confirmPasswordInput && PasswordInput && oldPasswordInput) {
+                    if (confirmPasswordInput.value !== PasswordInput.value) throw "Passwords do not match";
+                    if (confirmPasswordInput.value === oldPasswordInput.value) throw "New password cannot be the same as the old password";
+                }
             }
         }
         catch (e) {
@@ -95,19 +100,19 @@ forms.forEach(form => {
 
 
 
-function checkString(s, key){
-    if(!s || typeof s !== 'string' || s.trim().length === 0) throw `${key} must exist and must be a non empty string`;
+function checkString(s, key) {
+    if (!s || typeof s !== 'string' || s.trim().length === 0) throw `${key} must exist and must be a non empty string`;
     return s.trim();
 }
 
 function checkDate(date) {
     const today = new Date().toISOString().split("T")[0];
-    if(date<today) throw "Date must be in the future";
+    if (date < today) throw "Date must be in the future";
     return date
 }
 
-function checkLaterDate(date1,date2) {
-    if(date1>date2) throw "Date must be later than the start date";
+function checkLaterDate(date1, date2) {
+    if (date1 > date2) throw "Date must be later than the start date";
 }
 
 // function checkDate(date) {
@@ -126,19 +131,18 @@ function checkEmail(email) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw "Invalid email address"
     return email
 }
-function checkPhone(n)
-{
+function checkPhone(n) {
     n = n.trim()
     // if(n.length === 0) throw "Phone number must exist and must be a string type.";
-    if(!n || typeof n !== 'string') throw "Phone number must exist and must be a string type.";
-    if(!/^\d{3}[-]?\d{3}[-]?\d{4}$/.test(n)) throw "Cell phone number has to match the format. xxxxxxxxxxx, xxx-xxx-xxxxx or (xxx)xxx-xxxxx"
+    if (!n || typeof n !== 'string') throw "Phone number must exist and must be a string type.";
+    if (!/^\d{3}[-]?\d{3}[-]?\d{4}$/.test(n)) throw "Cell phone number has to match the format. xxxxxxxxxxx, xxx-xxx-xxxxx or (xxx)xxx-xxxxx"
     return n
 }
-function checkPassword(password){
-    if(!password|| typeof password !== "string") throw "Password must exist and must be a string.";
-    if(!/\d/.test(password)) throw "Password must contain at least one digit.";
-    if(!/[a-z]/.test(password)) throw "Password must contain nat least one letter."
-    if(password === password.toLowerCase()) throw "Password must have at least one upper case letter.";
+function checkPassword(password) {
+    if (!password || typeof password !== "string") throw "Password must exist and must be a string.";
+    if (!/\d/.test(password)) throw "Password must contain at least one digit.";
+    if (!/[a-z]/.test(password)) throw "Password must contain nat least one letter."
+    if (password === password.toLowerCase()) throw "Password must have at least one upper case letter.";
 
     return password.trim()
 }

@@ -13,6 +13,14 @@ const newHotelWindow = document.getElementById('newHotelWindow');
 const editInformationButton = document.getElementById('editInformationButton');
 const editInformationWindow = document.getElementById('editInformationWindow');
 const editRoomButton = document.getElementById('editRoomButton');
+const changePasswordButton = document.getElementById('changePasswordButton');
+const changePasswordWindow = document.getElementById('changePasswordWindow');
+
+function changePassword() {
+    changePasswordWindow.hidden = false;
+    changePasswordButton.style.display = 'none';
+}
+
 
 function editInformation() {
     editInformationWindow.hidden = false;
