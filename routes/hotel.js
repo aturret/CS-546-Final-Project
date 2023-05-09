@@ -555,7 +555,7 @@ router
     const hotelId = helper.checkId(req.params.hotelId, true);
     try {
       const roomTypes = await hotelFuncs.getHotelRoomType(hotelId);
-      res.render('roomtTypes', {hotelId: hotelId, roomTypes: roomTypes, title: `Room Type Control Panel`});
+      res.render('roomTypes', {hotelId: hotelId, roomTypes: roomTypes, title: `Room Type Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -567,12 +567,13 @@ router
     const hotelId = helper.checkId(req.params.hotelId, true);
     try {
       const roomTypeName = helper.checkString(req.body.newRoomTypeNameInput, "room type name", true);
-      const roomTypePicture = helper.checkWebsite(req.body.roomTypePictureInput, true);
-      const price = helper.checkPrice(req.body.newPriceInput, true);
-      const pictures = req.body.picturesInput ? helper.checkArray(req.body.picturesInput, true) : [];
-      const rooms = req.body.rooms ? helper.checkArray(req.body.rooms, true) : [];
+      // const roomTypePicture = helper.checkWebsite(req.body.roomTypePictureInput, true);
+      // const pictures = req.body.picturesInput ? helper.checkArray(req.body.picturesInput, true) : [];
+      const pictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+      const price = helper.checkPrice(parseFloat(req.body.newPriceInput), true);
+      // const rooms = req.body.rooms ? helper.checkArray(req.body.rooms, true) : [];
 
-      const addRoomTypeMessage = await hotelFuncs.addRoomType(hotelId, roomTypeName, roomTypePicture, price, rooms);
+      const addRoomTypeMessage = await hotelFuncs.addRoomType(hotelId, roomTypeName, pictures, price, []);
       req.flash(addRoomTypeMessage);
       res.redirect(`/hotel/${hotelId}/hotelManagement/roomtypes`);
     } catch (e) {

@@ -366,7 +366,7 @@ export async function deleteRoomType(id, hotel_id) {
   //update hotel
   const tempHotel = await hotelReg();
   const updateInfo = await tempHotel.findOneAndUpdate({ _id: hotel_id }, { $pull: { room_types: roomType.name } }, { returnDocument: "after" });
-  if (!updateInfo) throw CustomException(`Could not update the hotel with id ${hotel_id}`, true);
+  if (!updateInfo) throw CustomException(`Could not update the hotel with id ${hotel_id.toString()}`, true);
 
   //delete room type
   const deleteInfo = await tempRoomType.deleteOne({ _id: id });
