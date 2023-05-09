@@ -318,8 +318,6 @@ router
       const city = helper.checkString(req.body.hotelCityInput, "city", true);
       const state = helper.checkString(req.body.hotelStateInput, "state", true);
       const zip_code = helper.checkZip(req.body.hotelZipcodeInput, true);
-      // const userId = await userFuncs.getUser(req.user.username)
-      // const managers = [req.user.username];
       const pictures = req.body.hotelPhotoInput
         ? req.body.hotelPhotoInput.map((url) => helper.checkImageURL(url, true))
         : [];
