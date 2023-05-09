@@ -264,7 +264,9 @@ router
       const pictures = req.user.hotelPhotoInput
         ? req.user.hotelPhotoInput.map((url) => helper.checkImageURL(url, true))
         : [];
-      const requestMessage = await userFuncs.createRequest(req.user.username, hotelName, street, city, state, zip_code, phone, email, pictures, []);
+
+      const facilities = helper.checkString(req.user.hotelFacilitiesInput, "facilities", true);
+      const requestMessage = await userFuncs.createRequest(req.user.username, hotelName, street, city, state, zip_code, phone, email, pictures, facilities);
       req.flash(requestMessage);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
@@ -279,7 +281,7 @@ router
     }
   });
 
-router.route("/dashboard/:username/logout").get(
+router.route("/logout").get(
   (req, res, next) => {
     if (!req.isAuthenticated()) {
       return res.redirect("/user/login");
@@ -289,6 +291,7 @@ router.route("/dashboard/:username/logout").get(
         if (err) {
           return next(err);
         }
+        req.flash("success", "You have logged out successfully.")
         req.session.destroy();
         res.redirect("/user/login");
       }

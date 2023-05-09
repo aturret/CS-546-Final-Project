@@ -100,11 +100,10 @@ async function addHotel(...args) {
   newHotel.room_types = [];
   newHotel.overall_rating = NaN;
   if (args[8] !== undefined && Array.isArray(args[8])) {
-    newHotel.facilities = args[8].map((facility) =>
-      helper.checkString(facility, "facility", true)
-    );
+    newHotel.facilities = helper.checkString(facility, "facility", true)
+  
   } else if (!args[8]) {
-    newHotel.facilities = [];
+    newHotel.facilities = "";
   } else {
     throw CustomException("Invalid facilities.", true);
   }
@@ -359,7 +358,7 @@ try {
 
       //create hotel
       hotelInfo = hotelGenerator.next().value;
-      hotelInfo.facilities = [];
+      hotelInfo.facilities = "wifi, parking, pool, gym, spa, restaurant";
       hotelInfo.managers = [manager_id];
       console.log(hotelInfo);
       hotelInfo = await addHotel(
@@ -454,7 +453,7 @@ try {
     } else {
       //create hotel
       hotelInfo = hotelGenerator.next().value;
-      hotelInfo.facilities = [];
+      hotelInfo.facilities = "wifi, parking, pool, gym, spa, restaurant";
       hotelInfo.managers = [userInfo.insertedId.toString()];
       console.log(hotelInfo);
       //create request

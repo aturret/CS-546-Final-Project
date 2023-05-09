@@ -286,6 +286,7 @@ router
       hotelInfo.roomType = hotel.room_type;
       hotelInfo.manageable = manageable;
       hotelInfo.title = hotel.name;
+      hotelInfo.hotelFacilities = hotel.facilities;
       //get hotel room
       const roomTypes = await hotelFuncs.getHotelRoomType(hotel_id);
       hotelInfo.roomType = roomTypes;
