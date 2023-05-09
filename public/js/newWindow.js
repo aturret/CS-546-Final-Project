@@ -12,6 +12,7 @@ const newHotelWindow = document.getElementById('newHotelWindow');
 // const editRoomTypeWindow = document.getElementById('editRoomTypeWindow');
 const editInformationButton = document.getElementById('editInformationButton');
 const editInformationWindow = document.getElementById('editInformationWindow');
+const editRoomButton = document.getElementById('editRoomButton');
 
 function editInformation() {
     editInformationWindow.hidden = false;
@@ -31,12 +32,12 @@ function addReview() {
     addReviewButton.hidden = true;
 }
 
-// function editRoom(roomId){
-//     const editId = `edit-${roomId}`;
-//     const editRoomWindow = document.getElementById(editId);
-//     editRoomWindow.style.display = 'block';
-//     editRoomWindow.hidden = false;
-// }
+function editRoom(){
+    const editRoomWindow = document.getElementById('editRoomWindow');
+    editRoomWindow.style.display = 'block';
+    editRoomWindow.hidden = false;
+    editRoomButton.style.display = 'none';
+}
 
 function editRoomType(roomTypeId){
     const editId = `edit-${roomTypeId}`;
