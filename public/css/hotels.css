@@ -389,3 +389,65 @@ form.search-form {
   font-weight: bold;
   font-size: large;
 }
+
+.userFirstName
+{
+  position: relative;
+}
+
+.userFirstName input
+{
+  position: relative;
+  width: auto;
+  height: 15px;
+}
+
+.userLastName
+{
+  position: relative;
+}
+
+.userLastName input
+{
+  position: relative;
+  width: auto;
+  height: 15px;
+}
+
+.avatar label
+{
+  width: auto;
+  display: inline-block;
+  text-align: right;
+}
+.avatar input
+{
+  display: inline-block;
+  margin-bottom: 20px;
+}
+.userEmail
+{
+  margin-top: 20px;
+}
+.userEmail input
+{
+  position: relative;
+  width: auto;
+  height: 40px;
+}
+.userPhone
+{
+  position: relative;
+  width: auto;
+  height: 40px;
+}
+.userPhone label
+{
+  position: relative;
+}
+.userPhone input
+{
+  position: relative;
+  width: auto;
+  height: 40px;
+}

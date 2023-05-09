@@ -146,7 +146,7 @@ router.route("/dashboard/:username").get(isAuth, async (req, res) => {
       user.status = req.session.status;
       req.session.status = null;
       user.title = "Dashboard";
-      return res.status(req.session.status).render("dashboard", {user});
+      return res.status(user.status).render("dashboard", user);
     }
     user.title = "Dashboard";
     return res.status(200).render("dashboard", user);
