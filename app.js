@@ -24,6 +24,7 @@ const staticDir = express.static(__dirname + '/public');
 app.use('/public', staticDir);
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(methodOverride('_method'));
 
 const handlebarsInstance = exphbs.create({
     defaultLayout: 'main',
@@ -134,7 +135,6 @@ app.use((req, res, next) => {
     console.log(`${now} ${req.method} ${req.originalUrl} ${req.user && req.user.username? req.user.username: "Guest"}`);
     next();
 })
-app.use(methodOverride('_method'));
 configRoutes(app);
 
 app.listen(3000, () => {

@@ -389,6 +389,7 @@ export async function getOrderById(orderId) {
   return order;
 }
 
+
 export async function addOrder(...args) {
   if (args.length < 9) throw CustomException("Missing inputs.");
   let set = {};
@@ -486,7 +487,7 @@ export async function deleteOrder(order_id) {
 
   const tempOrder = await Order();
   const orderInfo = await tempOrder.findOneAndUpdate(
-    { _id: order_id },
+    { _id: new ObjectId(order_id) },
     { $set: { status: "canceled" } }
   );
   if (orderInfo.lastErrorObject.n === 0)

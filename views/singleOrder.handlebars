@@ -79,7 +79,7 @@ order has status: pending, completed, cancelled.
         </div> --}}
         <div class="cancelOrder">
             <div class="cancelOrderWindow">
-                <form action="/order/{{orderId}}/cancel" method="POST" id="cancelOrder-form" class="my-form">
+                <form action="/order/{{orderId}}?_method=DELETE" method="POST" id="cancelOrder-form" class="my-form">
                     <input type="hidden" name="orderId" value="{{orderId}}">
                     <input type="hidden">
                     <button type="submit" class="cancel">Cancel</button>

@@ -1,6 +1,6 @@
 import { Strategy as auth } from "passport-local";
 import express, { Router } from "express";
-import { ObjectId } from "mongodb";
+import { ObjectId, OrderedBulkOperation } from "mongodb";
 import { Review, Account } from "../Mongo_Connections/mongoCollections.js";
 import passport from "passport";
 import bcrypt from "bcryptjs";
@@ -641,7 +641,7 @@ router
     // const hotelId = helper.checkId(req.params.hotelId, true);
     // const hotel = await hotelFuncs.getHotel(hotelId);
     // res.render('orders', {orders: hotel.orders, title: `Order Control Panel`});
-    res.render('orders', {title: `Order Control Panel`});
+    res.render('adminOrder', {title: `Search Order`});
   })
   .delete(isMgr, async (req, res) => {
     try {
@@ -777,6 +777,116 @@ router
       res.redirect(previousUrl);
     }
   })
+
+  router.route("/order/:orderId")
+  .get(isAuth, async (req, res) => {
+    const orderId = helper.checkId(req.params.orderId, true);
+    try {
+      const order = await userFuncs.getOrderById(orderId);
+      order.hotelId = order.hotel_id
+
+      const room = await hotelFuncs.getRoom(order.room_id);
+      order.roomType = room.room_type;
+      order.hotelName = order.hotel_name
+      order.orderPrice = order.price
+      order.startDate = order.start_date
+      order.endDate = order.end_date
+      if(order.guests && order.guests[0]) 
+      {
+        order.guest1 = order.guests[0]
+      }
+      if(order.guests && order.guests[1])
+      {
+        order.guest2 = order.guests[1]
+      }
+      order.orderId = order._id.toString()
+      return res.render('singleOrder', {order: order, title: `Order Detail`});
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      res.redirect(`/order/${orderId}`);
+    }
+  })
+  .delete(isAuth, async (req, res) => {
+    const orderId = helper.checkId(req.params.orderId, true);
+    try {
+      const order = await userFuncs.deleteOrder(orderId);
+      req.flash("success", "Order has been cancelled");
+      res.redirect(`/order/${orderId}`);
+      
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      res.redirect(`/order/${orderId}`);
+    }
+  })
+
+
+  router.route("/searchOrder")
+  .post(isMgr, async (req, res) => {
+    const orderId = helper.checkId(req.body.orderIdInput, true);
+    try {
+    if (req.user.identity === "admin")
+    {
+       const order = await userFuncs.getOrderById(orderId);
+       const room = await hotelFuncs.getRoom(order.room_id.toString());
+       order.hotelId = order.hotel_id
+       order.roomType = room.room_type;
+       order.hotelName = order.hotel_name
+       order.orderPrice = order.price
+       order.startDate = order.checkin_date
+       order.endDate = order.checkout_date
+       if(order.guests && order.guests[0])
+       {
+         order.guest1 = order.guests[0]
+       }
+       if(order.guests && order.guests[1])
+       {
+         order.guest2 = order.guests[1]
+       }
+       order.orderId = order._id.toString()
+       order.title = `Order Detail`
+       return res.status(200).render('singleOrder', order);
+    }
+    else{
+      const order = await userFuncs.getOrderById(orderId);
+      if (order.hotel_id.toString() === req.user.hotel_id)
+      {
+        const room = await hotelFuncs.getRoom(order.room_id.toString());
+        order.roomType = room.room_type;
+        order.hotelName = order.hotel_name
+        order.orderPrice = order.price
+        order.startDate = order.start_date
+        order.endDate = order.end_date
+        if(order.guests && order.guests[0])
+        {
+          order.guest1 = order.guests[0]
+        }
+        if(order.guests && order.guests[1])
+        {
+          order.guest2 = order.guests[1]
+        }
+        order.title = `Order Detail`
+        order.orderId = order._id.toString()
+        return res.status(200).render('singleOrder', {order});
+      }
+      else{
+        req.session.status = 403;
+        req.session.errorMessage = "This order is not in your hotel";
+        res.redirect(`/hotel/${hotelId}/hotelManagement/orders`);
+      }
+    }
+  } catch (e) {
+    req.session.status = e.code ? e.code : 500;
+    req.session.errorMessage = e.message;
+    if(res.user.identity === "admin")
+    {
+      return res.redirect(`/admin/searchOrder`);
+    }
+    orderId = order._id.toString()
+    res.redirect(`/hotel/${hotelId}/hotelManagement`);
+  }
+})
 
 // //manager or admin only
 // router.route("dashboard/:username/hotel_orders")
