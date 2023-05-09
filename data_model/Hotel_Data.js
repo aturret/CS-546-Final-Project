@@ -425,6 +425,7 @@ export async function getHotelRoom(id) {
 
 //get single room
 export async function getRoom(id) {
+  id = id.toString();
   id = new ObjectId(helper.checkId(id, true));
   const tempRoom = await Room();
 

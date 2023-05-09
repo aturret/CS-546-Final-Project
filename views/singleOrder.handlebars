@@ -33,8 +33,15 @@ order has status: pending, completed, cancelled.
                 <p>{{endDate}}</p>
             </div>
             <div class="orderGuests">
-                <p>{{guest1.firstName}} {{guests1.lastName}}</p>
-                <p>{{guest2.firstName}} {{guests2.lastName}}</p>
+                <ul>
+                    <li>
+                        <p>{{guest1.firstName}} {{guests1.lastName}}</p>
+                    </li>
+                    <li>
+                        <p>{{guest2.firstName}} {{guests2.lastName}}</p>
+                    </li>
+                </ul>
+
             </div>
             <div class="orderStatus">
                 <p>{{status}}</p>

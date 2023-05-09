@@ -84,6 +84,7 @@ forms.forEach(form => {
                     if (confirmPasswordInput.value === oldPasswordInput.value) throw "New password cannot be the same as the old password";
                 }
             }
+            
         }
         catch (e) {
             console.log(`Ooops..${e}`);

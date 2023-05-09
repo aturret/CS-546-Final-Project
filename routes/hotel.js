@@ -801,7 +801,8 @@ router
         order.guest2 = order.guests[1]
       }
       order.orderId = order._id.toString()
-      return res.render('singleOrder', {order: order, title: `Order Detail`});
+      order.title = `Order Detail`
+      return res.render('singleOrder', order);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;

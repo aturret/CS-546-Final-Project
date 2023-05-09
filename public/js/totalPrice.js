@@ -24,12 +24,15 @@ function daysBetweenDates(date1, date2) {
     return daysDiff;
 }
 
-const radioInputs = document.querySelectorAll('input[type="radio"][name="roomTypeIdInput"]');
-
-radioInputs.forEach(input => {
+const radioInputs = document.querySelectorAll('input[type="radio"]');
+console.log(radioInputs);
+radioInputs.forEach(input => {    
     input.addEventListener('change', event => {
-        roomTypeSpan.textContent = event.target.value;
-        totalPriceSpan.textContent = event.target.value * betweenDays;
+        let priceDOM = event.target.nextElementSibling.nextElementSibling.nextElementSibling.children[0];
+        const price = priceDOM.querySelectorAll('span')[0].textContent;
+        roomTypeSpan.textContent = event.target.nextElementSibling.textContent;
+        console.log(` ${event.target.parentNode.id} was selected`);
+        totalPriceSpan.textContent = price * betweenDays;
         console.log(` ${event.target.value} was selected`);
     });
 });
