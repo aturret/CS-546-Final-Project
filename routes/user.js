@@ -307,7 +307,7 @@ router
       permission = await userFuncs.getRequest(req.user.username);
       if(!permission)
       {
-        req.session.status = 403;
+        req.user.status = 403;
         req.session.errorMessage = "You already have a request.";
         return res.redirect(`/user/dashboard/${req.user.username}`);
       }

@@ -880,10 +880,8 @@ export async function createRequest(...args) {
 //get request by username
 export async function getRequest(username) {
   username = helper.checkString(username, "username", true);
-
   const tempRequest = await mgrReq();
   const requestInfo = await tempRequest.findOne({ username: username });
   if (requestInfo !== null) return false;
-
   return true;
 }
