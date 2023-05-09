@@ -18,7 +18,9 @@ reviewUserId: the id of the user who wrote the review
     <div class="hotelName">
         <p>{{hotelName}}</p>
     </div>
-    <div class="hotelPhoto"><img src="{{hotelPhoto}}"></div>
+    <div class="hotelPhoto">
+        <img src="{{hotelPhoto}}" alt="photo of the hotel">
+    </div>
     <div class="hotelRating">
         <p>Rating: {{hotelRating}}</p>
     </div>
@@ -38,8 +40,8 @@ reviewUserId: the id of the user who wrote the review
         {{#each hotelReviews}}
         <div class="reviewItem box">
             <div class="reviewUserItem left">
-                <div class="reviewUserPhoto" >
-                    <img src="{{userAvatar}}" aria-placeholder="User Avatar">
+                <div class="reviewUserPhoto">
+                    <img src="{{userAvatar}}" alt="User Avatar" aria-placeholder="User Avatar">
                 </div>
             </div>
             <div class="reviewContentItem right">
@@ -84,7 +86,7 @@ reviewUserId: the id of the user who wrote the review
             </label>
             <textarea name="reviewInput" id="reviewInput" cols="30" rows="10"></textarea>
             <button type="submit">Submit</button>
-        </form>        
+        </form>
     </div>
 
 </div>

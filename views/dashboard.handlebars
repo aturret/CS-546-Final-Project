@@ -11,7 +11,7 @@
 {{/if}}
 <div class="avatar">
     {{#if avatar}}
-    <img src="{{avatar}}" alt="thumbnail not available">
+    <img src="{{avatar}}" alt="avatar of the user">
     {{else}}
     <img src="/public/img/avatar.jpg" alt="default avatar">
     {{/if}}
@@ -69,7 +69,7 @@
         <button id="changePasswordButton" onclick="changePassword()">Change Password</button>
         <div id="changePasswordWindow" hidden="true">
             <form action="/user/dashboard/{{username}}/change_password?_method=PUT" method="POST"
-                id="editInformation-form" class="my-form">
+                id="changePassword-form" class="my-form">
                 <input type="hidden" name="username" value="{{username}}">
                 <div class="userPassword">
                     <label for="userPassword">Password</label>
@@ -84,7 +84,7 @@
                     <input type="password" name="userConfirmNewPasswordInput" id="confirmNewPasswordInput"
                         class="confirmNewPasswordInput">
                 </div>
-                <button type="submit" id="editInformation">Submit</button>
+                <button type="submit" id="editChangePassword">Submit</button>
             </form>
         </div>
     </div>

@@ -338,7 +338,7 @@ router
     }
   });
 
-router.route("/dashboard/:username/logout").get(
+router.route("/dashboard/logout").get(
   (req, res, next) => {
     if (!req.isAuthenticated()) {
       return res.redirect("/user/login");
@@ -346,6 +346,7 @@ router.route("/dashboard/:username/logout").get(
     else{
       req.logout(function (err) {
         if (err) {
+          console.log(err);
           return next(err);
         }
         req.session.destroy();
