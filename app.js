@@ -99,7 +99,7 @@ passport.use('login', new auth({
 
 passport.serializeUser((user, next) => {
     process.nextTick(() => {
-        return next(null, {username: user.username, identity: user.identity});
+        return next(null, {username: user.username, identity: user.identity, hotel: user.hotel_id});
     }
     )
 }

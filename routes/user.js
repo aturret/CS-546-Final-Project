@@ -25,6 +25,32 @@ export const isAuth = (req, res, next) => {
   next();
 };
 
+export const isMgr = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/user/login");
+  }
+  if (req.user && req.user.identity === 'user') {
+    req.flash("errorMessage", "You are not allow to access this page")
+    return res.redirect(`/user/dashboard/${req.user.username}`);
+  }
+  if (req.user.identity === 'manager' && req.user.hotel !== req.params.hotelId) {
+    req.flash("errorMessage", "You are not allow to access this page")
+    return res.redirect(`/user/dashboard/${req.user.username}`);
+  }
+  next();
+};
+
+export const isAdmin = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/user/login");
+  }
+  if (req.user && req.user.identity !== 'admin') {
+    req.flash("errorMessage", "You are not allow to access this page")
+    return res.redirect(`/user/dashboard/${req.user.username}`);
+  }
+  next();
+};
+
 router
   .route("/login")
   .get(

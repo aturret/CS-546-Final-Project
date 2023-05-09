@@ -15,17 +15,18 @@ import {upload} from '../helper.js'
 const router = express.Router();
 
 // functions for checking session authentication
+
 export const isMgr = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.redirect("/user/login");
   }
   if (req.user && req.user.identity === 'user') {
     req.flash("errorMessage", "You are not allow to access this page")
-    return res.redirect("/user/dashboard");
+    return res.redirect(`/user/dashboard/${req.user.username}`);
   }
   if (req.user.identity === 'manager' && req.user.hotel !== req.params.hotelId) {
     req.flash("errorMessage", "You are not allow to access this page")
-    return res.redirect("/user/dashboard");
+    return res.redirect(`/user/dashboard/${req.user.username}`);
   }
   next();
 };
@@ -36,7 +37,7 @@ export const isAdmin = (req, res, next) => {
   }
   if (req.user && req.user.identity !== 'admin') {
     req.flash("errorMessage", "You are not allow to access this page")
-    return res.redirect("/user/dashboard");
+    return res.redirect(`/user/dashboard/${req.user.username}`);
   }
   next();
 };
@@ -208,13 +209,13 @@ router
   .get(isAdmin, async (req, res) => {
     res.render('adminHotel', {title:"Hotel Creating Panel"});
   })
-  .post(isAdmin, upload.array("hotelPictures",10), async (req, res, next) => {
+  .post(isAdmin, upload.array("hotelPhotoInput",10), async (req, res, next) => {
     if(req.files.length > 0){
-      req.body.hotelPictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+      req.body.hotelPhotoInput = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
     }
     next();
   },
-     async (req, res) => {
+    async (req, res) => {
     try {
       let hotelInput = req.body;
       let args = [];
@@ -225,8 +226,8 @@ router
       args[4] = helper.checkZip(hotelInput.zipCodeInput, true);
       args[5] = helper.checkPhone(hotelInput.phoneInput, true);
       args[6] = helper.checkEmail(hotelInput.emailInput, true);
-      args[7] = hotelInput.picturesInput
-        ? hotelInput.picturesInput.map((web) => helper.checkWebsite(web, true))
+      args[7] = hotelInput.hotelPhotoInput
+        ? hotelInput.hotelPhotoInput.map((web) => helper.checkWebsite(web, true))
         : [];
       if (hotelInput.facilitiesInput && Array.isArray(hotelInput.facilitiesInput)) {
         args[8] = hotelInput.facilitiesInput.map((facility) =>
@@ -563,15 +564,18 @@ router
       res.redirect(previousUrl);
     }
   })
-  .post(isMgr, async (req, res) => {
+  .post(isMgr, upload.array("newPicturesInput", 10), async (req, res, next) => {
+    if(req.files.length > 0){
+      req.body.newPictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+    }
+    next();
+  }, async (req, res) => {
     const hotelId = helper.checkId(req.params.hotelId, true);
     try {
+      const pictures = helper.checkArray(req.body.newPictures, 'new roomtype pictures', true);
       const roomTypeName = helper.checkString(req.body.newRoomTypeNameInput, "room type name", true);
-      // const roomTypePicture = helper.checkWebsite(req.body.roomTypePictureInput, true);
-      // const pictures = req.body.picturesInput ? helper.checkArray(req.body.picturesInput, true) : [];
-      const pictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+      // const pictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
       const price = helper.checkPrice(parseFloat(req.body.newPriceInput), true);
-      // const rooms = req.body.rooms ? helper.checkArray(req.body.rooms, true) : [];
 
       const addRoomTypeMessage = await hotelFuncs.addRoomType(hotelId, roomTypeName, pictures, price, []);
       req.flash(addRoomTypeMessage);
@@ -583,7 +587,12 @@ router
       res.redirect(previousUrl);
     }
   })
-  .put(isMgr, async (req, res) => {
+  .put(isMgr, upload.array("picturesInput", 10), async (req, res, next) => {
+    if(req.files.length > 0){
+      req.body.picturesInput = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+    }
+    next();
+  }, async (req, res) => {
     const hotelId = helper.checkId(req.params.hotelId, true);
     try {
       const roomTypeId = helper.checkId(req.body.roomTypeId, true);
@@ -708,8 +717,9 @@ router
   .get(isMgr, async (req, res) => {
     const hotelId = helper.checkId(req.params.hotelId, true);
     try {
-      const mgrList = await hotelFuncs.getHotelMgr(hotelId);
-      res.render('hotelManagers', {managers: mgrList, title: `Manager Control Panel`});
+      const hotel = await hotelFuncs.getHotel(hotelId);
+      const managers = await hotelFuncs.getHotelMgr(hotelId);
+      res.render('hotelManagers', {hotel: hotel, managers: managers, title: `Manager Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;

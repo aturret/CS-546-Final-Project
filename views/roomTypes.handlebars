@@ -66,7 +66,7 @@ new variable.
     </ol>
 </div>
 <div class="addNewRoomType right">
-    <form action="/hotel/{{this.hotel_id}}/hotelManagement/roomTypes" method="POST" id="addNewRoom-form" class="my-form">
+    <form action="/hotel/{{hotelId}}/hotelManagement/roomTypes" method="POST" id="addNewRoom-form" class="my-form">
         <label for="newRoomTypeNameInput" id="nnewRoomTypeNameInput-label">
             Room Type:
         </label>
@@ -79,7 +79,7 @@ new variable.
             Room Pictures:
         </label>
         <input type="file" name="newPicturesInput" id="newPicturesInput" accept="image/*" multiple>
-        <input type="hidden" name="hotelId" value="{{this.hotel_id}}">
+        <input type="hidden" name="hotelId" value="{{hotelId}}">
         <button type="submit" id="addNewRoom-button">Add</button>
     </form>
 </div>

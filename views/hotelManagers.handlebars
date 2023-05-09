@@ -16,9 +16,13 @@ reviewUserId: the id of the user who wrote the review
 <h2>{{hotel.name}}'s all managers</h2>
 <div class="hotelInfo">
     <div class="hotelName">
-        <p>{{hotelName}}</p>
+        <p>{{hotel.name}}</p>
     </div>
-    <div class="hotelPhoto"><img src="{{hotelPhoto}}"></div>
+    <div class="hotelPhoto">
+        {{#each hotel.pictures}}
+            <img src="{{this}}" alt="hotelPicture">
+        {{/each}}
+    </div>
     <div class="hotelRating">
         <p>Rating: {{hotelRating}}</p>
     </div>
