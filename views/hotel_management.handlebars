@@ -13,7 +13,11 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
 <h2>{{hotel.name}}</h2>
 <div class="hotelInfo">
     <div class="hotelBasicInfo">
-        <div class="hotelPhoto"><img src="{{hotel.pictures[0]}}"></div>
+        <div class="hotelPhoto">
+            {{#each hotel.pictures }}
+                this
+            {{/each}}
+        </div>
         <div class="hotelRating">
             <p>Rating: {{hotel.overall_rating}}</p>
         </div>
@@ -67,15 +71,15 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
                 <button type="submit">Submit Info Change</button>
             </form>
         </div>
-        <a href="/hotel/{{hotel._id}}/hotelManagement/room">Hotel Rooms</a>
-        <a href="/hotel/{{hotel._id}}/hotelManagement/roomType">Hotel Rooms Types</a>
+        <a href="/hotel/{{hotel._id}}/hotelManagement/rooms">Hotel Rooms</a>
+        <a href="/hotel/{{hotel._id}}/hotelManagement/roomTypes">Hotel Rooms Types</a>
         <a href="/hotel/{{hotel._id}}/hotelManagement/orders">Hotel orders</a>
-        <a href="/hotel/{{hotel._id}}/hotelManagement/review">Hotel Reviews</a>
+        <a href="/hotel/{{hotel._id}}/hotelManagement/reviews">Hotel Reviews</a>
         {{#if (eq user.userIdentity "admin")}}        
-        <a href="/hotel/{{hotel._id}}/hotelManagement/manager">Hotel Managers</a>
+        <a href="/hotel/{{hotel._id}}/hotelManagement/managers">Hotel Managers</a>
         {{/if}}
     </div>
-    {{if (eq user.userIdentity "admin")}}
+    {{#if (eq user.userIdentity "admin")}}
     <div class="delete">
         <button id="deleteHotelButton" onclick="deleteHotel()">Delete Hotel</button>
         <div hidden="true" id="deleteHotelWindow">

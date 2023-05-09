@@ -13,7 +13,7 @@ reviewUserId: the id of the user who wrote the review
 </div>
 {{/if}}
 
-<h2>{{hotel.name}}'s all reviews</h2>
+<h2>{{hotel.name}}'s all managers</h2>
 <div class="hotelInfo">
     <div class="hotelName">
         <p>{{hotelName}}</p>
@@ -32,57 +32,51 @@ reviewUserId: the id of the user who wrote the review
         </div>
     </div>
 </div>
-<div class="reviewOperations box">
-    <div class="reviewResult left">
-        <h3>All Reviews</h3>
-        {{#each hotelReviews}}
-        <div class="reviewItem box">
-            <div class="reviewUserItem left">
-                <div class="reviewUserPhoto">{{userAvatar}}</div>
+<div class="managerOperations box">
+    <div class="managerResult left">
+        <h3>All managers</h3>
+        {{#each managers}}
+        <div class="manager box">
+            <div class="managerContentItem left">
+                <div class="mgrPhoto">{{this.avatar}}</div>
             </div>
-            <div class="reviewContentItem right">
-                <div class="reviewTitle"><a href="/reviews/{{reviewId}}">{{reviewTitle}}</a></div>
-                <div class="reviewRating">
-                    <p>{{reviewRating}}</p>
+            <div class="managerContentItem right">
+                <div class="mgrId">
+                    <p>User ID: {{this._id}}</p>
                 </div>
-                <div class="reviewComment">
-                    <p>{{comment}}</p>
+    
+                <div class="mgrUsername">
+                    <p>Username: {{this.username}}</p>
                 </div>
-                <div class="reviewVotes">
-                    <p>Upvote: {{upVote}}</p>
-                    <p>Downvote: {{downVote}}</p>
+
+                <div class="mgrName">
+                    <p>Name: {{this.firstName}} {{this.lastName}}</p>
+                </div>
+
+                <div class="mgrEmail">
+                    <p>Email: {{this.email}}</p>
+                </div>
+
+                <div class="mgrPhone">
+                    <p>Phone: {{this.phone}}</p>
                 </div>
             </div>
+            <form action="/hotel/:hotelId/hotelManagement/managers?_method=DELETE" method="POST" id="deleteMgr-form" class="my-form">
+                <input type="hidden" name="userNameInput" id="userNameInput" value="{{this.username}}">
+                <button type="submit" id="deleteMgr" class="danger">Delete</button>
+            </form>
         </div>
         {{/each}}
     </div>
-    <div class="addReview">
-        <h3>Add a new review</h3>
-        <form action="/hotel/{{hotelId}}/review" method="POST" id="registration-form" class="my-form">
-            <input type="hidden" name="hotelId" value="{{hotelId}}">
-            <label for="reviewUsernameInput" id="reviewUsernameInput-label">
+    <div class="addMgr">
+        <h3>Add a new manager</h3>
+        <form action="/hotel/:hotelId/hotelManagement/managers" method="POST" id="registration-form" class="my-form">
+            {{!-- <input type="hidden" name="hotelId" value="{{hotelId}}"> --}}
+            <label for="userNameInput" id="userNameInput-label">
                 Username:
             </label>
-            <input type="text" name="reviewUsernameInput" id="reviewUsernameInput">
-            <label for="orderIdInput" id="orderIdInput-label">
-                Order ID:
-            </label>
-            <input type="text" name="orderIdInput" id="orderIdInput">
-            <label for="ratingInput" id="ratingInput-label">
-                Review Rating:
-            </label>
-            <select name="ratingInput" id="ratingInput">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3" selected>3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-            </select>
-            <label for="reviewInput" id="reviewInput-label">
-                Review Comment:
-            </label>
-            <textarea name="reviewInput" id="reviewInput" cols="30" rows="10"></textarea>
-            <button type="submit">Submit</button>
+            <input type="text" name="userNameInput" id="userNameInput">
+            <button type="submit">Add</button>
         </form>        
     </div>
 

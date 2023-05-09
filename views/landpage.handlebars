@@ -39,3 +39,8 @@ login form handlebar template
     <p>You can <a href="/user/register">register</a> or <a href="/user/login">login</a> first.</p>
 </div>
 {{/if}}
+{{#if (eq user.identity "admin")}}
+<div class="new-hotel">
+    <a href="/hotel/createHotel">Create a hotel</a>
+</div>
+{{/if}}

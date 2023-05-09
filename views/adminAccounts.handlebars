@@ -26,6 +26,9 @@
                     <p>Email: {{searchedUser.email}}</p>
                     <p>Phone: {{searchedUser.phone}}</p>
                     <p>Identity: {{searchedUser.identity}}</p>
+                    {{#if (eq searchedUser.identity "manager")}}
+                        <p>Hotel ID: {{searchedUser.hotel_id}}</p>
+                    {{/if}}
                 </div>
             </div>
             <div class="editInformation">
@@ -135,3 +138,7 @@
     <p class="error" id="client-error">
         {{errorMessage}}
     </p>
+    <div class="adminPage">
+        <a href="/admin">Admin Main Page</a>
+    </div>
+</div>

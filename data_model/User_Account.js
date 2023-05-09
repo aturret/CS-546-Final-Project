@@ -18,9 +18,7 @@ async function recalculateOverall(hotel_id) {
   hotel_id = helper.checkId(hotel_id, true);
   const tempHotel = await hotelReg();
   const tempReview = await Review();
-  const newHotel = await tempHotel.findOne(
-    { _id: new ObjectId(hotel_id) }
-  );
+  const newHotel = await tempHotel.findOne({_id: new ObjectId(hotel_id)})
   let sum = 0;
   let overallRating = 0;
   if (newHotel.reviews.length === 0) { overallRating = NaN }
@@ -180,7 +178,7 @@ export async function addMgr(mgrName, userName, hotelId) {
     );
 
   const hotelInfo = await tempHotel.findOne(
-    { _id: Object(hotelId) },
+    { _id: new ObjectId(hotelId) },
     { _id: 1 }
   );
   if (hotelInfo === null)
@@ -215,7 +213,7 @@ export async function deleteMgr(applicantName, respondentName, hotelId) {
   if (respondentInfo === null) throw CustomException(`Could not find user with username ${respondentName}`, true);
   if (userInfo.identity !== 'manager' && userInfo.hotel === null) throw CustomException(`User ${userName} is not a manager, could not upgrade`, true);
 
-  const hotelInfo = await tempHotel.findOne({ _id: Object(hotelId) }, { _id: 1 });
+  const hotelInfo = await tempHotel.findOne({ _id: new ObjectId(hotelId) }, { _id: 1 });
   if (hotelInfo === null) throw CustomException(`Could not find hotel with ID ${hotelId}`, true);
   if (hotelInfo._id !== userInfo.hotel) throw CustomException(`Could not find user with username ${respondentName} who is the manager of hotel ${hotelId}`, true);
 
@@ -228,14 +226,14 @@ export async function deleteMgr(applicantName, respondentName, hotelId) {
   )
 
   const hoteldeleteMgrInfo = await tempHotel.findOneAndUpdate(
-    { _id: Object(hotelId) },
-    { $pull: { manager: Object(respondentInfo._id) } },
+    { _id: new ObjectId(hotelId) },
+    { $pull: { manager: new ObjectId(respondentInfo._id) } },
     { returnDocument: "after" }
   );
   if (!hoteldeleteMgrInfo)
     throw CustomException(`Update hotel with id ${hotelId} failed.`, true);
 
-  return { message: `delete a manager ${userName} from hotel ${hotelId}` };
+  return { message: `delete a manager ${respondentName} from hotel ${hotelId}` };
 }
 
 //delete account
@@ -426,7 +424,7 @@ export async function addOrder(...args) {
   //update user account, and add order to order database
   const tempOrder = await Order();
   const tempAccount = await Account();
-  const orderInfo = tempOrder.insertOne(set);
+  const orderInfo = await tempOrder.insertOne(set);
   if (!orderInfo) throw CustomException(`Could not add the order.`, true);
   const updateInfo = await tempAccount.findOneAndUpdate(
     { _id: set.user_id },

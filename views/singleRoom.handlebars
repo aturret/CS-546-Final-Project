@@ -11,31 +11,24 @@ roomTypes collection, or you can just calculate its availability and set it as a
     <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
-<h2>The room {{roomNumber}}</h2>
-<div class="roomInfo">
-                <div class="roomNumber">
-                    <p><a href="/hotel/{{hotelId}}/room/{{roomId}}">{{roomNumber}}</a></p>
-                </div>
-                <div class="roomType">
-                    <p>{{roomType}}</p>
-                </div>
-                <div class="roomStatus">
-                    <p>{{roomStatus}}</p>
-                </div>
-            </div>
-{{#if (eq roomStatus "available")}}
+<h2>The room {{room.room_number}}</h2>
+
+<div class="roomType">
+    <p>{{room.room_type}}</p>
+</div>
+
 <div class="deleteRoom">
-    <form action="/hotel/{{hotelId}}/hotelManagement/room/{{roomId}}?_method=DELETE" method="POST">
+    <form action="/hotel/:hotelId/hotelManagement/rooms/:roomId?_method=DELETE" method="POST">
         <button type="submit" class="danger">Delete the room</button>
     </form>
 </div>
-{{/if}}
+
 <div class="editRoom">
     <div class="editRoomButton">
         <button class="editRoom" onclick="editRoom()">Edit the room</button>
     </div>
     <div class="editRoomWindow" hidden="true" id="edit">
-        <form action="/hotel/{{hotelId}}/hotelManagement/room/{{roomId}}?_method=PUT" method="POST" id="editRoom-form" class="my-form">
+        <form action="/hotel/{{hotelId}}/hotelManagement/rooms/{{roomId}}?_method=PUT" method="POST" id="editRoom-form" class="my-form">
             <label id="roomNumberInput-label">
                 Room Number:
                 <input type="text" name="roomNumberInput">
