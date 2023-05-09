@@ -132,7 +132,7 @@ export async function addHotel(...args) {
   newHotel.phone = helper.checkPhone(args[5], true);
   newHotel.email = helper.checkEmail(args[6], true);
   newHotel.pictures = args[7]
-    ? args[7].map((web) => helper.checkWebsite(web, true))
+    ? args[7].map((web) => helper.checkImageURL(web, true))
     : [];
   newHotel.rooms = [];
   newHotel.room_types = [];
@@ -377,7 +377,7 @@ export async function updateRoomType(id, hotel_id, roomType, price, picture) {
   hotel_id = new ObjectId(helper.checkId(hotel_id, true));
   roomType = helper.checkString(roomType, "room type", true);
   price = helper.checkPrice(price, true);
-  picture = helper.checkWebsite(picture, true);
+  picture = helper.checkImageURL(picture, true);
   picture = picture
     ? picture.map((url) => helper.checkImageURL(url, true))
     : [];

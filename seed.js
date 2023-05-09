@@ -63,7 +63,7 @@ async function create(...args) {
   user.identity = helper.checkString(args[0], "identity", true).toLowerCase();
   if (["manager", "user", "admin"].every((obj) => obj !== user.identity))
     throw CustomException("Invalid identity.", true);
-  user.avatar = args[2] ? helper.checkWebsite(args[2], true) : args[2];
+  user.avatar = args[2] ? helper.checkImageURL(args[2], true) : args[2];
   user.firstName = helper.checkString(args[3], "first name", true);
   user.lastName = helper.checkString(args[4], "last name", true);
   user.phone = args[5] ? helper.checkPhone(args[5], true) : args[5];
@@ -94,7 +94,7 @@ async function addHotel(...args) {
   newHotel.phone = helper.checkPhone(args[5], true);
   newHotel.email = helper.checkEmail(args[6], true);
   newHotel.pictures = args[7]
-    ? args[7].map((web) => helper.checkWebsite(web, true))
+    ? args[7].map((web) => helper.checkImageURL(web, true))
     : [];
   newHotel.rooms = [];
   newHotel.room_types = [];
@@ -126,7 +126,7 @@ export async function addRoomType(...args) {
   const hotel_id = new ObjectId(helper.checkId(args[0], true));
   const name = helper.checkString(args[1], "room type", true);
   const pictures = args[2]
-    ? args[2].map((web) => helper.checkWebsite(web, true))
+    ? args[2].map((web) => helper.checkImageURL(web, true))
     : [];
   const price = helper.checkPrice(args[3], true);
   const rooms =

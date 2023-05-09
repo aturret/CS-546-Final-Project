@@ -162,7 +162,7 @@ router
       );
 
       avatar = avatarInput
-        ? helper.checkWebsite(avatarInput, true)
+        ? helper.checkImageURL(avatarInput, true)
         : undefined;
 
       firstName = helper.checkNameString(
@@ -230,7 +230,7 @@ router
     if (req.session) req.session.status = undefined;
     return res.status(code).render("createNewAccount", { errorMessage: error , title: "Create new user"});
   })
-  .post(isAdmin, upload.single("avatar"), async (req, res, next) => {
+  .post(isAdmin, upload.single("avatarInput"), async (req, res, next) => {
     if (req.file) {
       req.body.avatarInput = `http://localhost:3000/public/uploads/${req.file.filename}`;
     }
@@ -241,7 +241,7 @@ router
       user.username = helper.checkString(user.username, "username", true);
       
       user.avatarInput = user.avatarInput
-        ? helper.checkWebsite(user.avatarInput, true)
+        ? helper.checkImageURL(user.avatarInput, true)
         : undefined;
       user.firstNameInput = helper.checkNameString(
         user.firstNameInput,

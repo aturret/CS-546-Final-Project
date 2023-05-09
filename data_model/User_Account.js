@@ -50,7 +50,7 @@ async function recalculateOverall(hotel_id) {
 /*-------------------------User Account-------------------------*/
 const refInfo = {
   username: helper.checkString.bind(null, undefined, "username", true),
-  avatar: helper.checkWebsite.bind(null, undefined, true),
+  avatar: helper.checkImageURL.bind(null, undefined, true),
   firstName: helper.checkNameString.bind(null, undefined, "first name", true),
   lastName: helper.checkNameString.bind(null, undefined, "last name", true),
   phone: helper.checkPhone.bind(null, undefined, true),
@@ -64,7 +64,7 @@ export async function create(...args) {
   user.identity = helper.checkString(args[0], "identity", true).toLowerCase();
   if (["manager", "user", "admin"].every((obj) => obj !== user.identity))
     throw CustomException("Invalid identity.", true);
-  user.avatar = args[2] ? helper.checkWebsite(args[2], true) : args[2];
+  user.avatar = args[2] ? helper.checkImageURL(args[2], true) : args[2];
   user.firstName = helper.checkString(args[3], "first name", true);
   user.lastName = helper.checkString(args[4], "last name", true);
   user.phone = args[5] ? helper.checkPhone(args[5], true) : args[5];
@@ -833,7 +833,7 @@ export async function createRequest(...args) {
   const zip_code = helper.checkZip(args[5], true);
   const phone = helper.checkPhone(args[6], true);
   const email = helper.checkEmail(args[7], true);
-  const pictures = args[8] ? args[8].map((web) => helper.checkWebsite(web, true)) : [];
+  const pictures = args[8] ? args[8].map((web) => helper.checkImageURL(web, true)) : [];
   let facilities = [];
   if (args[9] && Array.isArray(args[9])) {
     facilities = args[9].map((facility) =>

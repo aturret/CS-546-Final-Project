@@ -97,7 +97,7 @@ router
       user.username = helper.checkString(user.username, "username", true);
       
       user.avatar = user.avatar
-        ? helper.checkWebsite(user.avatar, true)
+        ? helper.checkImageURL(user.avatar, true)
         : undefined;
       user.firstNameInput = helper.checkNameString(
         user.firstNameInput,

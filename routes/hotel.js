@@ -221,9 +221,6 @@ router
       let hotelInput = req.body;
       let args = [];
       const name = helper.checkString(hotelInput.hotelNameInput, "hotel name", true);
-      // const pictures = hotelInput.hotelPhotoInput
-      //   ? hotelInput.hotelPhotoInput.map((web) => helper.checkWebsite(web, true))
-      //   : [];
       const pictures = [];
       const facilities = helper.checkString(hotelInput.hotelFacilitiesInput, "facilities", true);
       const phone = helper.checkPhone(hotelInput.hotelPhoneInput, true);
