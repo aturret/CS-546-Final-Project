@@ -180,12 +180,15 @@ router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) 
 //TODO: ask which implementation is better   TODO: edit password as well
 router
   .route("/dashboard/:username/edit_info")
-  .put(isAuth, upload.single("avatar"), async (req, res, next) => {
+  .put(isAuth, 
+    upload.single("avatar"), 
+    async (req, res, next) => {
     if (req.file) {
       req.body.avatar = `http://localhost:3000/public/uploads/${req.file.filename}`;
     }
     next();
-  }, async (req, res) => {
+  }, 
+  async (req, res) => {
     try {
       req.body.username = helper.checkString(
         req.body.username,
@@ -212,7 +215,7 @@ router
         phone: req.body.userPhoneInput,
         email: req.body.userEmailInput,
       };
-      if (req.body.avatar === undefined || req.body.avatar === "") { delete set.avatar; }
+      // if (req.body.avatar === undefined || req.body.avatar === "") { delete set.avatar; }
       const user = await userFuncs.updateUser(req.user.username, set);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
@@ -227,6 +230,36 @@ router
     }
   });
 
+router
+  .route("/dashboard/:username/change_password")
+  .put(isAuth, async (req, res) => {
+    try {
+      req.body.userPasswordInput = helper.checkPassword( req.body.userPasswordInput, true);
+      req.body.userNewPasswordInput = helper.checkPassword( req.body.userNewPasswordInput, true);
+      req.body.userConfirmNewPasswordInput = helper.checkPassword( req.body.userConfirmNewPasswordInput, true);
+      if (req.body.userNewPasswordInput !== req.body.userConfirmNewPasswordInput) {
+        throw new CustomException("New password and confirm password do not match", true);
+      }
+      if (req.body.userPasswordInput === req.body.userNewPasswordInput) {
+        throw new CustomException("New password and old password are the same", true);
+      }
+      const password = await bcrypt.hash(req.body.userNewPasswordInput, 12);
+      let set = {
+        password: password
+      };
+      const user = await userFuncs.updateUser(req.user.username, set);
+      return res.redirect(`/user/dashboard/${req.user.username}`);
+    } catch (e) {
+      console.log(e);
+      if (!e.code) {
+        req.session.status = 500;
+      } else {
+        req.session.status = e.code;
+      }
+      req.session.errorMessage = e.message;
+      res.redirect(`/user/dashboard/${req.user.username}`);
+    }
+  });
 //TODO: this function suppose to create a new request to admin. You need to define a funciton in user_model to create a new collection for requests schema.
 router
   .route("/dashboard/:username/upgrade")

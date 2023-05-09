@@ -10,6 +10,7 @@ import * as helper from "../helper.js";
 import isAuth from "./user.js";
 import moment from "moment";
 import {upload} from '../helper.js'
+import { ro } from "faker/lib/locales.js";
 
 
 const router = express.Router();
@@ -412,15 +413,17 @@ router
       res.redirect(previousUrl);
     }
   })
-  .put(isMgr, upload. array("hotelPictures",10), async (req, res, next) => {
+  .put(isMgr,
+    upload.array("hotelPictures",10),
+    async (req, res, next) => {
     if(req.files.length > 0){
       req.body.hotelPictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
     }
     next();
-  }, async (req, res) => {
+  },
+  async (req, res) => {
     const hotelId = req.params.hotelId;
-    try {
-      
+    try {      
       const hotelName = req.body.hotelName;
       const hotelStreet = req.body.hotelStreet;
       const hotelCity = req.body.hotelCity;
@@ -447,7 +450,7 @@ router
         // reviews
       );
       req.flash(result);
-      return res.redirect(200).redirect(`/hotel/${hotelId}/hotelManagement`);
+      return res.redirect(`/hotel/${hotelId}/hotelManagement`);
     } catch (e) {
       console.log(e);
       e.code = e.code ? e.code : 500;
@@ -564,31 +567,33 @@ router
       res.redirect(previousUrl);
     }
   })
-  .post(isMgr, upload.array("newPicturesInput", 10), async (req, res, next) => {
-    if(req.files.length > 0){
-      req.body.newPictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
-    }
-    next();
-  }, async (req, res) => {
-    const hotelId = helper.checkId(req.params.hotelId, true);
-    try {
-      const pictures = helper.checkArray(req.body.newPictures, 'new roomtype pictures', true);
-      const roomTypeName = helper.checkString(req.body.newRoomTypeNameInput, "room type name", true);
-      // const pictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
-      const price = helper.checkPrice(parseFloat(req.body.newPriceInput), true);
-
-      const addRoomTypeMessage = await hotelFuncs.addRoomType(hotelId, roomTypeName, pictures, price, []);
-      req.flash(addRoomTypeMessage);
-      res.redirect(`/hotel/${hotelId}/hotelManagement/roomtypes`);
-    } catch (e) {
-      req.session.status = e.code ? e.code : 500;
-      req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/roomtypes`;
-      res.redirect(previousUrl);
-    }
-  })
+  .post(isMgr,
+    upload.array("newPicturesInput", 10),
+     async (req, res, next) => {
+      if (req.files.length > 0) {
+        req.body.newPictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+      }
+      next();
+    },
+    async (req, res) => {
+      const hotelId = helper.checkId(req.params.hotelId, true);
+      try {
+        const pictures = helper.checkArray(req.body.newPictures, 'new roomtype pictures', true);
+        const roomTypeName = helper.checkString(req.body.newRoomTypeNameInput, "room type name", true);
+        // const pictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+        const price = helper.checkPrice(parseFloat(req.body.newPriceInput), true);
+        const addRoomTypeMessage = await hotelFuncs.addRoomType(hotelId, roomTypeName, pictures, price, []);
+        req.flash(addRoomTypeMessage);
+        res.redirect(`/hotel/${hotelId}/hotelManagement/roomtypes`);
+      } catch (e) {
+        req.session.status = e.code ? e.code : 500;
+        req.session.errorMessage = e.message;
+        const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/roomtypes`;
+        res.redirect(previousUrl);
+      }
+    })
   .put(isMgr, upload.array("picturesInput", 10), async (req, res, next) => {
-    if(req.files.length > 0){
+    if (req.files.length > 0) {
       req.body.picturesInput = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
     }
     next();
