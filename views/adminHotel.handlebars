@@ -12,12 +12,17 @@
 
 <div class="newHotel">
     <div id="newHotelWindow">
-        <form action="/admin/createHotel" method="POST">
+        <form action="/admin/createHotel" method="POST" class="my-form" enctype="multipart/form-data">
 
             <label for="hotelNameInput" id="hotelNameInput-label">
                 Hotel Name:
             </label>
             <input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
+
+            <label for="hotelFacilitiesInput" id="hotelFacilitiesInput-label">
+                Hotel Facilities:
+            </label>
+            <input type="text" name="hotelFacilitiesInput" id="hotelFacilitiesInput" value="{{hotelFacilitiesInput}}">
 
             <label for="hotelPhotoInput" id="hotelPhotoInput-label">
                 Hotel Photo:
