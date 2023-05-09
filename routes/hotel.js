@@ -262,6 +262,10 @@ router
       const hotelId = helper.checkId(req.params.hotelId, true);
       const checkin = helper.checkDate(req.body.startDate, true);
       const checkout = helper.checkDate(req.body.endDate, true);
+      const curDate = moment().format('YYYY/MM/DD');
+      if (moment(checkin, 'YYYY/MM/DD').isBefore(curDate, 'YYYY/MM/DD')) throw new helper.CustomException(400, "Check-in date cannot be before today");
+      if (moment(checkout, 'YYYY/MM/DD').isBefore(moment(checkin, 'YYYY/MM/DD'))) throw new helper.CustomException(400, "Check-out date cannot be before check-in date");
+      if (moment(checkin, 'YYYY/MM/DD').isAfter(moment(checkout, 'YYYY/MM/DD'))) throw new helper.CustomException(400, "Check-in date cannot be after check-out date");
       const searchResult = await hotelFuncs.checkRoomAvailabilityOrder(hotelId, checkin, checkout);
       if(searchResult.roomType.length === 0){
         searchResult.hotelRoom = false;
@@ -301,6 +305,10 @@ router
 
       const checkin = helper.checkDate(req.body.checkInDateInput, true);
       const checkout = helper.checkDate(req.body.checkOutDateInput, true);
+      const curDate = moment().format('YYYY/MM/DD');
+      if (moment(checkin, 'YYYY/MM/DD').isBefore(curDate, 'YYYY/MM/DD')) throw new helper.CustomException(400, "Check-in date cannot be before today");
+      if (moment(checkout, 'YYYY/MM/DD').isBefore(moment(checkin, 'YYYY/MM/DD'))) throw new helper.CustomException(400, "Check-out date cannot be before check-in date");
+      if (moment(checkin, 'YYYY/MM/DD').isAfter(moment(checkout, 'YYYY/MM/DD'))) throw new helper.CustomException(400, "Check-in date cannot be after check-out date");
       const guest1FirstName = req.body.guestFirstNameInputA? helper.checkString(req.body.guestFirstNameInputA, true): undefined;
       const guest1LastName = req.body.guestLastNameInputA? helper.checkString(req.body.guestLastNameInputA, true): undefined;
       const guest2FirstName = req.body.guestFirstNameInputB? helper.checkString(req.body.guestFirstNameInputB, true): undefined;
@@ -326,7 +334,7 @@ router
       const status = 'accepted';
       const addOrder = await userFuncs.addOrder(hotelId, userId._id.toString(), roomId.toString(), hotelName, checkin, checkout, guests, price, status);
       if (addOrder) req.flash('Add order successfullly');
-      res.redirect(`/hotel/${hotelId}/searchResult`);
+      res.redirect(`/hotel/${hotelId}`);
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
