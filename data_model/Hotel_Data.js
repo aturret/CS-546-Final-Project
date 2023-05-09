@@ -274,19 +274,21 @@ export async function getHotelReview(id) {
   //get review
   const tempReview = await Review();
   const reviewList = await tempReview.find({ _id: { $in: reviewId } }).toArray();
+  if (reviewList && !Array.isArray(reviewList)) reviewList = [reviewList];
   if (reviewList.length === 0) throw CustomException("Review not found", false);
 
   //get user 
   console.log(reviewList)
   const tempAccount = await Account();
   for (let i of reviewList) {
-    const userInfo = await tempAccount.findOne({ _id: new ObjectId(i.user_id) }, { username: 1, avatar: 1 });
+    const userInfo = await tempAccount.findOne({ _id: i.user_id }, { username: 1, avatar: 1 });
     i.upVote = i.upvote
     i.downVote = i.downvote
     i.upvote = null
     i.downvote = null
     i.userName = userInfo.username
-    i.userAvatar = userInfo.avatar 
+    i.userAvatar = userInfo.avatar
+    i.reviewRating = i.rating
   }
   console.log(reviewList)
   if (!reviewInfo) throw CustomException("Hotel not found", false);
@@ -444,6 +446,7 @@ export async function getHotelRoomType(id) {
 
   const roomTypeInfo = await tempRoomType.find({ hotel_id: new ObjectId(id) }).toArray();
   if (!roomTypeInfo) throw CustomException("Hotel not found", false);
+  if (!Array.isArray(roomTypeInfo)) return [roomTypeInfo];
   return roomTypeInfo;
 }
 
@@ -455,6 +458,7 @@ export async function getRoomType(id) {
   if (!roomTypeInfo) throw CustomException("Room type not found", false);
   return roomTypeInfo;
 }
+
 
 //check room availability
 export async function checkRoomAvailability(...args) {
@@ -643,7 +647,7 @@ export async function updateRoom(hotel_id, room_id, typeNme, roomNum) {
 
   if (rv.modifiedCount === 0) throw CustomException(`Could not update the room.`, true);
 
-  return { message: `Room ${roomNum} updated successfully.` };
+  return `Room ${roomNum} updated successfully.`;
 }
 
 
