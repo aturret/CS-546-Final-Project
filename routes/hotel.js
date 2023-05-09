@@ -21,11 +21,11 @@ export const isMgr = (req, res, next) => {
   }
   if (req.user && req.user.identity === 'user') {
     req.flash("errorMessage", "You are not allow to access this page")
-    return res.redirect("/user/dashboard");
+    return res.redirect(`/user/dashboard/${req.user.username}`);
   }
   if (req.user.identity === 'manager' && req.user.hotel !== req.params.hotelId) {
     req.flash("errorMessage", "You are not allow to access this page")
-    return res.redirect("/user/dashboard");
+    return res.redirect(`/user/dashboard/${req.user.username}`);
   }
   next();
 };
@@ -36,7 +36,7 @@ export const isAdmin = (req, res, next) => {
   }
   if (req.user && req.user.identity !== 'admin') {
     req.flash("errorMessage", "You are not allow to access this page")
-    return res.redirect("/user/dashboard");
+    return res.redirect(`/user/dashboard/${req.user.username}`);
   }
   next();
 };
@@ -239,7 +239,7 @@ router
       }
       args[9] = [];
       const addHotelId = await hotelFuncs.addHotel(args);
-      req.flash('Create hotel successfully');
+      req.flash("success", 'Create hotel successfully');
       res.redirect("/admin/createHotel");
     } catch (e) {
       if (!e.code) {
@@ -299,6 +299,8 @@ router
       
       hotelInfo.reviews = reviews;
       hotelInfo.title = hotel.name;
+      hotelInfo.errorMessage = errorMessage;
+      hotelInfo.status = status;
       return res.status(status).render("hotel", hotelInfo);
     }
     catch(e){
@@ -383,8 +385,8 @@ router
       const price = roomType.price * days;
       const status = 'accepted';
       const addOrder = await userFuncs.addOrder(hotelId, userId._id.toString(), roomId.toString(), hotelName, checkin, checkout, guests, price, status);
-      if (addOrder) req.flash("successMessage", 'Add order successfullly');
-      res.redirect(`/hotel/${hotelId}`);
+      if (addOrder) req.flash("success", 'Add order successfully');
+      return res.redirect(`/hotel/${hotelId}`);
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -507,7 +509,21 @@ router
     const roomId = helper.checkId(req.params.roomId, true);
     try {
       const room = await hotelFuncs.getRoom(roomId);
-      res.render('singleRoom', {room: room, title: `Room Control Panel`});
+
+      //get room type
+      const roomType = await hotelFuncs.getHotelRoomType(hotelId);
+    for (let i = 0; i < roomType.length; i++) {
+        roomType[i].typeName = roomType[i].name;
+      }
+      room.roomTypes = roomType;
+      const errorMessage = req.session.errorMessage? req.session.errorMessage : null;
+      const status = req.session.status? req.session.status : 200;
+      room.errorMessage = errorMessage;
+      req.session.errorMessage = null;
+      req.session.status = null;
+      room.status = status;
+      room.errorMessage = errorMessage;
+      res.status(status).render('singleRoom', {room: room, title: `Room Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -520,11 +536,11 @@ router
     const roomId = helper.checkId(req.params.roomId, true);
     try {
       const typeName = helper.checkString(req.body.roomTypeInput, "room type", true);
-      const roomNum = helper.checkId(req.body.roomNum, 'room number', true);
+      const roomNum = helper.checkString(req.body.roomNumberInput, 'room number', true);
       if(!/[0-9]{0,5}$/.test(roomNum)) throw CustomException(`Invalid room number.`, true);
       
       const updateRoomMessage = await hotelFuncs.updateRoom(hotelId, roomId, typeName, roomNum);
-      req.flash(updateRoomMessage);
+      req.flash("success", updateRoomMessage);
       res.redirect(`/hotel/${hotelId}/hotelManagement/rooms/${roomId}`);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
@@ -628,7 +644,7 @@ router
     try {
       const orderId = helper.checkId(req.body.orderId, true);
       const deleteOrderMessage = await userFuncs.deleteOrder(orderId);
-      req.flash("successMessage", deleteOrderMessage);
+      req.flash("success", deleteOrderMessage);
       res.redirect('/hotel/:hotelId/hotelManagement/order');
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
@@ -646,13 +662,22 @@ router
     try {
       const hotelId = helper.checkId(req.params.hotelId, true);
       const hotelReviews = await hotelFuncs.getHotelReview(hotelId);
-      hotelReviews.title = `Review Control Panel`;
-      res.render('hotelReviews', hotelReviews);
+      const hotelInfo = await hotelFuncs.getHotel(hotelId);
+      hotelInfo.hotelName = hotelInfo.name;
+      hotelInfo.hotelId = hotelInfo.id;
+      hotelInfo.hotelRating = hotelInfo.rating;
+      hotelInfo.hotelPhone = hotelInfo.phone;
+      hotelInfo.hotelPhoto = hotelInfo.photos;
+      hotelInfo.hotelAddress = hotelInfo.street + ", " + hotelInfo.city + ", " + hotelInfo.state + ", " + hotelInfo.zip_code;
+      hotelInfo.hotelEmail = hotelInfo.email;
+      hotelInfo.hotelReviews = hotelReviews;
+      hotelInfo.title = `Review Control Panel`;
+      return res.render('hotelReviews', hotelInfo);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
       const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement`;
-      res.redirect(previousUrl);
+      return res.redirect(previousUrl);
     }
   })
   .post(isAdmin, async (req, res) => {
@@ -664,7 +689,7 @@ router
       const rating = helper.checkRating(req.body.ratingInput, true);
 
       const hotelReviews = await userFuncs.addReview(orderId, hotelId, username, review, rating);
-      if (hotelReviews) req.flash("successMessage",'Add review successfully');
+      if (hotelReviews) req.flash("success",'Add review successfully');
       res.redirect('/hotel/:hotelId/hotelManagement/review');
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
@@ -1003,7 +1028,7 @@ router
 //         room_picture,
 //         rooms
 //       );
-//       req.flash({ successMessage: "Room type added successfully" });
+//       req.flash({ success: "Room type added successfully" });
 //       return res.redirect(200).redirect("/user/dashboard/:username/hotel_management/room_type");
 //     } catch (e) {
 //       e.code = e.code ? e.code : 500;
@@ -1033,7 +1058,7 @@ router
 //     const room_picture = req.body.room_picture;
 
 //     const result = await hotelFuncs.updateRoomType(type_id, hotel_id, room_type, room_price, room_picture);
-//     req.flash({ successMessage: "Room type updated successfully" });
+//     req.flash({ success: "Room type updated successfully" });
 //     return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
 //   }
 //   catch (e) {
@@ -1060,7 +1085,7 @@ router
 //     const hotel_id = req.params.hotel_id;
 //     const type_id = req.params.room_type;
 //     const result = await hotelFuncs.deleteRoomType(type_id, hotel_id);
-//     req.flash({ successMessage: "Room type deleted successfully" });
+//     req.flash({ success: "Room type deleted successfully" });
 //     return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room_type`);
 //   }
 //   catch (e) {
@@ -1150,7 +1175,7 @@ router
 //       const hotel_id = req.params.hotel_id;
 //       const room_id = req.params.room_id;
 //       const result = await hotelFuncs.deleteRoom(room_id, hotel_id);
-//       req.flash({ successMessage: "Room deleted successfully" });
+//       req.flash({ success: "Room deleted successfully" });
 //       return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
 //     }
 //     catch (e) {
@@ -1176,7 +1201,7 @@ router
 //       const hotel_id = req.params.hotel_id;
 //       const room_id = req.params.room_id;
 //       const result = await hotelFuncs.updateRoom(room_id, hotel_id);
-//       req.flash({ successMessage: "Room updated successfully" });
+//       req.flash({ success: "Room updated successfully" });
 //       return res.redirect(200).redirect(`/user/dashboard/${username}/hotel_management/${hotel_id}/room`);
 //     }
 //     catch (e) {

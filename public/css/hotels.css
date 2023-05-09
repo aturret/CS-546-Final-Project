@@ -383,3 +383,9 @@ form.search-form {
   padding: 1rem;
   margin-bottom: 1.5rem;
 }
+
+.flash{
+  color: red;
+  font-weight: bold;
+  font-size: large;
+}

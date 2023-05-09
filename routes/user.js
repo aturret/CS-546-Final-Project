@@ -31,7 +31,7 @@ router
     //check if user is already logged in
     (req, res, next) => {
       if (req.isAuthenticated()) {
-        return res.redirect(`/dashboard/${req.user.username}`);
+        return res.redirect(`/user/dashboard/${req.user.username}`);
       }
       next();
     },

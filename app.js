@@ -99,7 +99,7 @@ passport.use('login', new auth({
 
 passport.serializeUser((user, next) => {
     process.nextTick(() => {
-        return next(null, {username: user.username, identity: user.identity});
+        return next(null, {username: user.username, identity: user.identity, hotel: user.hotel_id});
     }
     )
 }
@@ -123,8 +123,8 @@ app.use((req, res, next) => {
 })
 
 app.use((req, res, next) => {
-  res.locals.success = req.flash('sucessMessage');
-  res.locals.error = req.flash('errorMessage');
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
   next();
 });
 
