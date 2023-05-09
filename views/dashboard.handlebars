@@ -37,14 +37,14 @@
     </div>
     {{!-- edit personal information --}}
     <div class="editInformation"><button id="editInformationButton" onclick="editInformation()">Edit Info</button>
-    <div id="editInformationWindow" hidden="true">
-        <form action="/user/dashboard/{{username}}/edit_info?_method=PUT" method="POST" id="editInformation-form"
-            class="my-form" enctype="multipart/form-data">
-            <input type="hidden" name="username" value="{{username}}">
-            <div class="userFirstName">
-                <label for="userFirstNameInput">First Name</label>
-                <input type="text" name="userFirstNameInput" id="userFirstNameInput" value="{{firstName}}">
-            </div>
+        <div id="editInformationWindow" hidden="true">
+            <form action="/user/dashboard/{{username}}/edit_info?_method=PUT" method="POST" id="editInformation-form"
+                class="my-form" enctype="multipart/form-data">
+                <input type="hidden" name="username" value="{{username}}">
+                <div class="userFirstName">
+                    <label for="userFirstNameInput">First Name</label>
+                    <input type="text" name="userFirstNameInput" id="userFirstNameInput" value="{{firstName}}">
+                </div>
                 <div class="userLastName">
                     <label for="userLastNameInput">Last Name</label>
                     <input type="text" name="userLastNameInput" id="userLastNameInput" value="{{lastName}}">
@@ -68,8 +68,9 @@
     <div class="changePassword">
         <button id="changePasswordButton" onclick="changePassword()">Change Password</button>
         <div id="changePasswordWindow" hidden="true">
-            <form action="/user/dashboard/{{username}}/change_password?_method=PUT" method="POST" id="editInformation-form" class="my-form">
-                <input type="hidden" name="username" value="{{username}}">                
+            <form action="/user/dashboard/{{username}}/change_password?_method=PUT" method="POST"
+                id="editInformation-form" class="my-form">
+                <input type="hidden" name="username" value="{{username}}">
                 <div class="userPassword">
                     <label for="userPassword">Password</label>
                     <input type="password" name="userPasswordInput" id="userPasswordInput">
@@ -94,43 +95,37 @@
 <div class="newApplication">
     <button id="newHotelButton" onclick="newHotel()">Start Hotel Registration</button>
     <div id="newHotelWindow" hidden="true">
-        <form action="/user/dashboard/{{username}}/upgrade" method="POST" class="my-form">
+        <form action="/user/dashboard/{{username}}/upgrade" method="POST" class="my-form" enctype="multipart/form-data">
             <label for="hotelNameInput" id="hotelNameInput-label">
-                Hotel Name:
-            </label>
-            <input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
+                Hotel Name:<input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
+            </label>            
             <label for="hotelPhoto" id="hotelPhoto-label">
-                Hotel Photo:
-            </label>
-            <input type="file" name="hotelPhotoInput" id="hotelPhotoInput" accept="image/*" multiple>
+                Hotel Photo:<input type="file" name="hotelPhotoInput" id="hotelPhotoInput" accept="image/*" multiple>
+            </label>            
             <div class="hotelContact">
                 <label for="hotelPhoneInput" id="hotelPhoneInput-label">
-                    Hotel Phone:
+                    Hotel Phone:<input type="text" name="hotelPhoneInput" id="hotelPhoneInput" value="{{hotelPhone}}">
                 </label>
-                <input type="text" name="hotelPhoneInput" id="hotelPhoneInput" value="{{hotelPhone}}">
                 <label for="hotelEmailInput" id="hotelEmailInput-label">
-                    Hotel Email:
+                    Hotel Email:<input type="email" name="hotelEmailInput" id="hotelEmailInput" value="{{hotelEmail}}">
                 </label>
-                <input type="email" name="hotelEmailInput" id="hotelEmailInput" value="{{hotelEmail}}">
             </div>
             <div class="hotelAddress">
                 <label for="hotelCityInput" id="hotelCityInput-label">
-                    Hotel City:
+                    Hotel City:<input type="text" name="hotelCityInput" id="hotelCityInput" value="{{hotelCity}}">
                 </label>
-                <input type="text" name="hotelCityInput" id="hotelCityInput" value="{{hotelCity}}">
                 <label for="hotelStreetInput" id="hotelStreetInput-label">
-                    Hotel Street:
+                    Hotel Street:<input type="text" name="hotelStreetInput" id="hotelStreetInput"
+                        value="{{hotelStreet}}">
                 </label>
-                <input type="text" name="hotelStreetInput" id="hotelStreetInput" value="{{hotelStreet}}">
                 <label for="hotelStateInput" id="hotelStateInput-label">
-                    Hotel State:
+                    Hotel State:<select id="hotelStateInput" class="state" name="hotelStateInput">
+                    </select>
                 </label>
-                <select id="hotelStateInput" class="state" name="hotelStateInput">
-                </select>
                 <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
-                    Hotel Zip:
+                    Hotel Zip:<input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput"
+                        value="{{hotelZipcode}}">
                 </label>
-                <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput" value="{{hotelZipcode}}">
                 <input type="hidden" name="userIdInput" value="{{_id}}">
             </div>
             <button type="submit" id="newApplication">Apply for a new hotel</button>

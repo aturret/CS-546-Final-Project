@@ -42,7 +42,6 @@ export const isAdmin = (req, res, next) => {
 //helper functions
 
 
-
 //TODO: Hotel searching main page
 router
   .route("/")
@@ -209,7 +208,13 @@ router
   .get(isAdmin, async (req, res) => {
     res.render('adminHotel', {title:"Hotel Creating Panel"});
   })
-  .post(isAdmin, async (req, res) => {
+  .post(isAdmin, upload.array("hotelPictures",10), async (req, res, next) => {
+    if(req.files.length > 0){
+      req.body.hotelPictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+    }
+    next();
+  },
+     async (req, res) => {
     try {
       let hotelInput = req.body;
       let args = [];
