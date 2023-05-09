@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
 import * as helper from "../helper.js";
-import isAuth from "./user.js";
+import {isAuth} from "./user.js";
 import moment from "moment";
 import {upload} from '../helper.js'
 import { ro } from "faker/lib/locales.js";
@@ -174,14 +174,14 @@ router
     const reviewVote= req.body.voteInput;
     let reviewVoteSign = 0
     if (reviewVote === 'upvote') {
-      reviewVoteSign = 1;
+      reviewVoteSign = true;
     }
     else if (reviewVote === 'downvote') {
-      reviewVoteSign = -1;
+      reviewVoteSign = false;
     }
     try{
       const result = await userFuncs.voteReview(reviewId, reviewVoteSign);
-      return res.redirect(`/reviews/${{reviewId}}`);
+      return res.redirect(`/reviews/${reviewId}`);
     }
     catch(e){
       req.session.status = e.code ? e.code : 500;

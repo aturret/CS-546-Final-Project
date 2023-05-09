@@ -648,29 +648,33 @@ export async function getReviewById(review_id) {
 /*------------vote review------------*/
 export async function voteReview(review_id, flag) {
   review_id = helper.checkId(review_id, true);
-
   const tempReview = await Review();
   let updateInfo = await tempReview.findOne({ _id: new ObjectId(review_id) });
   const user_id = updateInfo.user_id;
-  if (updateInfo.votedId && updateInfo.votedId.includes(user_id)) {
+  if (updateInfo.votedId.some((obj) => obj.equals(user_id)))
+  {
+    console.log("already voted");
     throw CustomException(`Already voted.`, true);
   }
   else {
     if (updateInfo.votedId === undefined) {
-      updateInfo.votedId = [];
-    }
+      tempReview.updateOne(
+        { _id: new ObjectId(review_id) },
+        { $push: { votedId: [] } }
+      );
+    }    
     if (flag) {
       updateInfo = await tempReview.findOneAndUpdate(
         { _id: new ObjectId(review_id) },
-        { $inc: { upvote: 1 } },
-        { $addToSet: { votedId: user_id } },
+        { $inc: { upvote: 1 } ,
+         $addToSet: { votedId: user_id }, },
         { returnDocument: "after" }
       );
     } else {
       updateInfo = await tempReview.findOneAndUpdate(
         { _id: new ObjectId(review_id) },
-        { $inc: { downvote: 1 } },
-        { $addToSet: { votedId: user_id } },
+        { $inc: { downvote: 1 } ,
+         $addToSet: { votedId: user_id }, },
         { returnDocument: "after" }
       );
     }
