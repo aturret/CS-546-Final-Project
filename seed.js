@@ -70,7 +70,7 @@ async function create(...args) {
   args[6] = helper.checkPassword(args[6], true);
   user.email = helper.checkEmail(args[7], true);
   user.hotel_id = "";
-  user.orders = {};
+  user.orders = [];
 
   user.password = await bcrypt.hash(args[6], saltRounds);
 
@@ -176,7 +176,7 @@ export async function addRoom(...args) {
   if (!/^\d{1,5}$/.test(room_number))
     throw CustomException(`Invalid room number.`, true);
   const room_type = helper.checkString(args[2], "room type", true);
-  const order = {};
+  const order = [];
 
   //check if hotel exists
   const tempHotel = await hotelReg();
@@ -279,8 +279,8 @@ export async function addOrder(...args) {
   //update room
   const tempRoom = await Room();
   const roomInfo = await tempRoom.findOneAndUpdate(
-    { _id: new ObjectId(args.room_id) },
-    { $addToSet: { orders: orderInfo.insertedId } },
+    { _id: set.room_id},
+    { $addToSet: { order: orderInfo.insertedId } },
     { returnDocument: "after" }
   );
   if (!roomInfo)
@@ -425,8 +425,8 @@ try {
       order.hotelName = "hotel" + ref[i];
       console.log(order);
       order = await addOrder(
-        order.user_id,
         order.hotel_id,
+        order.user_id,
         order.room_id,
         order.hotelName,
         order.checkin_date,

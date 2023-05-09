@@ -39,8 +39,9 @@ export function checkArray(arr, key, flag){
 
 export function checkDate(date, flag){
     if(!date || typeof date !== "string" || date.trim().length === 0) throw new CustomException("Date must exist and must be a non empty string.", flag);
-    if(!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw new CustomException("Date must be a valid date.", flag);
     date = date.trim();
+    date = date.replace(/-/g, "/");
+    if(!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw new CustomException("Date must be a valid date.", flag);
     let temp = +date.split("/")[0];
     if (temp < 1900 || temp > 2023)
       throw new CustomException("The year of release of the album must be between 1900 and 2024.", flag);
@@ -100,8 +101,8 @@ export function checkGuests(obj, flag)
 {
     if (!obj || !Array.isArray(obj)) throw new CustomException("Object must exist and must be an object.", flag);
     for (let guest of obj){
-        guest.firstName = checkNameString(guest.firstName, "First name", true)
-        guest.lastName = checkNameString(guest.lastName, "last name", true)
+        guest.firstName = guest.firstName? checkNameString(guest.firstName, "First name", true): undefined
+        guest.lastName = guest.firstName? checkNameString(guest.lastName, "last name", true): undefined
     }
 
     return obj
