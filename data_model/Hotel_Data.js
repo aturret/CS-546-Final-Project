@@ -300,7 +300,7 @@ export async function getHotelReview(id) {
 export async function addRoomType(...args) {
   if (args.length !== 5) throw CustomException("Missing inputs.", true);
   const hotel_id = new ObjectId(helper.checkId(args[0], true));
-  const name = helper.checkString(args[1], "room type", true);
+  const name = helper.checkString(args[1], "room type name", true);
   const pictures = args[2]
     ? args[2].map((web) => helper.checkWebsite(web, true))
     : [];

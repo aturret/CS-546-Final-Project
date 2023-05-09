@@ -43,18 +43,19 @@ new variable.
                 <div hidden="true" id="edit-{{this._id}}">
                     <form action="/hotel/{{hotelId}}/hotelManagement/roomTypes/?_method=PUT" method="POST"
                         id="editRoomType-form" class="my-form">
-                        <label for="roomTypeName" id="roomTypeName-label">
+                        <input type="hidden" name="roomTypeId" value="{{this._id}}">
+                        <label for="roomTypeNameInput" id="roomTypeNameInput-label">
                             Room Type:
                         </label>
-                        <input type="text" name="roomTypeName" id="roomTypeName">
-                        <label for="roomTypePrice" id="roomTypePrice-label">
+                        <input type="text" name="roomTypeNameInput" id="roomTypeNameInput">
+                        <label for="priceInput" id="priceInput-label">
                             Room Price:
                         </label>
-                        <input type="number" name="roomTypePrice" id="roomTypePrice">
-                        <label for="roomTypePictures" id="roomTypePictures-label">
+                        <input type="number" name="priceInput" id="priceInput">
+                        <label for="picturesInput" id="picturesInput-label">
                             Room Pictures:
                         </label>
-                        <input type="file" name="roomTypePictures" id="roomTypePictures" accept="image/*" multiple>
+                        <input type="file" name="picturesInput" id="picturesInput" accept="image/*" multiple>
                         <input type="hidden" name="hotelId" value="{{hotelId}}">
                         <button type="submit" id="editRoomType-button">Edit</button>
                     </form>
@@ -66,18 +67,18 @@ new variable.
 </div>
 <div class="addNewRoomType right">
     <form action="/hotel/{{hotelId}}/hotelManagement/roomTypes" method="POST" id="addNewRoom-form" class="my-form">
-        <label for="newRoomTypeName" id="newRoomTypeName-label">
+        <label for="newRoomTypeNameInput" id="nnewRoomTypeNameInput-label">
             Room Type:
         </label>
-        <input type="text" name="newRoomTypeName" id="newRoomTypeName">
-        <label for="newRoomTypePrice" id="newRoomTypePrice-label">
+        <input type="text" name="newRoomTypeNameInput" id="newRoomTypeNameInput">
+        <label for="newPriceInput" id="newPriceInput-label">
             Room Price:
         </label>
-        <input type="number" name="newRoomTypePrice" id="newRoomTypePrice">
-        <label for="newRoomTypePictures" id="newRoomTypePictures-label">
+        <input type="number" name="newPriceInput" id="newPriceInput">
+        <label for="newPicturesInput" id="newPicturesInput-label">
             Room Pictures:
         </label>
-        <input type="file" name="newRoomTypePictures" id="newRoomTypePictures" accept="image/*" multiple>
+        <input type="file" name="newPicturesInput" id="newPicturesInput" accept="image/*" multiple>
         <input type="hidden" name="hotelId" value="{{hotelId}}">
         <button type="submit" id="addNewRoom-button">Add</button>
     </form>
