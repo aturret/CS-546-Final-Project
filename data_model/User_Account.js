@@ -812,21 +812,17 @@ export async function deleteReview(review_id) {
 //TODO: create request. request document should have three field. id, user_id, hotel_id.
 export async function createRequest(...args) {
   const username = helper.checkString(args[0], "username", true);
-
   const tempAccount = await Account();
   const tempRequest = await mgrReq();
   const tempHotel = await hotelReg();
-
   const userInfo = await tempAccount.findOne({ username: username }, {_id: 1, username: 1, identity: 1});
   if (userInfo === null)
     throw CustomException(
       `Could not find user with username ${username}`,
       true
     );
-
   if (userInfo.identity === 'manager') 
     throw CustomException(`The user with username ${username} is already a manager, could not create another request`, true);
-
   const hotelName = helper.checkString(args[1], "hotel name", true);
   const street = helper.checkString(args[2], "street", true);
   const city = helper.checkString(args[3], "city", true);
@@ -850,7 +846,6 @@ export async function createRequest(...args) {
   // args[9]
   //   ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))
   //   : undefined;
-
   const hotelInfo = await tempHotel.findOne(
     {
       name: hotelName,
@@ -862,7 +857,6 @@ export async function createRequest(...args) {
     { _id: 1 }
   );
   if (hotelInfo !== null) throw CustomException("Hotel exist", true);
-
   const newRequest = {
     username: username,
     name: hotelName,
@@ -877,7 +871,6 @@ export async function createRequest(...args) {
     managers: managers,
     status: "pending"
   };
-
   const requestInfo = await tempRequest.insertOne(newRequest);
   if (requestInfo.insertedCount === 0)
     throw CustomException(`Could not add the request.`, true);
