@@ -291,18 +291,12 @@ router
 router
   .route("/hotel/:hotelId/searchResult")
   .post(isAuth, async (req, res) => {
-    console.log(req.params)
     const hotelId = helper.checkId(req.params.hotelId, true);
-    console.log(hotelId)
-    console.log(req.body)
     try {
 
       const roomTypeId = helper.checkId(req.body.roomCheckInput, true);
-      console.log(req.user.username)
       const userId = await userFuncs.getUser(req.user.username);
-      console.log(userId)
       const hotel = await hotelFuncs.getHotel(hotelId);
-      console.log(hotel)
       const hotelName = hotel.name;
 
       const checkin = helper.checkDate(req.body.checkInDateInput, true);
