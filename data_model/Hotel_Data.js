@@ -558,7 +558,7 @@ export async function deleteRoom(hotel_id, room_id) {
   //check if room exists
   const tempRoom = await Room();
   const roomInfo = await tempRoom.findOne({ _id: room_id });
-  if (!roomInfo) throw CustomException(`Room ${roomNum} does not exist.`, true);
+  if (!roomInfo) throw CustomException(`The room does not exist.`, true);
   const typeNme = roomInfo.room_type
   //check if hotel exists
   const tempHotel = await hotelReg();
@@ -591,7 +591,7 @@ export async function deleteRoom(hotel_id, room_id) {
   if (deleteInfo.deletedCount !== orderList.length) throw Error(`Could not delete the order.`);
 
   //delete order from user
-  const tempUser = await User();
+  const tempUser = await Account();
   const updateInfo3 = await tempUser.updateMany({ orders: { $in: orderList } }, { $pull: { orders: { $in: orderList } } }, { returnDocument: "after" });
   if (!updateInfo3) throw Error(`Could not update the user with id ${hotel_id}`);
 
@@ -600,7 +600,7 @@ export async function deleteRoom(hotel_id, room_id) {
   const deleteInfo2 = await tempReview.deleteMany({ _id: { $in: reviewList } });
   if (deleteInfo2.deletedCount !== reviewList.length) throw Error(`Could not delete the review.`);
 
-  return { message: `Room ${roomNum} deleted successfully.` };
+  return { message: `The Room deleted successfully.` };
 }
 
 

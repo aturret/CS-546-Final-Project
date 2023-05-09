@@ -537,10 +537,11 @@ router
     const hotelId = helper.checkId(req.body.hotelId, true);
     const roomId = helper.checkId(req.body.roomId, true);
     try {
-      const deleteRoomMessage = await hotelFuncs(hotelId, roomId);
+      const deleteRoomMessage = await hotelFuncs.deleteRoom(hotelId,roomId );
       req.flash(deleteRoomMessage);
       res.redirect(`/hotel/${hotelId}/hotelManagement/rooms`);
     } catch (e) {
+      console.log(e);
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
       const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/rooms/${roomId}`;
