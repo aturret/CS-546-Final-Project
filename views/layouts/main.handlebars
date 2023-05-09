@@ -39,6 +39,15 @@ There are four types of identities: "guest", "user", "manager", "admin".
                 </ul>
             </div>
         </header>
+        {{#if success}}
+        <div class="alert alert-success">{{success}}
+        </div>
+        {{/if}}
+
+        {{#if error}}
+        <div class="alert alert-danger">{{error}}
+        </div>
+        {{/if}}
         <section class="content">
         {{{body}}}
         </section>
