@@ -522,12 +522,9 @@ router
     }
   })
   .delete(isMgr, async (req, res) => {
-    const hotelId = helper.checkId(req.params.hotelId, true);
-    const roomId = helper.checkId(req.body.roomIdInput, true);
+    const hotelId = helper.checkId(req.body.hotelId, true);
+    const roomId = helper.checkId(req.body.roomId, true);
     try {
-      const hotelId = helper.checkId(req.params.hotelId, true);
-      const roomId = helper.checkId(req.body.roomIdInput, true);
-      
       const deleteRoomMessage = await hotelFuncs(hotelId, roomId);
       req.flash(deleteRoomMessage);
       res.redirect(`/hotel/${hotelId}/hotelManagement/rooms`);
@@ -542,20 +539,19 @@ router
 router
   .route("/hotel/:hotelId/hotelManagement/roomtypes")
   .get(isMgr, async (req, res) => {
+    const hotelId = helper.checkId(req.params.hotelId, true);
     try {
-      const hotelId = helper.checkId(req.params.hotelId, true);
       const roomTypes = await hotelFuncs.getHotelRoomType(hotelId);
-      res.render('roomtTypes', {roomTypes: roomTypes, title: `Room Type Control Panel`});
+      res.render('roomtTypes', {hotelId: hotelId, roomTypes: roomTypes, title: `Room Type Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel/:hotelId/hotelManagement';
+      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/roomtypes`;
       res.redirect(previousUrl);
     }
   })
   .post(isMgr, async (req, res) => {
     try {
-      let args = [];
       const hotelId = helper.checkId(req.params.hotelId, true);
       const roomTypeName = helper.checkString(req.body.roomTypeNameInput, "room type name", true);
       const roomTypePicture = helper.checkWebsite(req.body.roomTypePictureInput, true);
@@ -568,7 +564,7 @@ router
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel/:hotelId/hotelManagement/roomtypes';
+      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/roomtypes`;
       res.redirect(previousUrl);
     }
   })
@@ -582,25 +578,25 @@ router
 
       const updateRoomTypeMessage = await hotelFuncs.updateRoomType(roomTypeId, hotelId, roomTypeName, price, picture);
       req.flash(updateRoomTypeMessage);
-      res.redirect('/hotel/:hotelId/hotelManagement/room');
+      res.redirect(`/hotel/${hotelId}/hotelManagement/roomtypes`);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel/:hotelId/hotelManagement/roomtypes';
+      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/roomtypes`;
       res.redirect(previousUrl);
     } 
   })
   .delete(isMgr, async (req, res) => {
+    const hotelId = helper.checkId(req.params.hotelId, true);
     try {
-      const roomTypeId = helper.checkId(req.body.roomTypeIdInput, true);
-      const hotelId = helper.checkId(req.params.hotelId, true);
+      const roomTypeId = helper.checkId(req.body.roomTypeId, true);
       const deleteRoomTypeMessage = await hotelFuncs.deleteRoomType(roomTypeId, hotelId);
       req.flash(deleteRoomTypeMessage);
-      res.redirect('/hotel/:hotelId/hotelManagement/room');
+      res.redirect(`/hotel/${hotelId}/hotelManagement/roomtypes`);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || '/hotel/:hotelId/hotelManagement/roomtypes';
+      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/roomtypes`;
       res.redirect(previousUrl);
     }
   })
