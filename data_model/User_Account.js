@@ -71,7 +71,7 @@ export async function create(...args) {
   args[6] = helper.checkPassword(args[6], true);
   user.email = helper.checkEmail(args[7], true);
   user.hotel_id = "";
-  user.orders = {};
+  user.orders = [];
 
   user.password = await bcrypt.hash(args[6], saltRounds);
 
@@ -432,7 +432,7 @@ export async function addOrder(...args) {
     { $addToSet: { orders: orderInfo.insertedId } },
     { returnDocument: "after" }
   );
-  if (!updateInfo)
+  if (!updateInfo.lastErrorObject.updatedExisting)
     throw CustomException(
       `Could not update the account with id ${set.user_id}`,
       true
@@ -441,8 +441,8 @@ export async function addOrder(...args) {
   //update room
   const tempRoom = await Room();
   const roomInfo = await tempRoom.findOneAndUpdate(
-    { _id: new ObjectId(args.room_id) },
-    { $addToSet: { orders: orderInfo.insertedId } },
+    { _id: set.room_id },
+    { $addToSet: { order: orderInfo.insertedId } },
     { returnDocument: "after" }
   );
   if (!roomInfo)
