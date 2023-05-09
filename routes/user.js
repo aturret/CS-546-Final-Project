@@ -1,13 +1,22 @@
 import { Strategy as auth } from "passport-local";
 import express from "express";
 import passport from "passport";
+import formidable from "formidable";
 import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
+import { upload } from "../helper.js";
 import {Order, hotelReg, Room, RoomType}from "../Mongo_Connections/mongoCollections.js";
 const router = express.Router();
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
+import path from "path";
+import moment from "moment";
+import {fileURLToPath} from 'url';
+import {dirname} from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const isAuth = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -145,37 +154,43 @@ router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) 
 //TODO: ask which implementation is better   TODO: edit password as well
 router
   .route("/dashboard/:username/edit_info")
-  .put(isAuth, async (req, res) => {
+  .put(isAuth, upload.single("avatar"), async (req, res, next) => {
+    if (req.file) {
+      req.body.avatar = `http://localhost:3000/public/uploads/${req.file.filename}`;
+    }
+    next();
+  }, async (req, res) => {
     try {
       req.body.username = helper.checkString(
         req.body.username,
         "username",
         true
       );
-      req.body.avatar = helper.checkWebsite(req.body.avatar, true);
-      req.body.firstName = helper.checkNameString(
-        req.body.firstName,
+      req.body.userFirstNameInput = helper.checkNameString(
+        req.body.userFirstNameInput,
         "first name",
         true
       );
-      req.body.lastName = helper.checkNameString(
-        req.body.lastName,
+      req.body.userLastNameInput = helper.checkNameString(
+        req.body.userLastNameInput,
         "last name",
         true
-      );
-      req.body.phone = helper.checkPhone(req.body.phone, true);
-      req.body.email = helper.checkEmail(req.body.email, true);
-      const set = {
+      );      
+      req.body.userPhoneInput = helper.checkPhone(req.body.userPhoneInput, true);
+      req.body.userEmailInput = helper.checkEmail(req.body.userEmailInput, true);
+      let set = {
         username: req.body.username,
         avatar: req.body.avatar,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        phone: req.body.phone,
-        email: req.body.email,
+        firstName: req.body.userFirstNameInput,
+        lastName: req.body.userLastNameInput,
+        phone: req.body.userPhoneInput,
+        email: req.body.userEmailInput,
       };
+      if (req.body.avatar === undefined || req.body.avatar === "") { delete set.avatar; }
       const user = await userFuncs.updateUser(req.user.username, set);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
+      console.log(e);
       if (!e.code) {
         req.session.status = 500;
       } else {
@@ -190,7 +205,7 @@ router
 router
   .route("/dashboard/:username/upgrade")
   .post(
-    (req, res, next) =>
+    async (req, res, next) =>
     {
       if(!req.isAuthenticated()) return res.redirect("/user/login");
       if(req.user.identity !== "user"){
@@ -199,11 +214,18 @@ router
         return res.redirect("/user/dashboard/:username")
       }
       next();
+    },
+  upload.array("hotelPhotoInput", 10), async(req, res, next) => {
+    if (req.files.length > 0) {
+      req.body.hotelPhotoInput = req.files.map((file) => {
+        return `http://localhost:3000/public/uploads/${file.filename}`;
+      });
     }
-  , async (req, res) => {
+    next();
+  },
+  async (req, res) => {
     try {
-      req.user.username = helper.checkString(req.user.username, "username", true);
-
+      req.user.username = helper.checkString(req.user.username, "username", true);      
       //check if already have request
       let permission = false
       permission = await userFuncs.getRequest(req.user.username);
@@ -213,26 +235,23 @@ router
         req.session.errorMessage = "You already have a request.";
         return res.redirect("/user/dashboard/:username");
       }
-
-      const hotelName = helper.checkString(req.user.name, "name", true);
-      const email = helper.checkEmail(req.user.email, true);
-      const phone = helper.checkPhone(req.user.phone, true);
-
-
-      const street = helper.checkString(req.user.hotelStreet, "street", true);
-      const city = helper.checkString(req.user.hotelCity, "city", true);
-      const state = helper.checkString(req.user.hotelState, "state", true);
-      const zip_code = helper.checkZip(req.user.hotelZipcode, true);
+      const hotelName = helper.checkString(req.user.hotelNameInput, "name", true);
+      const email = helper.checkEmail(req.user.hotelEmailInput, true);
+      const phone = helper.checkPhone(req.user.hotelPhoneInput, true);
+      const street = helper.checkString(req.user.hotelStreetInput, "street", true);
+      const city = helper.checkString(req.user.hotelCityInput, "city", true);
+      const state = helper.checkString(req.user.hotelStateInput, "state", true);
+      const zip_code = helper.checkZip(req.user.hotelZipcodeInput, true);
       // const userId = await userFuncs.getUser(req.user.username)
       // const managers = [req.user.username];
-      const pictures = req.user.hotelPictures
-        ? req.user.hotelPictures.map((web) => helper.checkWebsite(web, true))
+      const pictures = req.user.hotelPhotoInput
+        ? req.user.hotelPhotoInput.map((url) => helper.checkImageURL(url, true))
         : [];
-
       const requestMessage = await userFuncs.createRequest(req.user.username, hotelName, street, city, state, zip_code, phone, email, pictures, []);
       req.flash(requestMessage);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
+      console.log(e);
       if (!e.code) {
         req.session.status = 500;
       } else {
@@ -249,9 +268,9 @@ router.route("/dashboard/:username/logout").get(
       return res.redirect("/user/login");
     }
     else{
-      req.logout();
+      req.logout(function(){});
       req.session.destroy();
-      res.redirect("/user/login");
+      res.render("logout", {title: "Logout"});
     }
   },
   (req, res) => {

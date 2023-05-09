@@ -118,6 +118,7 @@ export async function getUser(username) {
 }
 
 export async function getUserById(id) {
+  if(id instanceof ObjectId){id = id.toString();}
   id = helper.checkId(id, true);
   const tempAccount = await Account();
   const user = await tempAccount.findOne({ _id: new ObjectId(id) });

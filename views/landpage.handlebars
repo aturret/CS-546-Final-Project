@@ -3,32 +3,34 @@
 login form handlebar template
 
 --}}
-
+<h2>Search for the best hotel you can have for your vacation!</h2>
 {{#if errorMessage}}
 <div class="error">
     <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
-
-<p>Search for the best hotel you can have for your vacation!</p>
 <form action="/" method="POST" id="search-form" class="search-form">
-    <label for="hotelNameInput" id="hotelNameInput-label">  
-        Hotel Name: 
-    </label>
-    <input type="text" name="hotelNameInput" id="hotelNameInput">
-    <label for="hotelState" id="hotelState-label">  
-        State:
-    </label>
-    <select id="hotelStateInput" name="hotelStateInput" class="state">
-    </select>
-    <label for="hotelCityInput" id="hotelCityInput-label">  
-        City:
-    </label>
-    <input type="text" name="hotelCityInput" id="hotelCityInput">
-    <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">  
-        Zipcode:
-    </label>
-    <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput">
+    <div class="input">
+        <label for="hotelNameInput" id="hotelNameInput-label">
+            Hotel Name:<input type="text" name="hotelNameInput" id="hotelNameInput">
+        </label>
+    </div>
+    <div class="input">
+        <label for="hotelState" id="hotelState-label">
+            State:<select id="hotelStateInput" name="hotelStateInput" class="state">
+            </select>
+        </label>
+    </div>
+    <div class="input">
+        <label for="hotelCityInput" id="hotelCityInput-label">
+            City:<input type="text" name="hotelCityInput" id="hotelCityInput">
+        </label>
+    </div>
+    <div class="input">
+        <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
+            Zipcode:<input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput">
+        </label>
+    </div>
     <button type="submit" id="search-button">Search</button>
 </form>
 <div class="error" id="client">

@@ -1,6 +1,6 @@
 // In this file, you must perform all client-side validation for every single form input (and the role dropdown) on your pages. The constraints for those fields are the same as they are for the data functions and routes. Using client-side JS, you will intercept the form's submit event when the form is submitted and If there is an error in the user's input or they are missing fields, you will not allow the form to submit to the server and will display an error on the page to the user informing them of what was incorrect or missing.  You must do this for ALL fields for the register form as well as the login form. If the form being submitted has all valid data, then you will allow it to submit to the server for processing. Don't forget to check that password and confirm password match on the registration form!
 
-import moment from "moment";
+import {moment} from 'https://momentjs.com/downloads/moment.js'
 
 console.log('client-side JS loaded!');
 
@@ -65,12 +65,12 @@ forms.forEach(form => {
             textareas.forEach(input => {                
                 input.value = checkString(input.value, input.name, false);
             })
+            if (form.classList.contains('picForm')) {
             picInputs.forEach(input => {
                 const file = input.files[0];
                 if (!file) throw "No file selected";
                 if (!file.type.startsWith('image/')) throw "Picture file must be an image";
-                input.value = file.name;
-            })
+            })}
             if (date1 && date2) {
                     checkLaterDate(date1.value, date2.value);
             }

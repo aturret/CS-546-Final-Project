@@ -18,7 +18,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
 </div>
 
 <div class="deleteRoom">
-    <form action="/hotel/{{room.hotel_id}}/hotelManagement/rooms/{{room._id}}?_method=DELETE" method="POST">
+    <form action="/hotel/{{room.hotel_id}}/hotelManagement/rooms/{{room._id}}?_method=DELETE" method="POST" class="my-form">
         <input type="hidden" name="hotelId" value="{{room.hotel_id}}">
         <input type="hidden" name="roomId" value="{{room._id}}">
         <button type="submit" class="danger">Delete the room</button>
@@ -27,9 +27,9 @@ roomTypes collection, or you can just calculate its availability and set it as a
 
 <div class="editRoom">
     <div class="editRoomButton">
-        <button class="editRoom" onclick="editRoom()">Edit the room</button>
+        <button class="editRoom" id="editRoomButton" onclick="editRoom()">Edit the room</button>
     </div>
-    <div class="editRoomWindow" hidden="true" id="edit">
+    <div class="editRoomWindow" hidden="true" id="editRoomWindow">
         <form action="/hotel/{{room.hotel_id}}/hotelManagement/rooms/{{room._id}}?_method=PUT" method="POST" id="editRoom-form" class="my-form">
             <label id="roomNumberInput-label">
                 Room Number:
