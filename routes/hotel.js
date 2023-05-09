@@ -404,7 +404,7 @@ router
     const hotelId = helper.checkId(req.params.hotelId, true);
     try {
       const hotel = await hotelFuncs.getHotel(hotelId);
-      res.render('hotel_management', {hotel: hotel, title: `Hotel Control Panel`});
+      res.render('hotel_management', {userIdentity: req.user.identity, hotel: hotel, title: `Hotel Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -717,9 +717,9 @@ router
   .get(isMgr, async (req, res) => {
     const hotelId = helper.checkId(req.params.hotelId, true);
     try {
-      const hotel = await hotelFuncs.getHotel(hotelId);
+      // const hotel = await hotelFuncs.getHotel(hotelId);
       const managers = await hotelFuncs.getHotelMgr(hotelId);
-      res.render('hotelManagers', {hotel: hotel, managers: managers, title: `Manager Control Panel`});
+      res.render('hotelManagers', {hotelId: hotelId, managers: managers, title: `Manager Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -735,11 +735,11 @@ router
 
       const addMgrMessage = await userFuncs.addMgr(req.user.username, userName, hotelId);
       req.flash(addMgrMessage);
-      res.redirect(`/hotel/${hotelId}/hotelManagement/manager`);
+      res.redirect(`/hotel/${hotelId}/hotelManagement/managers`);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/manager`;
+      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/managers`;
       res.redirect(previousUrl);
     }
   })
@@ -750,11 +750,11 @@ router
 
       const deleteReviewMessage = await userFuncs.deleteMgr(req.user.username, userNameInput, hotelId);
       req.flash(deleteReviewMessage);
-      res.redirect(`/hotel/${hotelId}/hotelManagement/manager`);
+      res.redirect(`/hotel/${hotelId}/hotelManagement/managers`);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/manager`;
+      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/managers`;
       res.redirect(previousUrl);
     }
   })

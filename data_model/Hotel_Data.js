@@ -96,7 +96,7 @@ export async function getHotel(id) {
 export async function getHotelMgr(hotelId) {
   hotelId = helper.checkId(hotelId, true);
   const tempHotel = await hotelReg();
-  const hotel = await tempHotel.findOne({ hotelId: new ObjectId(hotelId) }, { _id: 0, managers: 1 });
+  const hotel = await tempHotel.findOne({ _id: new ObjectId(hotelId) });
   if (!hotel) throw CustomException(`No hotel with hotel ID ${hotelId}`, true);
 
   let mgrInfoList = []
@@ -112,6 +112,7 @@ export async function getHotelMgr(hotelId) {
       lastName: mgrInfo.lastName,
       email: mgrInfo.email,
       phone: mgrInfo.phone,
+      hotel_id: mgrInfo.hotel_id.toString()
     });
   });
 

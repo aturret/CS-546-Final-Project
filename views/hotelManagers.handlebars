@@ -13,8 +13,8 @@ reviewUserId: the id of the user who wrote the review
 </div>
 {{/if}}
 
-<h2>{{hotel.name}}'s all managers</h2>
-<div class="hotelInfo">
+<h2>All managers</h2>
+{{!-- <div class="hotelInfo">
     <div class="hotelName">
         <p>{{hotel.name}}</p>
     </div>
@@ -24,7 +24,7 @@ reviewUserId: the id of the user who wrote the review
         {{/each}}
     </div>
     <div class="hotelRating">
-        <p>Rating: {{hotelRating}}</p>
+        <p>Rating: {{hotel.overall_rating}}</p>
     </div>
 
     <div class="hotelIntro">
@@ -35,14 +35,14 @@ reviewUserId: the id of the user who wrote the review
             <p>Contacts: Phone: {{hotelPhone}} Email: {{hotelEmail}}</p>
         </div>
     </div>
-</div>
+</div> --}}
 <div class="managerOperations box">
     <div class="managerResult left">
         <h3>All managers</h3>
         {{#each managers}}
         <div class="manager box">
             <div class="managerContentItem left">
-                <div class="mgrPhoto">{{this.avatar}}</div>
+                <div class="mgrPhoto"><img src="{{this.avatar}}"></div>
             </div>
             <div class="managerContentItem right">
                 <div class="mgrId">
@@ -65,7 +65,7 @@ reviewUserId: the id of the user who wrote the review
                     <p>Phone: {{this.phone}}</p>
                 </div>
             </div>
-            <form action="/hotel/:hotelId/hotelManagement/managers?_method=DELETE" method="POST" id="deleteMgr-form" class="my-form">
+            <form action="/hotel/{{this.hotel_id}}/hotelManagement/managers?_method=DELETE" method="POST" id="deleteMgr-form" class="my-form">
                 <input type="hidden" name="userNameInput" id="userNameInput" value="{{this.username}}">
                 <button type="submit" id="deleteMgr" class="danger">Delete</button>
             </form>
@@ -74,7 +74,7 @@ reviewUserId: the id of the user who wrote the review
     </div>
     <div class="addMgr">
         <h3>Add a new manager</h3>
-        <form action="/hotel/:hotelId/hotelManagement/managers" method="POST" id="registration-form" class="my-form">
+        <form action="/hotel/{{hotelId}}/hotelManagement/managers" method="POST" id="registration-form" class="my-form">
             {{!-- <input type="hidden" name="hotelId" value="{{hotelId}}"> --}}
             <label for="userNameInput" id="userNameInput-label">
                 Username:
@@ -88,4 +88,4 @@ reviewUserId: the id of the user who wrote the review
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-<a href="/register">Click here to register!</a>
+<a href="/hotel/{{hotelId}}/hotelManagement">Back to Hotel Management Page for Hotel {{hotelId}}</a>
