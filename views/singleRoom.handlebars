@@ -38,7 +38,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
             <label id="roomTypeInput-label">
                 Room Type:
                 <select name="roomTypeInput" id="roomTypeInput">
-                    {{#each roomTypes}}
+                    {{#each room.roomTypes}}
                     <option value="{{typeName}}">{{typeName}}</option>
                     {{/each}}
                 </select>

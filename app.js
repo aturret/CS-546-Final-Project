@@ -123,8 +123,8 @@ app.use((req, res, next) => {
 })
 
 app.use((req, res, next) => {
-  res.locals.success = req.flash('sucessMessage');
-  res.locals.error = req.flash('errorMessage');
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
   next();
 });
 

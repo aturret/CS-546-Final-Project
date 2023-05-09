@@ -39,6 +39,7 @@ There are four types of identities: "guest", "user", "manager", "admin".
                 </ul>
             </div>
         </header>
+        <div class="flash">
         {{#if success}}
         <div class="alert alert-success">{{success}}
         </div>
@@ -48,6 +49,7 @@ There are four types of identities: "guest", "user", "manager", "admin".
         <div class="alert alert-danger">{{error}}
         </div>
         {{/if}}
+        </div>
         <section class="content">
         {{{body}}}
         </section>
