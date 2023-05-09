@@ -8,11 +8,8 @@ import * as userFuncs from "../data_model/User_Account.js";
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
 import * as helper from "../helper.js";
 import isAuth from "./user.js";
-<<<<<<< HEAD
-import {upload} from '../helper.js'
-=======
 import moment from "moment";
->>>>>>> origin/Linhao_Zhao_branch
+import {upload} from '../helper.js'
 
 
 const router = express.Router();
@@ -414,18 +411,15 @@ router
       res.redirect(previousUrl);
     }
   })
-<<<<<<< HEAD
-  .put(isMgr, upload.array("hotelPictures",10), async (req, res, next) => {
+  .put(isMgr, upload. array("hotelPictures",10), async (req, res, next) => {
     if(req.files.length > 0){
       req.body.hotelPictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
     }
     next();
   }, async (req, res) => {
-=======
-  .put(isMgr, async (req, res) => {
     const hotelId = req.params.hotelId;
->>>>>>> origin/Linhao_Zhao_branch
     try {
+      
       const hotelName = req.body.hotelName;
       const hotelStreet = req.body.hotelStreet;
       const hotelCity = req.body.hotelCity;
@@ -452,11 +446,7 @@ router
         // reviews
       );
       req.flash(result);
-<<<<<<< HEAD
-      return res.status(200).redirect("/hotel/:hotelId/hotelManagement");
-=======
       return res.redirect(200).redirect(`/hotel/${hotelId}/hotelManagement`);
->>>>>>> origin/Linhao_Zhao_branch
     } catch (e) {
       console.log(e);
       e.code = e.code ? e.code : 500;
