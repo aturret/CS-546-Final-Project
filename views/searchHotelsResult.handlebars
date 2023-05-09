@@ -18,7 +18,11 @@ hotelPrice: might be the lowest price or average price. I think lowest is better
         <li>
             <div class="searchResultItem">
                 <div class="hotelName"><a href="/hotel/{{this.hotelId}}">{{this.hotelName}}</a></div>
+                {{#if this.hotelPicture}}
                 <div class="hotelPicture"><img src="{{this.hotelPicture}}"></div>
+                {{else}}
+                <div class="hotelPicture"><img src="/public/img/hotel.jpg"></div>
+                {{/if}}                
                 <div class="hotelReviewNumber">
                     <p>Review number: {{this.hotelReviewNumber}}</p>
                 </div>

@@ -15,7 +15,7 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
     <div class="hotelBasicInfo">
         <div class="hotelPhoto">
             {{#each hotel.pictures }}
-                this
+            this
             {{/each}}
         </div>
         <div class="hotelRating">
@@ -33,49 +33,76 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
     <div class="edit">
         <button id="editHotelButton" onclick="editHotel()">Edit Hotel Basic Info</button>
         <div hidden="true" id="editHotelWindow">
-            <form action="/hotel/{{hotel._id}}?_method=PUT" method="POST" id="editHotelForm" class="my-form">
+            <form action="/hotel/{{hotel._id}}/hotelManagement?_method=PUT" method="POST" id="editHotelForm" class="my-form"
+                enctype="multipart/form-data">
                 <input type="hidden" name="hotelIdInput" value="{{hotel._id}}">
-                <label for="hotelNameInput" id="hotelNameInput-label">
-                    Hotel Name:
-                </label>
-                <input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotel.name}}">
+                <input type="hidden" name="fakestate" value="{{hotel.state}}">
+                <div class="hotelName input">
+                    <label for="hotelNameInput" id="hotelNameInput-label">
+                        Hotel Name:<input type="text" name="hotelName" id="hotelNameInput" value="{{hotel.name}}">
+                    </label>
+                </div>
+                <div class="hotelPictures input">
+                    <label for="hotelPicturesInput" id="hotelPicturesInput-label">
+                        Hotel Pictures:<input type="file" name="hotelPictures" id="hotelPicturesInput" multiple>
+                    </label>
+                </div>
                 <div class="hotelContact">
-                    <label for="hotelPhoneInput" id="hotelPhoneInput-label">
-                        Hotel Phone:
-                    </label>
-                    <input type="text" name="hotelPhoneInput" id="hotelPhoneInput" value="{{hotel.phone}}">
-                    <label for="hotelEmailInput" id="hotelEmailInput-label">
-                        Hotel Email:
-                    </label>
-                    <input type="email" name="hotelEmailInput" id="hotelEmailInput" value="{{hotel.email}}">
+                    <div class="input">
+                        <label for="hotelPhoneInput" id="hotelPhoneInput-label">
+                            Hotel Phone:<input type="text" name="hotelPhone" id="hotelPhoneInput"
+                                value="{{hotel.phone}}">
+                        </label>
+                    </div>
+                    <div class="input">
+                        <label for="hotelEmailInput" id="hotelEmailInput-label">
+                            Hotel Email:<input type="email" name="hotelEmail" id="hotelEmailInput"
+                                value="{{hotel.email}}">
+                        </label>
+                    </div>
                 </div>
                 <div class="hotelAddress">
-                    <label for="hotelCityInput" id="hotelCityInput-label">
-                        Hotel City:
-                    </label>
-                    <input type="text" name="hotelCityInput" id="hotelCityInput" value="{{hotel.city}}">
-                    <label for="hotelStreetInput" id="hotelStreetInput-label">
-                        Hotel Street:
-                    </label>
-                    <input type="text" name="hotelStreetInput" id="hotelStreetInput" value="{{hotel.street}}">
-                    <label for="hotelStateInput" id="hotelStateInput-label">
-                        Hotel State:
-                    </label>
-                    <select id="hotelStateInput" class="state" name="hotelStateInput" value="{{hotel.state}}">
-                    </select>
-                    <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
-                        Hotel Zip:
-                    </label>
-                    <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput" value="{{hotel.zip_code}}">
+                    <div class="input">
+                        <label for="hotelCityInput" id="hotelCityInput-label">
+                            Hotel City:<input type="text" name="hotelCity" id="hotelCityInput" value="{{hotel.city}}">
+                        </label>
+                    </div>
+                    <div class="input">
+                        <label for="hotelStreetInput" id="hotelStreetInput-label">
+                            Hotel Street:<input type="text" name="hotelStreet" id="hotelStreetInput"
+                                value="{{hotel.street}}">
+                        </label>
+                    </div>
+                    <div class="input">
+                        <label for="hotelStateInput" id="hotelStateInput-label">
+                            Hotel State:<select id="hotelStateInput" class="state" name="hotelState"
+                                value="{{hotel.state}}">
+                            </select>
+                        </label>
+                    </div>
+                    <div class="input">
+                        <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
+                            Hotel Zip:<input type="text" name="hotelZipCode" id="hotelZipcodeInput"
+                                value="{{hotel.zip_code}}">
+                        </label>
+                    </div>
                 </div>
                 <button type="submit">Submit Info Change</button>
             </form>
         </div>
-        <a href="/hotel/{{hotel._id}}/hotelManagement/rooms">Hotel Rooms</a>
-        <a href="/hotel/{{hotel._id}}/hotelManagement/roomTypes">Hotel Rooms Types</a>
-        <a href="/hotel/{{hotel._id}}/hotelManagement/orders">Hotel orders</a>
-        <a href="/hotel/{{hotel._id}}/hotelManagement/reviews">Hotel Reviews</a>
-        {{#if (eq user.userIdentity "admin")}}        
+        <div>
+            <a href="/hotel/{{hotel._id}}/hotelManagement/rooms">Hotel Rooms</a>
+        </div>
+        <div>
+            <a href="/hotel/{{hotel._id}}/hotelManagement/roomTypes">Hotel Rooms Types</a>
+        </div>
+        <div>
+            <a href="/hotel/{{hotel._id}}/hotelManagement/orders">Hotel orders</a>
+        </div>
+        <div>
+            <a href="/hotel/{{hotel._id}}/hotelManagement/reviews">Hotel Reviews</a>
+        </div>
+        {{#if (eq user.userIdentity "admin")}}
         <a href="/hotel/{{hotel._id}}/hotelManagement/managers">Hotel Managers</a>
         {{/if}}
     </div>

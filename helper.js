@@ -95,6 +95,14 @@ export function checkWebsite(web, flag)
     return web
 }
 
+export function checkImageURL(url, flag)
+{
+    url = url.trim()
+    if(!url || typeof url !== 'string') throw new CustomException("Image URL must exist and must be a string type.", flag);
+    if(!/^(http|https):\/\//i.test(url)) throw new CustomException("Image URL has to match the format.", flag);
+    return url
+}
+
 export function checkPhone(n, flag)
 {
     n = n.trim()

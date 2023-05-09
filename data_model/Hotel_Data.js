@@ -64,6 +64,7 @@ export async function getAllHotels() {
 }
 
 export async function getHotel(id) {
+  if(id instanceof ObjectId){id = id.toString();}
   id = helper.checkId(id, true);
   const hotelCollection = await hotelReg();
 
@@ -167,7 +168,7 @@ export async function updateHotel(...args) {
   updateHotel.phone = helper.checkPhone(args[6], false);
   updateHotel.email = helper.checkEmail(args[7], false);
   updateHotel.picture = args[8]
-    ? args[8].map((web) => helper.checkWebsite(web, false))
+    ? args[8].map((url) => helper.checkImageURL(url, false))
     : undefined;
   if (args[9] && Array.isArray(args[9])) {
     updateHotel.facilities = args[9] ? args[9].map((facility) =>

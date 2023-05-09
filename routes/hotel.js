@@ -8,6 +8,7 @@ import * as userFuncs from "../data_model/User_Account.js";
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
 import * as helper from "../helper.js";
 import isAuth from "./user.js";
+import {upload} from '../helper.js'
 
 
 const router = express.Router();
@@ -84,7 +85,7 @@ router
         hotelInfo.hotelAddress = result[i].street + ", " + result[i].city + ", " + result[i].state + ", " + result[i].zip_code;
         hotelInfo.hotelName = result[i].name;
         hotelInfo.hotelId = result[i]._id;
-        hotelInfo.hotelPicture = result[i].pictures;
+        hotelInfo.hotelPicture = result[i].picture?.[0];
         hotelInfo.hotelPhone = result[i].phone;
         hotelInfo.hotelEmail = result[i].email;
         hotelInfo.hotelRoom = result[i].rooms;
@@ -144,7 +145,7 @@ router
       };
       res.render('reviews', reviewInfo);
     } catch (e) {
-      console.log(e.message);
+      console.log(e);
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
       const previousUrl = req.headers.referer || '/hotel';
@@ -272,7 +273,7 @@ router
       const hotelInfo = {};
       hotelInfo.hotelId = hotel._id;
       hotelInfo.hotelName = hotel.name;
-      hotelInfo.hotelPhoto = hotel.pictures;
+      hotelInfo.hotelPhoto = hotel.picture;
       hotelInfo.HotelRating = hotel.overall_rating;
       hotelInfo.hotelAddress = hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code;
       hotelInfo.hotelPhone = hotel.phone;
@@ -424,7 +425,12 @@ router
       res.redirect(previousUrl);
     }
   })
-  .put(isMgr, async (req, res) => {
+  .put(isMgr, upload.array("hotelPictures",10), async (req, res, next) => {
+    if(req.files.length > 0){
+      req.body.hotelPictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+    }
+    next();
+  }, async (req, res) => {
     try {
       const hotelId = req.params.hotelId;
       const hotelName = req.body.hotelName;
@@ -434,9 +440,8 @@ router
       const hotelZipCode = req.body.hotelZipCode;
       const hotelPhone = req.body.hotelPhone;
       const hotelEmail = req.body.hotelEmail;
-      const hotelPicture = req.body.hotelPicture;
+      const hotelPicture = req.body.hotelPictures;
       const hotelFacilities = req.body.hotelFacilities;
-
       const result = await hotelFuncs.updateHotel(
         hotelId,
         hotelName,
@@ -454,8 +459,9 @@ router
         // reviews
       );
       req.flash(result);
-      return res.redirect(200).redirect("/hotel/:hotelId/hotelManagement");
+      return res.status(200).redirect("/hotel/:hotelId/hotelManagement");
     } catch (e) {
+      console.log(e);
       e.code = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
       res.redirect("/hotel_management");

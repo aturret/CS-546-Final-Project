@@ -25,7 +25,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
 
 <div class="editRoom">
     <div class="editRoomButton">
-        <button class="editRoom" onclick="editRoom()">Edit the room</button>
+        <button class="editRoom" id="editRoomButton" onclick="editRoom()">Edit the room</button>
     </div>
     <div class="editRoomWindow" hidden="true" id="editRoomWindow">
         <form action="/hotel/{{hotelId}}/hotelManagement/rooms/{{roomId}}?_method=PUT" method="POST" id="editRoom-form" class="my-form">

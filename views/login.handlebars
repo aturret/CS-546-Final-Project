@@ -12,14 +12,16 @@ login form handlebar template
 
 <p>Please log in your account.</p>
 <form action="/user/login" method="POST" id="login-form" class="my-form">
-    <label for="username" id="username">  
-        Username: 
-    </label>
-    <input type="username" name="username" id="username">
-    <label for="passwordInput" id="passwordInput-label">  
-        Password:
-    </label>
-    <input type="password" name="passwordInput" id="passwordInput">
+    <div class="input">
+        <label for="username" id="username">
+            Username: <input type="text" name="username" id="username">
+        </label>
+    </div>
+    <div class="input">
+        <label for="passwordInput" id="passwordInput-label">
+            Password:<input type="password" name="passwordInput" id="passwordInput">
+        </label>
+    </div>
     <button type="submit" id="login-button">Login</button>
 </form>
 <div class="error" id="client">
