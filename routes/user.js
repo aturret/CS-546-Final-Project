@@ -117,10 +117,12 @@ router.route("/dashboard/:username").get(isAuth, async (req, res) => {
     if (req.session && req.session.errorMessage) {
       user.errorMessage = req.session.errorMessage;
       req.session.errorMessage = null;
-      const status = req.session.status;
+      user.status = req.session.status;
       req.session.status = null;
-      return res.status(status).render("dashboard", {user, title: "Dashboard"});
+      user.title = "Dashboard";
+      return res.status(req.session.status).render("dashboard", {user});
     }
+    user.title = "Dashboard";
     return res.status(200).render("dashboard", user);
   } catch (e) {
     if (!e.code) {
@@ -137,9 +139,24 @@ router.route("/dashboard/:username").get(isAuth, async (req, res) => {
 router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) => {
   try {
     const username = helper.checkString(req.params.username, "username", true);
-    const user = await userFuncs.getUser(req.user.username);
     const orders = await userFuncs.getOrder(username);
-    return res.status(200).render("orders", { user: user, orders: orders, title: "Order History" });
+    for (let i of orders)
+    {
+      i.hotelId = i.hotel_id;
+      i.orderPrice = i.price;
+      i.startDate = i.checkin_date;
+      i.endDate = i.checkout_date;
+      if (i.guests && i.guests[0])
+      {
+        i.guest1 = i.guests[0];
+
+      }
+      if (i.guests && i.guests[1])
+      {
+        i.guest2 = i.guests[1];
+      }
+    }
+    return res.status(200).render("orders", { order: orders, title: "Order History" });
   } catch (e) {
     if (!e.code) {
       req.session.status = 500;
@@ -147,7 +164,7 @@ router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) 
       req.session.status = e.code;
     }
     req.session.errorMessage = e.message;
-    return res.redirect("/user/register");
+    return res.redirect(`/user/dashboard/${req.params.username}`);
   }
 });
 

@@ -359,37 +359,24 @@ export async function getOrder(username) {
   username = helper.checkString(username, "username", true);
   const tempAccount = await Account();
 
-  const rv = await tempAccount.aggregate([
-    {
-      $match: { username: username },
-    },
-    {
-      $lookup: {
-        from: "hotels",
-        localField: "hotel_id",
-        foreignField: "_id",
-        as: "order_details",
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        hotel_name: 1,
-        checkin_date: 1,
-        checkout_date: 1,
-        guests: 1,
-        order_price: 1,
-        order_status: 1,
-        review: 1,
-      },
-    },
-  ]);
-  if (!rv)
-    throw CustomException(
-      `Could not find order with username ${username}`,
-      true
-    );
-  return rv;
+  let orderIds = await tempAccount.findOne({username: username});
+  if(!orderIds) throw CustomException(`Could not find user with username ${username}`, true);
+  orderIds = orderIds.orders;
+  const tempOrder = await Order();
+  let orders = await tempOrder.find({_id: {$in: orderIds}}).toArray();
+  if (orders && !Array.isArray(orders)) orders = [orders]; 
+  const tempHotel = await hotelReg();
+  const tempRoom = await Room();
+  let hotel = undefined;
+  let roomType = undefined;
+  for (let i of orders)
+  {
+    hotel = await tempHotel.findOne({_id: i.hotel_id}, {name: 1})
+    i.hotelName = hotel.name;
+    roomType = await tempRoom.findOne({_id: i.room_id});
+    i.roomType = roomType.room_type;
+  }
+  return orders;
 }
 
 export async function getOrderById(orderId) {
