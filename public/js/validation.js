@@ -65,12 +65,12 @@ forms.forEach(form => {
             textareas.forEach(input => {                
                 input.value = checkString(input.value, input.name, false);
             })
+            if (form.classList.contains('picForm')) {
             picInputs.forEach(input => {
                 const file = input.files[0];
                 if (!file) throw "No file selected";
                 if (!file.type.startsWith('image/')) throw "Picture file must be an image";
-                input.value = file.name;
-            })
+            })}
             if (date1 && date2) {
                     checkLaterDate(date1.value, date2.value);
             }

@@ -1,13 +1,22 @@
 import { Strategy as auth } from "passport-local";
 import express from "express";
 import passport from "passport";
+import formidable from "formidable";
 import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as helper from "../helper.js";
 import { CustomException } from "../helper.js";
+import { upload } from "../helper.js";
 import {Order, hotelReg, Room, RoomType}from "../Mongo_Connections/mongoCollections.js";
 const router = express.Router();
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
+import path from "path";
+import moment from "moment";
+import {fileURLToPath} from 'url';
+import {dirname} from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const isAuth = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -145,37 +154,42 @@ router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) 
 //TODO: ask which implementation is better   TODO: edit password as well
 router
   .route("/dashboard/:username/edit_info")
-  .put(isAuth, async (req, res) => {
-    try {
+  .put(isAuth, upload.single("avatar"), async (req, res, next) => {
+    if (req.file) {
+      req.body.avatar = `http://localhost:3000/public/uploads/${req.file.filename}`;
+    }
+    next();
+  }, async (req, res) => {
+    try {      
       req.body.username = helper.checkString(
         req.body.username,
         "username",
         true
       );
-      req.body.avatar = helper.checkWebsite(req.body.avatar, true);
-      req.body.firstName = helper.checkNameString(
-        req.body.firstName,
+      req.body.userFirstNameInput = helper.checkNameString(
+        req.body.userFirstNameInput,
         "first name",
         true
       );
-      req.body.lastName = helper.checkNameString(
-        req.body.lastName,
+      req.body.userLastNameInput = helper.checkNameString(
+        req.body.userLastNameInput,
         "last name",
         true
-      );
-      req.body.phone = helper.checkPhone(req.body.phone, true);
-      req.body.email = helper.checkEmail(req.body.email, true);
+      );      
+      req.body.userPhoneInput = helper.checkPhone(req.body.userPhoneInput, true);
+      req.body.userEmailInput = helper.checkEmail(req.body.userEmailInput, true);
       const set = {
         username: req.body.username,
         avatar: req.body.avatar,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        phone: req.body.phone,
-        email: req.body.email,
+        firstName: req.body.userFirstNameInput,
+        lastName: req.body.userLastNameInput,
+        phone: req.body.userPhoneInput,
+        email: req.body.userEmailInput,
       };
       const user = await userFuncs.updateUser(req.user.username, set);
       return res.redirect(`/user/dashboard/${req.user.username}`);
     } catch (e) {
+      console.log(e);
       if (!e.code) {
         req.session.status = 500;
       } else {
@@ -249,9 +263,9 @@ router.route("/dashboard/:username/logout").get(
       return res.redirect("/user/login");
     }
     else{
-      req.logout();
+      req.logout(function(){});
       req.session.destroy();
-      res.redirect("/user/login");
+      res.render("logout", {title: "Logout"});
     }
   },
   (req, res) => {

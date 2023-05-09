@@ -2,8 +2,23 @@ import { Account } from "./Mongo_Connections/mongoCollections.js";
 import { ObjectId } from 'mongodb';
 import moment from 'moment';
 import faker from 'faker';
-
-
+import formidable from 'formidable';
+// import __dirname from './app.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import multer from 'multer';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, './public/uploads/');
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    },
+  });  
+export const upload = multer({ storage: storage });
 
 export function CustomException(message, flag) {
     const error = new Error(message);  

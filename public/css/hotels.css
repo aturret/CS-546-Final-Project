@@ -105,7 +105,7 @@ section.content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 10px 20px 30px 40px;
+  margin: 1em 2em 3em 4em;
 }
 
 .left {

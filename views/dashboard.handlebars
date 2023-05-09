@@ -36,43 +36,58 @@
         </div>
     </div>
     {{!-- edit personal information --}}
-    <div class="editInformation">
-        <button id="editInformationButton" onclick="editInformation()">Edit</button>
-        <div id="editInformationWindow" hidden="true">
-            <form action="/user/dashboard/{{username}}/edit" method="PATCH" id="editInformation-form" class="my-form">
-                <div class="userFirstName">
-                    <input type="text" name="userFirstNameInput" id="userFirstNameInput" value="{{firstName}}">
-                    <label for="userFirstNameInput">First Name</label>
-                </div>
+    <div class="editInformation"><button id="editInformationButton" onclick="editInformation()">Edit Info</button>
+    <div id="editInformationWindow" hidden="true">
+        <form action="/user/dashboard/{{username}}/edit_info?_method=PUT" method="POST" id="editInformation-form"
+            class="my-form" enctype="multipart/form-data">
+            <input type="hidden" name="username" value="{{username}}">
+            <div class="userFirstName">
+                <label for="userFirstNameInput">First Name</label>
+                <input type="text" name="userFirstNameInput" id="userFirstNameInput" value="{{firstName}}">
+            </div>
                 <div class="userLastName">
-                    <input type="text" name="userLastNameInput" id="userLastNameInput" value="{{lastName}}">
                     <label for="userLastNameInput">Last Name</label>
+                    <input type="text" name="userLastNameInput" id="userLastNameInput" value="{{lastName}}">
+                </div>
+                <div class="avatar">
+                    <label for="avatar">Avatar</label>
+                    <input type="file" name="avatar" id="avatar" accept="image/*">
                 </div>
                 <div class="userEmail">
-                    <input type="email" name="userEmailInput" id="userEmailInput" value="{{email}}">
                     <label for="userEmail">Email</label>
+                    <input type="email" name="userEmailInput" id="userEmailInput" value="{{email}}">
                 </div>
                 <div class="userPhone">
-                    <input type="text" name="userPhoneInput" id="userPhoneInput" value="{{phone}}">
                     <label for="userPhone">Phone</label>
-                </div>
-                <div class="userPassword">
-                    <input type="password" name="userPasswordInput" id="userPasswordInput">
-                    <label for="userPassword">Password</label>
-                </div>
-                <div class="userNewPassword">
-                    <input type="password" name="userNewPasswordInput" id="userNewPasswordInput" class="PasswordInput">
-                    <label for="userPassword">New Password</label>
-                </div>
-                <div class="userConfirmNewPassword">
-                    <input type="password" name="userConfirmNewPasswordInput" id="userConfirmNewPasswordInput"
-                        class="confirmPasswordInput">
-                    <label for="userConfirmPassword">Confirm New Password</label>
+                    <input type="text" name="userPhoneInput" id="userPhoneInput" value="{{phone}}">
                 </div>
                 <button type="submit" id="editInformation">Submit</button>
             </form>
         </div>
     </div>
+    <div class="changePassword">
+        <button id="changePasswordButton" onclick="changePassword()">Change Password</button>
+        <div id="changePasswordWindow" hidden="true">
+            <form action="/user/dashboard/{{username}}/change_password?_method=PUT" method="POST" id="editInformation-form" class="my-form">
+                <input type="hidden" name="username" value="{{username}}">                
+                <div class="userPassword">
+                    <label for="userPassword">Password</label>
+                    <input type="password" name="userPasswordInput" id="userPasswordInput">
+                </div>
+                <div class="userNewPassword">
+                    <label for="userPassword">New Password</label>
+                    <input type="password" name="userNewPasswordInput" id="userNewPasswordInput" class="PasswordInput">
+                </div>
+                <div class="userConfirmNewPassword">
+                    <label for="userConfirmPassword">Confirm New Password</label>
+                    <input type="password" name="userConfirmNewPasswordInput" id="userConfirmNewPasswordInput"
+                        class="confirmPasswordInput">
+                </div>
+                <button type="submit" id="editInformation">Submit</button>
+            </form>
+        </div>
+    </div>
+
 </div>
 {{!-- manager/hotel application --}}
 {{#if (eq user.identity "user")}}
@@ -118,7 +133,7 @@
                 <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput" value="{{hotelZipcode}}">
                 <input type="hidden" name="userIdInput" value="{{_id}}">
             </div>
-                <button type="submit" id="newApplication">Apply for a new hotel</button>
+            <button type="submit" id="newApplication">Apply for a new hotel</button>
         </form>
     </div>
 </div>

@@ -29,7 +29,7 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
     <div class="edit">
         <button id="editHotelButton" onclick="editHotel()">Edit Hotel Basic Info</button>
         <div hidden="true" id="editHotelWindow">
-            <form action="/hotel/{{hotel._id}}" method="PATCH" id="editHotelForm" class="my-form">
+            <form action="/hotel/{{hotel._id}}?_method=PUT" method="POST" id="editHotelForm" class="my-form">
                 <input type="hidden" name="hotelIdInput" value="{{hotel._id}}">
                 <label for="hotelNameInput" id="hotelNameInput-label">
                     Hotel Name:
@@ -79,9 +79,9 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
     <div class="delete">
         <button id="deleteHotelButton" onclick="deleteHotel()">Delete Hotel</button>
         <div hidden="true" id="deleteHotelWindow">
-            <form action="/hotel/{{hotel._id}}" method="DELETE" id="deleteHotelForm" class="my-form">
+            <form action="/hotel/{{hotel._id}}?_method=DELETE" method="POST" id="deleteHotelForm" class="my-form">
                 <input type="hidden" name="hotelIdInput" value="{{hotel._id}}">
-                <button type="submit">Confirm Delete</button>
+                <button type="submit" class="danger">Confirm Delete</button>
             </form>
         </div>
     </div>

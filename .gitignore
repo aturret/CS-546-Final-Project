@@ -2,3 +2,5 @@ node_modules/
 /front-end-playground
 fly.toml
 Dockerfile
+public/uploads/*
+```
