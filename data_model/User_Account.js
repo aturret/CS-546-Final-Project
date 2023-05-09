@@ -835,16 +835,17 @@ export async function createRequest(...args) {
   const phone = helper.checkPhone(args[6], true);
   const email = helper.checkEmail(args[7], true);
   const pictures = args[8] ? args[8].map((web) => helper.checkImageURL(web, true)) : [];
-  let facilities = [];
-  if (args[9] && Array.isArray(args[9])) {
-    facilities = args[9].map((facility) =>
-      helper.checkString(facility, "facility", true)
-    );
-  } else if (!args[9]) {
-    facilities = [];
-  } else {
-    throw CustomException("Invalid facilities.", true);
-  }
+  const facilities = helper.checkString(args[9], "facilities", true)
+  // let facilities = [];
+  // if (args[9] && Array.isArray(args[9])) {
+  //   facilities = args[9].map((facility) =>
+  //     helper.checkString(facility, "facility", true)
+  //   );
+  // } else if (!args[9]) {
+  //   facilities = [];
+  // } else {
+  //   throw CustomException("Invalid facilities.", true);
+  // }
   const managers = [userInfo._id];
   // args[9]
   //   ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))

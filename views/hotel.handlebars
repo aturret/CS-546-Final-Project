@@ -42,6 +42,9 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
         <div class="hotelContacts">
             <p>Contacts: Phone: {{hotelPhone}} Email: {{hotelEmail}}</p>
         </div>
+        <div class="hotelFacilities">
+            <p>Facilities: {{hotelFacilities}}</p>
+        </div>
     </div>
     {{#if (ne user.identity "guest")}}
     <div class="booking">

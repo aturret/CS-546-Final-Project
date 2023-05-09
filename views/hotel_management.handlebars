@@ -29,6 +29,9 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
         <div class="hotelContacts">
             <p>Contacts: Phone: {{hotel.phone}} Email: {{hotel.email}}</p>
         </div>
+        <div class="hotelFacilities">
+            <p>Facilities: {{hotel.facilities}}</p>
+        </div>
     </div>
     <div class="edit">
         <button id="editHotelButton" onclick="editHotel()">Edit Hotel Basic Info</button>
@@ -86,6 +89,12 @@ hotel_photo: the first photo of the Pictures attribute of the hotel
                                 value="{{hotel.zip_code}}">
                         </label>
                     </div>
+                </div>
+                <div class="input hotelFacilities">
+                    <label for="hotelFacilitiesInput" id="hotelFacilitiesInput-label">
+                        Hotel Facilities:<input type="text" name="hotelFacilities" id="hotelFacilitiesInput"
+                            value="{{hotel.facilities}}">
+                    </label>
                 </div>
                 <button type="submit">Submit Info Change</button>
             </form>

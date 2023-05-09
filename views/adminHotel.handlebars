@@ -57,9 +57,15 @@
                 <select id="hotelStateInput" class="state" name="hotelStateInput">
                 </select>
                 <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
-                    Hotel Zip:
+                    Hotel Zip:<input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput"
+                        value="{{hotelZipcode}}">
                 </label>
-                <input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput" value="{{hotelZipcode}}">
+            </div>
+            <div class="hotelFacilities">
+                <label for="hotelFacilitiesInput" id="hotelFacilitiesInput-label">
+                    Hotel Facilities:<input type="text" name="hotelFacilitiesInput" id="hotelFacilitiesInput"
+                        value="{{hotelFacilities}}">
+                </label>
             </div>
             <button type="submit" id="newApplication">Create hotel</button>
     </div>
