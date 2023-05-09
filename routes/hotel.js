@@ -220,27 +220,21 @@ router
     try {
       let hotelInput = req.body;
       let args = [];
-      args[0] = helper.checkString(hotelInput.nameInput, "hotel name", true);
-      args[1] = helper.checkString(hotelInput.streetInput, "street", true);
-      args[2] = helper.checkString(hotelInput.cityInput, "city", true);
-      args[3] = helper.checkString(hotelInput.stateInput, "state", true);
-      args[4] = helper.checkZip(hotelInput.zipCodeInput, true);
-      args[5] = helper.checkPhone(hotelInput.phoneInput, true);
-      args[6] = helper.checkEmail(hotelInput.emailInput, true);
-      args[7] = hotelInput.hotelPhotoInput
-        ? hotelInput.hotelPhotoInput.map((web) => helper.checkWebsite(web, true))
-        : [];
-      if (hotelInput.facilitiesInput && Array.isArray(hotelInput.facilitiesInput)) {
-        args[8] = hotelInput.facilitiesInput.map((facility) =>
-          helper.checkString(facility, "facility", true)
-        );
-      } else if (!hotelInput.facilitiesInput) {
-        args[8] = [];
-      } else {
-        throw CustomException("Invalid facilities.", true);
-      }
+      const name = helper.checkString(hotelInput.hotelNameInput, "hotel name", true);
+      // const pictures = hotelInput.hotelPhotoInput
+      //   ? hotelInput.hotelPhotoInput.map((web) => helper.checkWebsite(web, true))
+      //   : [];
+      const pictures = [];
+      const facilities = helper.checkString(hotelInput.hotelFacilitiesInput, "facilities", true);
+      const phone = helper.checkPhone(hotelInput.hotelPhoneInput, true);
+      const email = helper.checkEmail(hotelInput.hotelEmailInput, true);
+      const city = helper.checkString(hotelInput.hotelCityInput, "city", true);
+      const street = helper.checkString(hotelInput.hotelStreetInput, "street", true);
+      const state = helper.checkString(hotelInput.hotelStateInput, "state", true);
+      const zipcode = helper.checkZip(hotelInput.hotelZipcodeInput, true);
+      
       args[9] = [];
-      const addHotelId = await hotelFuncs.addHotel(args);
+      const addHotelId = await hotelFuncs.addHotel(name, street, city, state, zipcode, phone, email, pictures, facilities, []);
       req.flash("success", 'Create hotel successfully');
       res.redirect("/admin/createHotel");
     } catch (e) {
@@ -407,7 +401,7 @@ router
     const hotelId = helper.checkId(req.params.hotelId, true);
     try {
       const hotel = await hotelFuncs.getHotel(hotelId);
-      res.render('hotel_management', {hotel: hotel, title: `Hotel Control Panel`});
+      res.render('hotel_management', {userIdentity: req.user.identity, hotel: hotel, title: `Hotel Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -583,31 +577,29 @@ router
       res.redirect(previousUrl);
     }
   })
-  .post(isMgr,
-    upload.array("newPicturesInput", 10),
-     async (req, res, next) => {
-      if (req.files.length > 0) {
-        req.body.newPictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
-      }
-      next();
-    },
-    async (req, res) => {
-      const hotelId = helper.checkId(req.params.hotelId, true);
-      try {
-        const pictures = helper.checkArray(req.body.newPictures, 'new roomtype pictures', true);
-        const roomTypeName = helper.checkString(req.body.newRoomTypeNameInput, "room type name", true);
-        // const pictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
-        const price = helper.checkPrice(parseFloat(req.body.newPriceInput), true);
-        const addRoomTypeMessage = await hotelFuncs.addRoomType(hotelId, roomTypeName, pictures, price, []);
-        req.flash(addRoomTypeMessage);
-        res.redirect(`/hotel/${hotelId}/hotelManagement/roomtypes`);
-      } catch (e) {
-        req.session.status = e.code ? e.code : 500;
-        req.session.errorMessage = e.message;
-        const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/roomtypes`;
-        res.redirect(previousUrl);
-      }
-    })
+  .post(isMgr, upload.array("newPicturesInput", 10), async (req, res, next) => {
+    if(req.files.length > 0){
+      req.body.newPicturesInput = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+    }
+    next();
+  }, async (req, res) => {
+    const hotelId = helper.checkId(req.params.hotelId, true);
+    try {
+      const pictures = helper.checkArray(req.body.newPicturesInput, 'new roomtype pictures', true);
+      const roomTypeName = helper.checkString(req.body.newRoomTypeNameInput, "room type name", true);
+      // const pictures = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
+      const price = helper.checkPrice(parseFloat(req.body.newPriceInput), true);
+
+      const addRoomTypeMessage = await hotelFuncs.addRoomType(hotelId, roomTypeName, pictures, price, []);
+      req.flash(addRoomTypeMessage);
+      res.redirect(`/hotel/${hotelId}/hotelManagement/roomtypes`);
+    } catch (e) {
+      req.session.status = e.code ? e.code : 500;
+      req.session.errorMessage = e.message;
+      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/roomtypes`;
+      res.redirect(previousUrl);
+    }
+  })
   .put(isMgr, upload.array("picturesInput", 10), async (req, res, next) => {
     if (req.files.length > 0) {
       req.body.picturesInput = req.files.map(file => `http://localhost:3000/public/uploads/${file.filename}`);
@@ -747,9 +739,9 @@ router
   .get(isMgr, async (req, res) => {
     const hotelId = helper.checkId(req.params.hotelId, true);
     try {
-      const hotel = await hotelFuncs.getHotel(hotelId);
+      // const hotel = await hotelFuncs.getHotel(hotelId);
       const managers = await hotelFuncs.getHotelMgr(hotelId);
-      res.render('hotelManagers', {hotel: hotel, managers: managers, title: `Manager Control Panel`});
+      res.render('hotelManagers', {hotelId: hotelId, managers: managers, title: `Manager Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -765,11 +757,11 @@ router
 
       const addMgrMessage = await userFuncs.addMgr(req.user.username, userName, hotelId);
       req.flash(addMgrMessage);
-      res.redirect(`/hotel/${hotelId}/hotelManagement/manager`);
+      res.redirect(`/hotel/${hotelId}/hotelManagement/managers`);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/manager`;
+      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/managers`;
       res.redirect(previousUrl);
     }
   })
@@ -780,11 +772,11 @@ router
 
       const deleteReviewMessage = await userFuncs.deleteMgr(req.user.username, userNameInput, hotelId);
       req.flash(deleteReviewMessage);
-      res.redirect(`/hotel/${hotelId}/hotelManagement/manager`);
+      res.redirect(`/hotel/${hotelId}/hotelManagement/managers`);
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/manager`;
+      const previousUrl = req.headers.referer || `/hotel/${hotelId}/hotelManagement/managers`;
       res.redirect(previousUrl);
     }
   })

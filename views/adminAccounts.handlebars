@@ -35,13 +35,18 @@
                 <button id="editInformationButton" onclick="editInformation()">Edit Account</button>
                 <div id="editInformationWindow" hidden="true">
                     <form action="/admin/accounts?_method=PATCH" method="POST" id="editInformation-form"
-                        class="my-form">
+                        class="my-form" enctype="multipart/form-data">
                         <input type="hidden" name="searchedUsername" id="searchedUsername" value="{{searchedUsername}}">
 
                         <label for="usernameInput" id="usernameInput-label">
                             Username:
                             <input type="text" name="usernameInput" id="usernameInput">
                         </label>
+                        
+                        <label for="avatarInput" id="avatarInput-label">
+                            Avatar:
+                        </label>
+                        <input type="file" name="avatarInput" id="avatarInput" accept="image/*">
 
                         <label for="firstNameInput" id="firstNameInput-label">
                             First Name:

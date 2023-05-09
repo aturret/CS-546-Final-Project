@@ -5,11 +5,17 @@
 {{/if}}
 
 <p>Please fill up this form and register your account.</p>
-<form action="/admin/accounts/createNewAccount" method="POST" id="registration-form" class="my-form">
+<form action="/admin/accounts/createNewAccount" method="POST" id="registration-form" class="my-form" enctype="multipart/form-data">
     <label for="username" id="username-label">
         Username:
     </label>
     <input type="text" name="username" id="username" value="{{username}}">
+
+    <label for="avatarInput" id="avatarInput-label">
+        Avatar:
+    </label>
+    <input type="file" name="avatarInput" id="avatarInput" accept="image/*">
+
     <label for="firstNameInput" id="firstNameInput-label">
         First Name:
     </label>
@@ -40,6 +46,8 @@
     <input type="password" name="confirmPasswordInput" id="confirmPasswordInput" class="confirmPasswordInput" value="{{confirmPasswordInput}}">
     <button type="submit" id="register-button">Register</button>
 </form>
+<a href="/admin">Admin Main Page</a>
 <p class="error" id="client-error">
     {{errorMessage}}
 </p>
+

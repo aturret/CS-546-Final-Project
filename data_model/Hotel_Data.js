@@ -96,7 +96,7 @@ export async function getHotel(id) {
 export async function getHotelMgr(hotelId) {
   hotelId = helper.checkId(hotelId, true);
   const tempHotel = await hotelReg();
-  const hotel = await tempHotel.findOne({ hotelId: new ObjectId(hotelId) }, { _id: 0, managers: 1 });
+  const hotel = await tempHotel.findOne({ _id: new ObjectId(hotelId) });
   if (!hotel) throw CustomException(`No hotel with hotel ID ${hotelId}`, true);
 
   let mgrInfoList = []
@@ -112,6 +112,7 @@ export async function getHotelMgr(hotelId) {
       lastName: mgrInfo.lastName,
       email: mgrInfo.email,
       phone: mgrInfo.phone,
+      hotel_id: mgrInfo.hotel_id.toString()
     });
   });
 
@@ -136,15 +137,7 @@ export async function addHotel(...args) {
   newHotel.rooms = [];
   newHotel.room_types = [];
   newHotel.overall_rating = 0;
-  if (args[8] && Array.isArray(args[8])) {
-    newHotel.facilities = args[8].map((facility) =>
-      helper.checkString(facility, "facility", true)
-    );
-  } else if (!args[8]) {
-    newHotel.facilities = [];
-  } else {
-    throw CustomException("Invalid facilities.", true);
-  }
+  newHotel.facilities = helper.checkString(args[8], "facilities", true);
   newHotel.managers = args[9]
     ? args[9].map((manager) => new ObjectId(helper.checkId(manager, true)))
     : undefined;
@@ -171,14 +164,15 @@ export async function updateHotel(...args) {
   updateHotel.picture = args[8]
     ? args[8].map((url) => helper.checkImageURL(url, false))
     : undefined;
-  if (args[9] && Array.isArray(args[9])) {
-    updateHotel.facilities = args[9] ? args[9].map((facility) =>
-      helper.checkString(facility, "facility", false)) : [];
-  } else if (!args[9]) {
-    updateHotel.facilities = [];
-  } else {
-    throw CustomException("Invalid facilities.", true);
-  }
+  // if (args[9] && Array.isArray(args[9])) {
+  //   updateHotel.facilities = args[9] ? args[9].map((facility) =>
+  //     helper.checkString(facility, "facility", false)) : [];
+  // } else if (!args[9]) {
+  //   updateHotel.facilities = [];
+  // } else {
+  //   throw CustomException("Invalid facilities.", true);
+  // }
+  updateHotel.facilities = helper.checkString(args[9], "facilities", true);
 
   const tempHotel = await hotelReg();
   const updateInfo = await tempHotel.findOneAndUpdate(

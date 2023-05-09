@@ -6,6 +6,7 @@ import * as userFuncs from '../data_model/User_Account.js'
 import * as hotelFuncs from '../data_model/Hotel_Data.js'
 import * as adminFuncs from "../data_model/admin.js";
 import * as helper from "../helper.js";
+import {upload} from '../helper.js'
 
 export const isAdmin = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -22,10 +23,17 @@ const router = express.Router()
 router
   .route('/')
   .get(isAdmin, async (req, res) => {
+    const code = req.session && req.session.status ? req.session.status : 200;
+    const error =
+      req.session && req.session.errorMessage
+        ? req.session.errorMessage
+        : undefined;
+    if (req.session) req.session.errorMessage = undefined;
+    if (req.session) req.session.status = undefined;
     try{
       req.user.username = helper.checkString(req.user.username);
       const user = await userFuncs.getUser(req.user.username);
-      return res.render('admin',{user, title: "Admin Control Panel" })
+      return res.status(code).render('admin', {errorMessage: error, title: "Admin Control Panel" })
     }
     catch(e){
       if (!e.code){ 
@@ -42,17 +50,31 @@ router
 router
   .route('/requests')
   .get(isAdmin, async (req, res) => {
+    const code = req.session && req.session.status ? req.session.status : 200;
+    const error =
+      req.session && req.session.errorMessage
+        ? req.session.errorMessage
+        : undefined;
+    if (req.session) req.session.errorMessage = undefined;
+    if (req.session) req.session.status = undefined;
     const reqList = await adminFuncs.getAllReq();
-    res.render('requests', { reqList: reqList,title: "Hotel Application Processing Panel" });
+    return res.status(code).render('requests', { errorMessage: error, reqList: reqList,title: "Hotel Application Processing Panel" });
   })
 
 router
   .route('/requests/:requestId')
   .get(isAdmin, async (req, res) => {
+    const code = req.session && req.session.status ? req.session.status : 200;
+    const error =
+      req.session && req.session.errorMessage
+        ? req.session.errorMessage
+        : undefined;
+    if (req.session) req.session.errorMessage = undefined;
+    if (req.session) req.session.status = undefined;
     try {
       const requestId = helper.checkId(req.params.requestId, true);
       const request = await adminFuncs.getReqById(requestId);
-      res.render('requestById', { request: request,title:"Hotel Application Processing Panel" });
+      return res.status(code).render('requestById', { errorMessage: error, request: request,title:"Hotel Application Processing Panel" });
     } catch (e) {
       if (!e.code) {
         req.session.status = 500;
@@ -85,7 +107,14 @@ router
 router
   .route('/accounts')
   .get(isAdmin, async (req, res) => {
-    res.render('adminAccounts', { title:"User Management Panel" });
+    const code = req.session && req.session.status ? req.session.status : 200;
+    const error =
+      req.session && req.session.errorMessage
+        ? req.session.errorMessage
+        : undefined;
+    if (req.session) req.session.errorMessage = undefined;
+    if (req.session) req.session.status = undefined;
+    return res.status(code).render('adminAccounts', { errorMessage: error, title:"User Management Panel" });
   })
   .post(isAdmin, async (req, res) => {
     try {
@@ -102,10 +131,15 @@ router
       return res.redirect("/admin/accounts");
     }
   })
-  .patch(isAdmin, async (req, res) => {
+  .patch(isAdmin, upload.single("avatar"), async (req, res, next) => {
+    if (req.file) {
+      req.body.avatarInput = `http://localhost:3000/public/uploads/${req.file.filename}`;
+    }
+    next();
+  }, async (req, res) => {
     let searchedUsername = req.body.searchedUsername;
     let username = req.body.usernameInput;
-    // let avatar = req.body.avatarInput;
+    let avatar = req.body.avatarInput;
     let firstName = req.body.firstNameInput;
     let lastName = req.body.lastNameInput;
     let phone = req.body.phoneInput;
@@ -126,7 +160,11 @@ router
         "username",
         true
       );
-      // avatar = helper.checkWebsite(avatar, true);
+
+      avatar = avatarInput
+        ? helper.checkWebsite(avatarInput, true)
+        : undefined;
+
       firstName = helper.checkNameString(
         firstName,
         "first name",
@@ -141,7 +179,7 @@ router
       email = helper.checkEmail(email, true);
       const set = {
         username: username,
-        // avatar: avatar,
+        avatar: avatar,
         firstName: firstName,
         lastName: lastName,
         phone: phone,
@@ -192,13 +230,18 @@ router
     if (req.session) req.session.status = undefined;
     return res.status(code).render("createNewAccount", { errorMessage: error , title: "Create new user"});
   })
-  .post(isAdmin, async (req, res) => {
+  .post(isAdmin, upload.single("avatar"), async (req, res, next) => {
+    if (req.file) {
+      req.body.avatarInput = `http://localhost:3000/public/uploads/${req.file.filename}`;
+    }
+    next();
+  }, async (req, res) => {
     const user = req.body;
     try {
       user.username = helper.checkString(user.username, "username", true);
       
-      user.avatar = user.avatar
-        ? helper.checkWebsite(user.avatar, true)
+      user.avatarInput = user.avatarInput
+        ? helper.checkWebsite(user.avatarInput, true)
         : undefined;
       user.firstNameInput = helper.checkNameString(
         user.firstNameInput,
@@ -217,7 +260,7 @@ router
       const createNewAccountMessage = await userFuncs.create(
         'user',
         user.username,
-        user.avatar,
+        user.avatarInput,
         user.firstNameInput,
         user.lastNameInput,
         user.phone,
