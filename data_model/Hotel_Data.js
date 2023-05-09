@@ -428,7 +428,7 @@ export async function getRoom(id) {
   id = new ObjectId(helper.checkId(id, true));
   const tempRoom = await Room();
 
-  const roomInfo = await tempRoom.find({ _id: id });
+  const roomInfo = await tempRoom.findOne({ _id: new ObjectId(id) });
   if (!roomInfo) throw CustomException("Room not found", false);
   return roomInfo;
 }
@@ -438,7 +438,7 @@ export async function getHotelRoomType(id) {
   id = new ObjectId(helper.checkId(id, true));
   const tempRoomType = await RoomType();
 
-  const roomTypeInfo = await tempRoomType.find({ hotel_id: id }).toArray();
+  const roomTypeInfo = await tempRoomType.find({ hotel_id: new ObjectId(id) }).toArray();
   if (!roomTypeInfo) throw CustomException("Hotel not found", false);
   return roomTypeInfo;
 }
@@ -453,7 +453,7 @@ export async function checkRoomAvailability(...args) {
 
   //check if room is avaliable
   const tempRoom = await Room();
-  const room_orders = tempRoom.findOne({ _id: room_id }, { orders: 1 });
+  const room_orders = tempRoom.findOne({ _id: new ObjectId(room_id) }, { orders: 1 });
 
   if (!room_orders) throw CustomException(`Room does not exist.`, true);
   //if the target room has no orders return the true.

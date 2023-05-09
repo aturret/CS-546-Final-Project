@@ -18,7 +18,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
 </div>
 
 <div class="deleteRoom">
-    <form action="/hotel/:hotelId/hotelManagement/rooms/:roomId?_method=DELETE" method="POST">
+    <form action="/hotel/{{hotelId}}/hotelManagement/rooms/{{roomId}}?_method=DELETE" method="POST">
         <button type="submit" class="danger">Delete the room</button>
     </form>
 </div>
