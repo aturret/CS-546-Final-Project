@@ -338,7 +338,7 @@ router
     }
   });
 
-router.route("/dashboard/logout").get(
+router.route("/logout").get(
   (req, res, next) => {
     if (!req.isAuthenticated()) {
       return res.redirect("/user/login");
@@ -349,8 +349,9 @@ router.route("/dashboard/logout").get(
           console.log(err);
           return next(err);
         }
+        req.flash("success","You have logged out successfully.")
         req.session.destroy();
-        res.redirect("/user/login");
+        res.render("logout", {title: "Logout"}); 
       }
       )
     }
