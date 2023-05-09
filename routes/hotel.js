@@ -7,12 +7,16 @@ import bcrypt from "bcryptjs";
 import * as userFuncs from "../data_model/User_Account.js";
 import * as hotelFuncs from "../data_model/Hotel_Data.js";
 import * as helper from "../helper.js";
-import isAuth from "./user.js";
 import moment from "moment";
 import {upload} from '../helper.js'
 import { ro } from "faker/lib/locales.js";
 
-
+export const isAuth = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/user/login");
+  }
+  next();
+};
 const router = express.Router();
 
 // functions for checking session authentication
@@ -806,7 +810,7 @@ router
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
-      res.redirect(`/order/${orderId}`);
+      res.redirect(`/dashboard/${username}`);
     }
   })
   .delete(isAuth, async (req, res) => {
