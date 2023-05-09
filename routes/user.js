@@ -309,22 +309,21 @@ router
       {
         req.session.status = 403;
         req.session.errorMessage = "You already have a request.";
-        return res.redirect("/user/dashboard/:username");
+        return res.redirect(`/user/dashboard/${req.user.username}`);
       }
-      const hotelName = helper.checkString(req.user.hotelNameInput, "name", true);
-      const email = helper.checkEmail(req.user.hotelEmailInput, true);
-      const phone = helper.checkPhone(req.user.hotelPhoneInput, true);
-      const street = helper.checkString(req.user.hotelStreetInput, "street", true);
-      const city = helper.checkString(req.user.hotelCityInput, "city", true);
-      const state = helper.checkString(req.user.hotelStateInput, "state", true);
-      const zip_code = helper.checkZip(req.user.hotelZipcodeInput, true);
+      const hotelName = helper.checkString(req.body.hotelNameInput, "name", true);
+      const email = helper.checkEmail(req.body.hotelEmailInput, true);
+      const phone = helper.checkPhone(req.body.hotelPhoneInput, true);
+      const street = helper.checkString(req.body.hotelStreetInput, "street", true);
+      const city = helper.checkString(req.body.hotelCityInput, "city", true);
+      const state = helper.checkString(req.body.hotelStateInput, "state", true);
+      const zip_code = helper.checkZip(req.body.hotelZipcodeInput, true);
       // const userId = await userFuncs.getUser(req.user.username)
       // const managers = [req.user.username];
-      const pictures = req.user.hotelPhotoInput
-        ? req.user.hotelPhotoInput.map((url) => helper.checkImageURL(url, true))
+      const pictures = req.body.hotelPhotoInput
+        ? req.body.hotelPhotoInput.map((url) => helper.checkImageURL(url, true))
         : [];
-
-      const facilities = helper.checkString(req.user.hotelFacilitiesInput, "facilities", true);
+      const facilities = helper.checkString(req.body.hotelFacilitiesInput, "facilities", true);
       const requestMessage = await userFuncs.createRequest(req.user.username, hotelName, street, city, state, zip_code, phone, email, pictures, facilities);
       req.flash(requestMessage);
       return res.redirect(`/user/dashboard/${req.user.username}`);
@@ -336,7 +335,8 @@ router
         req.session.status = e.code;
       }
       req.session.errorMessage = e.message;
-      res.redirect(`/user/dashboard/${req.user.username}`);
+      res.status(req.session.status).redirect(`/user/dashboard/${req.user.username}`);
+      // res.redirect(`/user/dashboard/${req.user.username}`);
     }
   });
 

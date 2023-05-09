@@ -77,7 +77,8 @@
                 </div>
                 <div class="userNewPassword">
                     <label for="userPassword">New Password</label>
-                    <input type="password" name="userNewPasswordInput" id="userNewPasswordInput" class="newPasswordInput">
+                    <input type="password" name="userNewPasswordInput" id="userNewPasswordInput"
+                        class="newPasswordInput">
                 </div>
                 <div class="userConfirmNewPassword">
                     <label for="userConfirmPassword">Confirm New Password</label>
@@ -98,10 +99,10 @@
         <form action="/user/dashboard/{{username}}/upgrade" method="POST" class="my-form" enctype="multipart/form-data">
             <label for="hotelNameInput" id="hotelNameInput-label">
                 Hotel Name:<input type="text" name="hotelNameInput" id="hotelNameInput" value="{{hotelName}}">
-            </label>            
+            </label>
             <label for="hotelPhoto" id="hotelPhoto-label">
                 Hotel Photo:<input type="file" name="hotelPhotoInput" id="hotelPhotoInput" accept="image/*" multiple>
-            </label>            
+            </label>
             <div class="hotelContact">
                 <label for="hotelPhoneInput" id="hotelPhoneInput-label">
                     Hotel Phone:<input type="text" name="hotelPhoneInput" id="hotelPhoneInput" value="{{hotelPhone}}">
@@ -125,6 +126,10 @@
                 <label for="hotelZipcodeInput" id="hotelZipcodeInput-label">
                     Hotel Zip:<input type="text" name="hotelZipcodeInput" id="hotelZipcodeInput"
                         value="{{hotelZipcode}}">
+                </label>
+                <label for="hotelFacilitiesInput" id="hotelFacilitiesInput-label">
+                    Hotel Facilities:<input type="text" name="hotelFacilitiesInput" id="hotelFacilitiesInput"
+                        value="{{hotelFacilities}}">
                 </label>
                 <input type="hidden" name="userIdInput" value="{{_id}}">
             </div>
