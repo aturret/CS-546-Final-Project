@@ -19,11 +19,11 @@ export const isMgr = (req, res, next) => {
     return res.redirect("/user/login");
   }
   if (req.user && req.user.identity === 'user') {
-    req.flash("You are not allow to access this page")
+    req.flash("errorMessage", "You are not allow to access this page")
     return res.redirect("/user/dashboard");
   }
   if (req.user.identity === 'manager' && req.user.hotel !== req.params.hotelId) {
-    req.flash("You are not allow to access this page")
+    req.flash("errorMessage", "You are not allow to access this page")
     return res.redirect("/user/dashboard");
   }
   next();
@@ -34,7 +34,7 @@ export const isAdmin = (req, res, next) => {
     return res.redirect("/user/login");
   }
   if (req.user && req.user.identity !== 'admin') {
-    req.flash("You are not allow to access this page")
+    req.flash("errorMessage", "You are not allow to access this page")
     return res.redirect("/user/dashboard");
   }
   next();
@@ -333,7 +333,7 @@ router
       const price = roomType.price * days;
       const status = 'accepted';
       const addOrder = await userFuncs.addOrder(hotelId, userId._id.toString(), roomId.toString(), hotelName, checkin, checkout, guests, price, status);
-      if (addOrder) req.flash('Add order successfullly');
+      if (addOrder) req.flash("successMessage", 'Add order successfullly');
       res.redirect(`/hotel/${hotelId}`);
     } catch (e) {
       if (!e.code) {
@@ -651,7 +651,7 @@ router
     try {
       const orderId = helper.checkId(req.params.orderId, true);
       const deleteOrderMessage = await userFuncs.deleteOrder(orderId);
-      req.flash(deleteOrderMessage);
+      req.flash("successMessage", deleteOrderMessage);
       res.redirect('/hotel/:hotelId/hotelManagement/order');
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
@@ -687,7 +687,7 @@ router
       const rating = helper.checkRating(req.body.ratingInput, true);
 
       const hotelReviews = await userFuncs.addReview(orderId, hotelId, username, review, rating);
-      if (hotelReviews) req.flash('Add review successfully');
+      if (hotelReviews) req.flash("successMessage",'Add review successfully');
       res.redirect('/hotel/:hotelId/hotelManagement/review');
     } catch (e) {
       req.session.status = e.code ? e.code : 500;

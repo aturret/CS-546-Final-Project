@@ -249,9 +249,14 @@ router.route("/dashboard/:username/logout").get(
       return res.redirect("/user/login");
     }
     else{
-      req.logout();
-      req.session.destroy();
-      res.redirect("/user/login");
+      req.logout(function (err) {
+        if (err) {
+          return next(err);
+        }
+        req.session.destroy();
+        res.redirect("/user/login");
+      }
+      )
     }
   },
   (req, res) => {

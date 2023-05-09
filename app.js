@@ -121,6 +121,11 @@ app.use((req, res, next) => {
     next();
 })
 
+app.use((req, res, next) => {
+  res.locals.success = req.flash('sucessMessage');
+  res.locals.error = req.flash('errorMessage');
+  next();
+});
 
 //for debugging purposes
 app.use((req, res, next) => {
