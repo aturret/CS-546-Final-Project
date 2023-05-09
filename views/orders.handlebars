@@ -15,7 +15,7 @@ order has status: pending, completed, cancelled.
     <p>Error code {{status}}: {{errorMessage}}</p>
 </div>
 {{/if}}
-<h2>Search Result</h2>
+{{!-- <h2>Search Result</h2>
 {{#if (or (eq user.identity "admin") (eq user.identity "manager"))}}
 <div class="searchBar">
     <h2>Search Order</h2>
@@ -27,7 +27,7 @@ order has status: pending, completed, cancelled.
         <button type="submit" id="searchOrders-button">Search</button>
     </form>
 </div>
-{{/if}}
+{{/if}} --}}
 <div class="userOrders">
     {{#if order}}
     <ol>

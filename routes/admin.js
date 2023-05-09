@@ -46,6 +46,20 @@ router
     res.render('requests', { reqList: reqList,title: "Hotel Application Processing Panel" });
   })
 
+
+router.route('/orders')
+  .get(isAdmin, async (req, res) => {
+    let status = 200;
+    if(req.session && req.session.status){
+      status = req.session.status;
+      const errorMessage = req.session.errorMessage;
+      req.session.status = null;
+      req.session.errorMessage = null;
+      return res.status(status).render('orders', { status: status, errorMessage: errorMessage, title:"Order Management Panel" });
+    }
+    return res.status(status).render('orders', {title:"Order Management Panel" });
+  })
+
 router
   .route('/requests/:requestId')
   .get(isAdmin, async (req, res) => {
@@ -236,4 +250,16 @@ router
       return res.redirect("/admin/accounts/createNewAccount");
     }
   });
+
+router.route("/searchOrder")
+  .get(isAdmin, async (req, res) => {
+    const status = req.session && req.session.status ? req.session.status : 200;
+    const error =
+      req.session && req.session.errorMessage
+        ? req.session.errorMessage
+        : undefined;
+    if (req.session) req.session.errorMessage = undefined;
+    if (req.session) req.session.status = undefined;
+    return res.status(status).render("adminOrder", { status: status, errorMessage: error , title: "Search Order"});
+  })
 export default router;
