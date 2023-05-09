@@ -41,7 +41,7 @@ new variable.
             <div class="editRoomType">
                 <button id="editRoomTypeButton-{{this._id}}" onclick="editRoomType({{this._id}})">Edit</button>
                 <div hidden="true" id="edit-{{this._id}}">
-                    <form action="/hotel/{{this.hotel_id}}/hotelManagement/roomTypes/?_method=PUT" method="POST"
+                    <form action="/hotel/{{this.hotel_id}}/hotelManagement/roomTypes?_method=PUT" method="POST"
                         id="editRoomType-form" class="my-form" enctype="multipart/form-data">
                         <input type="hidden" name="roomTypeId" value="{{this._id}}">
                         <label for="roomTypeNameInput" id="roomTypeNameInput-label">
