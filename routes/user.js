@@ -198,7 +198,7 @@ router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) 
 router
   .route("/dashboard/:username/edit_info")
   .put(isAuth, 
-    upload.single("avatar"), 
+    upload.single("avatarInput"), 
     async (req, res, next) => {
     if (req.file) {
       req.body.avatar = `http://localhost:3000/public/uploads/${req.file.filename}`;
