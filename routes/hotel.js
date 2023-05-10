@@ -9,7 +9,6 @@ import * as hotelFuncs from "../data_model/Hotel_Data.js";
 import * as helper from "../helper.js";
 import {isAuth} from "./user.js";
 import moment from "moment";
-import { isAuth } from "./user.js";
 import {upload} from '../helper.js'
 import { ro } from "faker/lib/locales.js";
 
