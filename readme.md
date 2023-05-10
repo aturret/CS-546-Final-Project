@@ -1,10 +1,10 @@
 # 2023S CS 546-WS Final Project: Hotel Management System Web Application#
 ## Group 47 ##
 ### Group Member ###
-Jichen Jiang,
-Varun Reddy Pedditi,
-Zihe Wang,
-Linghao Zhao
+Jichen Jiang,  
+Varun Reddy Pedditi,  
+Zihe Wang,  
+Linghao Zhao  
 
 The final project involves creating a complete web application for Hotel Management System using HTML, CSS, Express, Node.js, MongoDB, client-side JavaScript, security measures, accessibility, and user authentication.
 
@@ -57,7 +57,8 @@ You can log in as admin using the following information:
 `Username: admin`  
 `Password: Group47admin1!`  
 
-+ Admin's Dashboard will have an additional Admin portal to manage requests and Accounts:  
-+ Requests: If the request is approved, a new hotel will be created based on the request information, and the applicant will be upgraded to manager with the order status being 'approval'; If it is rejected, the order status changes to 'reject '.-1 
-+ Accounts: You can search for users based on their username, modify and delete them, and create new users.-2
-+ When Admin searches for a hotel (/hotel/:hotelID) through the home page, there will be an external link to hotel management page for this hotel, which could manage each hotel as a manager. In addition, admin could delete hotel.
+- Admin's Dashboard will have an additional Admin portal to manage requests and Accounts:  
+  - Requests: If the request is approved, a new hotel will be created based on the request information, and the applicant will be upgraded to manager with the order status being 'approval'; If it is rejected, the order status changes to 'reject '.
+  - Accounts: You can search for users based on their username, modify and delete them, and create new users.
+  - Orders: You can search order with order ID, and delete it.
+- When Admin searches for a hotel (/hotel/:hotelID) through the home page, there will be an external link to hotel management page for this hotel, which could manage each hotel as a manager. In addition, admin could delete hotel.
