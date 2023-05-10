@@ -68,6 +68,7 @@ forms.forEach(form => {
             })
             nameInputs.forEach(input => {
                 input.value = checkUserName(input.value);
+                input.value = checkNameString(input.value, input.name, false);
             })
             if (form.classList.contains('picForm')) {
                 picInputs.forEach(input => {
@@ -101,10 +102,18 @@ forms.forEach(form => {
 
 
 
-export function checkUserName(username) {
+function checkUserName(username) {
     username = username.trim();
     if (/\s/.test(username)) throw `Error: Username cannot contain spaces`;
     return username;
+}
+
+function checkNameString(strVal, key, flag) {
+    strVal = strVal.trim();
+    if (/\s/.test(strVal)) throw `Error: ${key} cannot contain spaces`, flag;
+    if (/\d/.test(strVal)) throw `Error: ${key} cannot contain numbers`, flag;
+    if (strVal.length < 2 || strVal.length > 25) throw (`Error: ${key} must be between 2 and 25 characters`, flag;
+    return strVal;
 }
 
 
