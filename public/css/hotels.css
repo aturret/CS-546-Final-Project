@@ -451,3 +451,38 @@ form.search-form {
   width: auto;
   height: 40px;
 }
+
+
+
+.reviewItem {
+  display: flex;
+  align-items: stretch;
+}
+
+.reviewUser {
+  flex: 0 0 30%; /* Width ratio 3:7 */
+  max-width: 30%;
+  position: relative;
+}
+
+.reviewUser img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.reviewUser p {
+  margin: 0;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.reviewInfo {
+  flex: 0 0 70%; 
+  max-width: 70%;
+  padding: 10px;
+  box-sizing: border-box;
+}
