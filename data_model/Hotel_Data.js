@@ -517,7 +517,7 @@ export async function addRoom(...args) {
     hotel_id: hotel_id,
     room_number: room_number,
     room_type: room_type,
-    orders: order
+    order: order
   };
 
   //check if room exists
