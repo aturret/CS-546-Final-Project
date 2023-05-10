@@ -21,7 +21,12 @@
         <p>Hotel Name: {{request.name}}</p>
     </div>
     <div class="hotelPhoto">
+        {{#if request.photo}}
+        
         <img src="{{request.photo}}" alt="hotel photo">
+        {{else}}
+        <img src="/public/img/hotel.jpg" alt="default hotel photo">
+        {{/if}}
     </div>
     <div class="hotelAddress">
         <p>Hotel Address: {{request.street}}, {{request.city}}, {{request.state}}, {{request.zip_code}}</p>

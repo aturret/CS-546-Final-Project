@@ -13,38 +13,41 @@ registration handelbars
 
 <p>Please fill up this form and register your account.</p>
 <form action="/user/register" method="POST" id="registration-form" class="my-form">
-    <label for="username" id="username-label">
-        Username:
-    </label>
-    <input type="text" name="username" id="username" value="{{username}}" class="name">
-    <label for="firstNameInput" id="firstNameInput-label">
-        First Name:
-    </label>
-    <input type="text" name="firstNameInput" id="firstNameInput" value="{{firstNameInput}}" class="name">
+    <div class="input">
+        <label for="username" id="username-label">
+            Username:<input type="text" name="username" id="username" value="{{username}}" class="userName">
+        </label>
+    </div>
+    <div class="input">
+        <label for="firstNameInput" id="firstNameInput-label">
+            First Name:<input type="text" name="firstNameInput" id="firstNameInput" value="{{firstNameInput}}"
+                class="name">
+        </label>
+    </div>
+    <div class="input">
     <label for="lastNameInput" id="lastNameInput-label">
-        Last Name:
-    </label>
-    <input type="text" name="lastNameInput" id="lastNameInput" value="{{lastNameInput}}" class="name">
-
+        Last Name:<input type="text" name="lastNameInput" id="lastNameInput" value="{{lastNameInput}}" class="name">
+    </label></div>
+    <div class="input">
     <label for="emailAddressInput" id="emailAddressInput-label">
         Email:
         <input type="email" name="emailAddressInput" id="emailAddressInput" value="{{emailAddressInput}}">
-    </label>
-
+    </label></div>
+<div class="input">
     <label>
         Phone:
         <input type="phone" name="phone" id="phone" value="{{phone}}">
-    </label>
-
-    <label for="passwordInput" id="passwordInput-label" >
+    </label></div>
+<div class="input">
+    <label for="passwordInput" id="passwordInput-label">
         Password:
         <input type="password" name="passwordInput" id="passwordInput" class="PasswordInput" value="{{passwordInput}}">
     </label>
-
+</div><div class="input">
     <label for="confirmPasswordInput" id="confirmPasswordInput-label">
-        Confirm Password:
-    </label>
-    <input type="password" name="confirmPasswordInput" id="confirmPasswordInput" class="confirmPasswordInput" value="{{confirmPasswordInput}}">
+        Confirm Password:<input type="password" name="confirmPasswordInput" id="confirmPasswordInput" class="confirmPasswordInput"
+        value="{{confirmPasswordInput}}">
+    </label></div>    
     <button type="submit" id="register-button">Register</button>
 </form>
 <p class="error" id="client-error">

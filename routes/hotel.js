@@ -271,7 +271,7 @@ router
       hotelInfo.hotelId = hotel._id;
       hotelInfo.hotelName = hotel.name;
       hotelInfo.hotelPhoto = hotel.picture;
-      hotelInfo.HotelRating = hotel.overall_rating;
+      hotelInfo.hotelRating = hotel.overall_rating;
       hotelInfo.hotelAddress = hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code;
       hotelInfo.hotelPhone = hotel.phone;
       hotelInfo.hotelEmail = hotel.email;
@@ -437,11 +437,7 @@ router
         hotelPhone,
         hotelEmail,
         hotelPicture,
-        // rooms,
         hotelFacilities,
-        // manager,
-        // roomType,
-        // reviews
       );
       req.flash(result);
       return res.redirect(`/hotel/${hotelId}/hotelManagement`);

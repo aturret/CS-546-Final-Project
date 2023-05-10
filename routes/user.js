@@ -198,7 +198,7 @@ router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) 
 router
   .route("/dashboard/:username/edit_info")
   .put(isAuth, 
-    upload.single("avatarInput"), 
+    upload.single("avatar"), 
     async (req, res, next) => {
     if (req.file) {
       req.body.avatar = `http://localhost:3000/public/uploads/${req.file.filename}`;
@@ -225,7 +225,7 @@ router
       req.body.userPhoneInput = helper.checkPhone(req.body.userPhoneInput, true);
       req.body.userEmailInput = helper.checkEmail(req.body.userEmailInput, true);
       let set = {
-        username: req.body.username,
+        usernamerstNam: req.body.username,
         avatar: req.body.avatar,
         firstName: req.body.userFirstNameInput,
         lastName: req.body.userLastNameInput,

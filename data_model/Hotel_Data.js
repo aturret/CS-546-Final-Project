@@ -161,19 +161,10 @@ export async function updateHotel(...args) {
   updateHotel.zip_code = helper.checkZip(args[5], false);
   updateHotel.phone = helper.checkPhone(args[6], false);
   updateHotel.email = helper.checkEmail(args[7], false);
-  updateHotel.picture = args[8]
+  updateHotel.pictures = args[8]
     ? args[8].map((url) => helper.checkImageURL(url, false))
     : undefined;
-  // if (args[9] && Array.isArray(args[9])) {
-  //   updateHotel.facilities = args[9] ? args[9].map((facility) =>
-  //     helper.checkString(facility, "facility", false)) : [];
-  // } else if (!args[9]) {
-  //   updateHotel.facilities = [];
-  // } else {
-  //   throw CustomException("Invalid facilities.", true);
-  // }
   updateHotel.facilities = helper.checkString(args[9], "facilities", true);
-
   const tempHotel = await hotelReg();
   const updateInfo = await tempHotel.findOneAndUpdate(
     { _id: hotel_id },
@@ -182,7 +173,6 @@ export async function updateHotel(...args) {
   );
   if (!updateInfo)
     throw CustomException(`Update hotel with id ${hotel_id} failed.`, true);
-
   return { message: `Hotel with id ${hotel_id} updated successfully.` };
 }
 //delete hotel
@@ -258,6 +248,7 @@ export async function deleteHotel(id) {
 
 //get hotel review
 export async function getHotelReview(id) {
+  
   id = new ObjectId(helper.checkId(id, true));
   const tempHotel = await hotelReg();
 
