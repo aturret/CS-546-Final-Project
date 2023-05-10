@@ -27,6 +27,9 @@ searchForms.forEach(form => {
 })
 
 
+
+
+
 forms.forEach(form => {
     console.log('hi');
     form.addEventListener('submit', async (event) => {
@@ -102,6 +105,8 @@ forms.forEach(form => {
     }
     )
 })
+
+
 
 
 
@@ -184,3 +189,14 @@ function checkArray(arr, key, flag){
 //     return error;
 // }
 
+const deleteManager = document.getElementById("deleteMgr-form");
+deleteManager.addEventListener('submit', async (event) => {    
+    // event.preventDefault();
+    const yourname = deleteManager.querySelectorAll('.yourname')[0].value;
+    const userNameInput = deleteManager.querySelectorAll('.userNameInput')[0].value;
+    if (yourname === userNameInput) {
+        event.preventDefault();
+        console.log('sss');
+        clientError.innerHTML = "you cannot delete yourself";
+    }
+})

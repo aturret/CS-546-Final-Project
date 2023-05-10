@@ -66,7 +66,8 @@ reviewUserId: the id of the user who wrote the review
                 </div>
             </div>
             <form action="/hotel/{{this.hotel_id}}/hotelManagement/managers?_method=DELETE" method="POST" id="deleteMgr-form" class="my-form">
-                <input type="hidden" name="userNameInput" id="userNameInput" value="{{this.username}}">
+                <input type="hidden" name="userNameInput" class="userNameInput" value="{{this.username}}">
+                <input type="hidden" name="yourname" class="yourname" value="{{yourname}}">
                 <button type="submit" id="deleteMgr" class="danger">Delete</button>
             </form>
         </div>
@@ -88,4 +89,4 @@ reviewUserId: the id of the user who wrote the review
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-<a href="/hotel/{{hotelId}}/hotelManagement">Back to Hotel Management Page for Hotel {{hotelId}}</a>
+<button onclick="window.location.href='/hotel/{{hotelId}}/hotelManagement'">Back</button>

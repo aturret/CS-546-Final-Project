@@ -367,15 +367,14 @@ export async function updateRoomType(id, hotel_id, roomType, price, picture) {
   id = new ObjectId(helper.checkId(id, true));
   hotel_id = new ObjectId(helper.checkId(hotel_id, true));
   roomType = helper.checkString(roomType, "room type", true);
-  price = helper.checkPrice(price, true);
-  picture = helper.checkImageURL(picture, true);
+  price = helper.checkPrice(Number(price), true);
   picture = picture
     ? picture.map((url) => helper.checkImageURL(url, true))
     : [];
   const updateInfo = {
     name: roomType,
     price: price,
-    picture: picture
+    pictures: picture
   }
 
   //get room type details

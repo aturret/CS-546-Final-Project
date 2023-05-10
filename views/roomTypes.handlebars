@@ -20,14 +20,14 @@ new variable.
             <div class="searchResultInfo">
                 <div class="roomTypePictures">
                     {{#each this.pictures}}
-                    <img src="{{this.pictures}}" alt="roomTypePicture">
+                    <img src="{{this}}" alt="roomTypePicture">
                     {{/each}}
                 </div>
                 <div class="roomTypeName">
-                    <p>{{this.name}}</p>
+                    <p>Room Type: {{this.name}}</p>
                 </div>
                 <div class="roomTypePrice">
-                    <p>{{this.roomTypePrice}}</p>
+                    <p>Price: {{this.price}}</p>
                 </div>
             </div>
             <div class="deleteRoomType">
@@ -39,8 +39,8 @@ new variable.
                 </form>
             </div>
             <div class="editRoomType">
-                <button id="editRoomTypeButton-{{this._id}}" onclick="editRoomType({{this._id}})">Edit</button>
-                <div hidden="true" id="edit-{{this._id}}">
+                <button onclick="editRoomType(event)">Edit</button>
+                <div hidden="true">
                     <form action="/hotel/{{this.hotel_id}}/hotelManagement/roomTypes?_method=PUT" method="POST"
                         id="editRoomType-form" class="my-form" enctype="multipart/form-data">
                         <input type="hidden" name="roomTypeId" value="{{this._id}}">
@@ -57,7 +57,7 @@ new variable.
                         </label>
                         <input type="file" name="picturesInput" id="picturesInput" accept="image/*" multiple>
                         <input type="hidden" name="hotelId" value="{{this.hotel_id}}">
-                        <button type="submit" id="editRoomType-button">Edit</button>
+                        <button type="submit" id="editRoomType-button">Submit Edit</button>
                     </form>
                 </div>
             </div>
@@ -67,7 +67,7 @@ new variable.
 </div>
 <div class="addNewRoomType right">
     <form action="/hotel/{{hotelId}}/hotelManagement/roomTypes" method="POST" id="addNewRoom-form" class="my-form"
-    enctype="multipart/form-data">
+        enctype="multipart/form-data">
         <label for="newRoomTypeNameInput" id="newRoomTypeNameInput-label">
             Room Type:<input type="text" name="newRoomTypeNameInput" id="newRoomTypeNameInput">
         </label>
@@ -81,7 +81,7 @@ new variable.
         <button type="submit" id="addNewRoom-button">Add</button>
     </form>
 </div>
-    <button onclick="window.location.href='/hotel/{{hotelId}}/hotelManagement'">Back</button>
+<button onclick="window.location.href='/hotel/{{hotelId}}/hotelManagement'">Back</button>
 
 <div class="error" id="client">
     <p id="client-error"></p>

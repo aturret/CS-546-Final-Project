@@ -174,12 +174,11 @@ router.route("/dashboard/:username/order_history").get(isAuth, async (req, res) 
       i.endDate = i.checkout_date;
       if (i.guests && i.guests[0])
       {
-        i.guest1 = i.guests[0];
-
+        i.guest1 = i.guests[0] ;
       }
       if (i.guests && i.guests[1])
       {
-        i.guest2 = i.guests[1];
+        i.guest2 = i.guests[1] ;
       }
     }
     return res.status(200).render("orders", { order: orders, title: "Order History" });
@@ -857,13 +856,16 @@ router.route("/dashboard/:username/reviews")
     res.redirect(`/user/dashboard/${req.user.username}/bookings`);
 }});
 //add review
-router.route("/dashboard/:username/order_history/:order_id/add_review")
+// router.route("/order/:order_id/add_review")
+router.route("/order_history/:order_id/add_review")
 .post(isAuth, async (req, res) => {
   try { 
-    const rating = req.body.rating
-    const comment = req.body.comment
+    const rating = req.body.reviewRatingInput
+    const comment = req.body.reviewCommentInput
     const order_id = helper.checkId(req.params.order_id, true)
-    const result = await userFuncs.addReview(order_id, rating, comment)
+    const user = await userFuncs.getUser(req.user.username)
+    const hotel_id = req.body.hotelIdInput
+    const result = await userFuncs.addReview(order_id,hotel_id,user._id,comment, rating )
     if (!result) throw new CustomException("Review not found", true);
     req.flash(result);
     return res.status(200).redirect(`/user/dashboard/${req.user.username}/bookings`);

@@ -47,11 +47,13 @@ function editRoom(){
     editRoomButton.style.display = 'none';
 }
 
-function editRoomType(roomTypeId){
-    const editId = `edit-${roomTypeId}`;
-    const editRoomWindow = document.getElementById(editId);
+function editRoomType(event){
+    
+    const editRoomWindow = event.target.nextElementSibling;
     editRoomWindow.style.display = 'block';
     editRoomWindow.hidden = false;
+    event.target.style.display = 'none';
+    event.target.hidden = true;
 }
 
 function editHotel(){

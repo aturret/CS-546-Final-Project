@@ -90,7 +90,7 @@ export function checkPassword(password, flag){
 
 export function checkWebsite(web, flag)
 {
-    web = web.trim()
+    web = web.trim();
     if(!web || typeof web !== 'string') throw new CustomException("Website must exist and must be a string type.", flag);
     if(!/^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(:\d{1,5})?([\/?].*)?$/i.test(web)) throw new CustomException("Website has to match the format.", flag);
     return web
@@ -98,7 +98,7 @@ export function checkWebsite(web, flag)
 
 export function checkImageURL(url, flag)
 {
-    url = url.trim()
+    url = url.trim();
     if(!url || typeof url !== 'string') throw new CustomException("Image URL must exist and must be a string type.", flag);
     if(!/^(http|https):\/\//i.test(url)) throw new CustomException("Image URL has to match the format.", flag);
     return url
