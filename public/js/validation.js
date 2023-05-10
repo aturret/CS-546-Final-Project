@@ -33,6 +33,7 @@ forms.forEach(form => {
         const textInputs = form.querySelectorAll('input[type="text"]');
         const roomTypeInputs = form.querySelectorAll('select[class="roomType"]');
         const hotelStateInputs = form.querySelectorAll('select[id="hotelState"]');
+        const nameInputs = form.querySelectorAll('.name');              
         const passwordInputs = form.querySelectorAll('input[type="password"]');
         const dateInputs = form.querySelectorAll('input[type="date"]');
         const emailInputs = form.querySelectorAll('input[type="email"]');
@@ -64,6 +65,9 @@ forms.forEach(form => {
             })
             textareas.forEach(input => {
                 input.value = checkString(input.value, input.name, false);
+            })
+            nameInputs.forEach(input => {
+                input.value = checkUserName(input.value);
             })
             if (form.classList.contains('picForm')) {
                 picInputs.forEach(input => {
@@ -97,7 +101,11 @@ forms.forEach(form => {
 
 
 
-
+export function checkUserName(username) {
+    username = username.trim();
+    if (/\s/.test(username)) throw `Error: Username cannot contain spaces`;
+    return username;
+}
 
 
 
@@ -146,6 +154,13 @@ function checkPassword(password) {
     if (password === password.toLowerCase()) throw "Password must have at least one upper case letter.";
 
     return password.trim()
+}
+
+export function checkArray(arr, key, flag){
+    if (!arr || !Array.isArray(arr) || arr.length === 0) throw new CustomException(`${key} must exist and must be a non empty array.`, flag);
+    if (!arr.every(obj => typeof obj === "string" && obj.trim().length !== 0)) throw new CustomException(`Elements in ${key} must be non empty string type.`, flag);
+    arr.map(str => str.trim())
+    return arr
 }
 
 
