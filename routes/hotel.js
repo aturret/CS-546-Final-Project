@@ -11,7 +11,6 @@ import {isAuth} from "./user.js";
 import moment from "moment";
 import {upload} from '../helper.js'
 import { ro } from "faker/lib/locales.js";
-import { CustomException } from "../helper.js";
 
 const router = express.Router();
 
