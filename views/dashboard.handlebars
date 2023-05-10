@@ -40,14 +40,14 @@
         <div id="editInformationWindow" hidden="true">
             <form action="/user/dashboard/{{username}}/edit_info?_method=PUT" method="POST" id="editInformation-form"
                 class="my-form" enctype="multipart/form-data">
-                <input type="hidden" name="username" value="{{username}}">
+                <input type="hidden" name="username" value="{{username}}" class="name">
                 <div class="userFirstName">
                     <label for="userFirstNameInput">First Name</label>
-                    <input type="text" name="userFirstNameInput" id="userFirstNameInput" value="{{firstName}}">
+                    <input type="text" name="userFirstNameInput" id="userFirstNameInput" value="{{firstName}}" class="name">
                 </div>
                 <div class="userLastName">
                     <label for="userLastNameInput">Last Name</label>
-                    <input type="text" name="userLastNameInput" id="userLastNameInput" value="{{lastName}}">
+                    <input type="text" name="userLastNameInput" id="userLastNameInput" value="{{lastName}}" class="name">
                 </div>
                 <div class="avatar">
                     <label for="avatar">Avatar</label>
@@ -71,7 +71,7 @@
         <div id="changePasswordWindow" hidden="true">
             <form action="/user/dashboard/{{username}}/change_password?_method=PUT" method="POST"
                 id="changePassword-form" class="my-form">
-                <input type="hidden" name="username" value="{{username}}">
+                <input type="hidden" name="username" value="{{username}}" class="name">
                 <div class="userPassword">
                     <label for="userPassword">Password</label>
                     <input type="password" name="userPasswordInput" id="userPasswordInput" class="oldPasswordInput">
