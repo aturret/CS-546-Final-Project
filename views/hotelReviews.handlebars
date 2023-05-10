@@ -43,6 +43,7 @@ reviewUserId: the id of the user who wrote the review
 <div class="reviewOperations box">
     <div class="reviewResult left">
         <h3>All Reviews</h3>
+        {{#if hotelReviews}}
         {{#each hotelReviews}}
         <div class="reviewItem box">
             <div class="reviewUserItem left">
@@ -64,6 +65,9 @@ reviewUserId: the id of the user who wrote the review
             </div>
         </div>
         {{/each}}
+        {{else}}
+        <p>No reviews yet.</p>
+        {{/if}}
     </div>
     {{!-- <div class="addReview">
         <h3>Add a new review</h3>
@@ -99,4 +103,3 @@ reviewUserId: the id of the user who wrote the review
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-<a href="/register">Click here to register!</a>

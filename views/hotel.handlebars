@@ -73,16 +73,17 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
         {{#if userHasReviewed}}
         <a href="/review/{{reviewID}}">to your review</a>
         {{/if}}
-        <ol>
+        {{#if reviews}}
+                <ol>
             {{#each reviews}}
             <li>
                 <div class="reviewItem">
                     <div class="reviewUser">
                         <div class="reviewUserPhoto hotelPhoto">
                             <img src="{{this.userAvatar}}" alt="avatar of the reviewer">
-                        </div>                        
+                        </div>
                     </div>
-                    
+
                     <div class="reviewInfo">
                         <div class="reviewUserName">
                             <p><a href="/reviews/{{this._id}}">{{this.userName}}</a></p>
@@ -103,7 +104,10 @@ reviewID, reviewComment, reviewTitle: if the user has reviewed this hotel, pleas
                 </div>
             </li>
             {{/each}}
-        </ol>
+
+        </ol>{{else}}
+        <p>No reviews yet.</p>
+        {{/if}}
     </div>
 </div>
 

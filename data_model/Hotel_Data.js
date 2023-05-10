@@ -260,10 +260,11 @@ export async function getHotelReview(id) {
   const tempReview = await Review();
   const reviewList = await tempReview.find({ _id: { $in: reviewId } }).toArray();
   if (reviewList && !Array.isArray(reviewList)) reviewList = [reviewList];
-  if (reviewList.length === 0) throw CustomException("Review not found", false);
+  // if (reviewList.length === 0) throw CustomException("Review not found", false);
+  if (reviewList.length === 0) return [];
 
   //get user 
-  console.log(reviewList)
+  // console.log(reviewList)
   const tempAccount = await Account();
   for (let i of reviewList) {
     const userInfo = await tempAccount.findOne({ _id: i.user_id }, { username: 1, avatar: 1 });

@@ -286,7 +286,8 @@ router
       const reviews = await hotelFuncs.getHotelReview(hotel_id);
       
       const reviewList = []; 
-      reviews.forEach(review => { reviewList.push(review._id); });
+      if (reviews.length !== 0) {
+      reviews.forEach(review => { reviewList.push(review._id); });}
       req.session.hotelInfo = hotelInfo;
       req.session.hotelInfo.reviewList = reviewList;
       
