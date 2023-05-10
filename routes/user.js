@@ -88,7 +88,7 @@ router
         : undefined;
     if (req.session) req.session.errorMessage = undefined;
     if (req.session) req.session.status = undefined;
-    return res.status(code).render("register", { errorMessage: error , title: "Register"});
+    return res.status(code).render("register", {status: code, errorMessage: error , title: "Register"});
   })
   .post(async (req, res) => {
     const user = req.body;
