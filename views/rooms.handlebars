@@ -14,6 +14,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
 <h2>All rooms of the hotel</h2>
 <div class="searchResult">
     <ol>
+        {{#if rooms}}
         {{#each rooms}}
         <li>
             <div class="searchResultItem">
@@ -21,10 +22,10 @@ roomTypes collection, or you can just calculate its availability and set it as a
                     <p><a href="/hotel/{{this.hotel_id}}/hotelManagement/rooms/{{this._id}}">{{this.room_number}}</a></p>
                 </div>
                 <div class="roomId">
-                    <p>{{this._id}}</p>
+                    <p>Room Id: {{this._id}}</p>
                 </div>
                 <div class="roomType">
-                    <p>{{this.room_type}}</p>
+                    <p>Room Type: {{this.room_type}}</p>
                 </div>
                 {{!-- <div class="roomStatus">
                     <p>{{room_status}}</p>
@@ -32,6 +33,9 @@ roomTypes collection, or you can just calculate its availability and set it as a
             </div>
         </li>
         {{/each}}
+        {{else}}
+        <p>No rooms available. You can add some rooms!</p>
+        {{/if}}
     </ol>
     <div class="addNewRoom">
         <form action="/hotel/{{hotelId}}/hotelManagement/rooms" method="POST" id="addNewRoom-form" class="my-form">
@@ -52,6 +56,7 @@ roomTypes collection, or you can just calculate its availability and set it as a
             <button type="submit" id="addNewRoom-button">Add</button>
         </form>
     </div>
+    <button onclick="window.location.href='/hotel/{{hotelId}}/hotelManagement'">Back</button>
 </div>
 <div class="error" id="client">
     <p id="client-error"></p>

@@ -9,9 +9,9 @@ import * as hotelFuncs from "../data_model/Hotel_Data.js";
 import * as helper from "../helper.js";
 import {isAuth} from "./user.js";
 import moment from "moment";
-import { isAuth } from "./user.js";
 import {upload} from '../helper.js'
 import { ro } from "faker/lib/locales.js";
+import { CustomException } from "../helper.js";
 
 const router = express.Router();
 
@@ -272,7 +272,7 @@ router
       hotelInfo.hotelId = hotel._id;
       hotelInfo.hotelName = hotel.name;
       hotelInfo.hotelPhoto = hotel.picture;
-      hotelInfo.HotelRating = hotel.overall_rating;
+      hotelInfo.hotelRating = hotel.overall_rating;
       hotelInfo.hotelAddress = hotel.street + ", " + hotel.city + ", " + hotel.state + ", " + hotel.zip_code;
       hotelInfo.hotelPhone = hotel.phone;
       hotelInfo.hotelEmail = hotel.email;
@@ -287,7 +287,8 @@ router
       const reviews = await hotelFuncs.getHotelReview(hotel_id);
       
       const reviewList = []; 
-      reviews.forEach(review => { reviewList.push(review._id); });
+      if (reviews.length !== 0) {
+      reviews.forEach(review => { reviewList.push(review._id); });}
       req.session.hotelInfo = hotelInfo;
       req.session.hotelInfo.reviewList = reviewList;
       
@@ -438,11 +439,7 @@ router
         hotelPhone,
         hotelEmail,
         hotelPicture,
-        // rooms,
         hotelFacilities,
-        // manager,
-        // roomType,
-        // reviews
       );
       req.flash(result);
       return res.redirect(`/hotel/${hotelId}/hotelManagement`);
@@ -550,7 +547,7 @@ router
     const hotelId = helper.checkId(req.body.hotelId, true);
     const roomId = helper.checkId(req.body.roomId, true);
     try {
-      const deleteRoomMessage = await hotelFuncs.deleteRoom.deleteRoom(hotelId,roomId );
+      const deleteRoomMessage = await hotelFuncs.deleteRoom(hotelId, roomId );
       req.flash(deleteRoomMessage);
       res.redirect(`/hotel/${hotelId}/hotelManagement/rooms`);
     } catch (e) {
@@ -609,7 +606,7 @@ router
     try {
       const roomTypeId = helper.checkId(req.body.roomTypeId, true);
       const roomTypeName = helper.checkString(req.body.roomTypeNameInput, "room type name", true);
-      const price = helper.checkPrice(req.body.priceInput, true);
+      const price = helper.checkPrice(Number(req.body.priceInput), true);
       const pictures = req.body.picturesInput ? helper.checkArray(req.body.picturesInput, true) : [];
 
       const updateRoomTypeMessage = await hotelFuncs.updateRoomType(roomTypeId, hotelId, roomTypeName, price, pictures);
@@ -740,7 +737,8 @@ router
     try {
       // const hotel = await hotelFuncs.getHotel(hotelId);
       const managers = await hotelFuncs.getHotelMgr(hotelId);
-      res.render('hotelManagers', {hotelId: hotelId, managers: managers, title: `Manager Control Panel`});
+      managers.yourname = req.user.username;
+      res.render('hotelManagers', { hotelId: hotelId, managers: managers, title: `Manager Control Panel`});
     } catch (e) {
       req.session.status = e.code ? e.code : 500;
       req.session.errorMessage = e.message;
@@ -767,8 +765,9 @@ router
   .delete(isMgr, async (req, res) => {
     const hotelId = helper.checkId(req.params.hotelId, true);
     try {
+      
       const userNameInput = helper.checkNameString(req.body.userNameInput, "user username", true);
-
+      if (userNameInput === req.user.username) throw new helper.CustomException(400, "You cannot delete yourself");
       const deleteReviewMessage = await userFuncs.deleteMgr(req.user.username, userNameInput, hotelId);
       req.flash(deleteReviewMessage);
       res.redirect(`/hotel/${hotelId}/hotelManagement/managers`);

@@ -19,7 +19,13 @@ reviewUserId: the id of the user who wrote the review
         <p>{{hotelName}}</p>
     </div>
     <div class="hotelPhoto">
-        <img src="{{hotelPhoto}}" alt="photo of the hotel">
+        {{#if hotelPhoto}}
+        {{#each hotelPhoto}}
+        <img src="{{this}}" alt="photo of the hotel">
+        {{/each}}
+        {{else}}
+        <img src="/public/img/hotel.jpg" alt="default hotel photo">
+        {{/if}}
     </div>
     <div class="hotelRating">
         <p>Rating: {{hotelRating}}</p>
@@ -37,6 +43,7 @@ reviewUserId: the id of the user who wrote the review
 <div class="reviewOperations box">
     <div class="reviewResult left">
         <h3>All Reviews</h3>
+        {{#if hotelReviews}}
         {{#each hotelReviews}}
         <div class="reviewItem box">
             <div class="reviewUserItem left">
@@ -58,8 +65,11 @@ reviewUserId: the id of the user who wrote the review
             </div>
         </div>
         {{/each}}
+        {{else}}
+        <p>No reviews yet.</p>
+        {{/if}}
     </div>
-    <div class="addReview">
+    {{!-- <div class="addReview">
         <h3>Add a new review</h3>
         <form action="/hotel/{{hotelId}}/hotelManagements/reviews" method="POST" id="registration-form" class="my-form">
             <input type="hidden" name="hotelId" value="{{hotelId}}">
@@ -87,10 +97,9 @@ reviewUserId: the id of the user who wrote the review
             <textarea name="reviewInput" id="reviewInput" cols="30" rows="10"></textarea>
             <button type="submit">Submit</button>
         </form>
-    </div>
+    </div> --}}
 
 </div>
 <div class="error" id="client">
     <p id="client-error"></p>
 </div>
-<a href="/register">Click here to register!</a>

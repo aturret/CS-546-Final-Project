@@ -147,8 +147,8 @@ export async function updateUser(username, set) {
 }
 
 export async function addMgr(mgrName, userName, hotelId) {
-  mgrName = helper.checkNameString(mgrName, "manager username", true);
-  userName = helper.checkNameString(userName, "user username", true);
+  mgrName = helper.checkUserName(mgrName, "manager username", true);
+  userName = helper.checkUserName(userName, "user username", true);
   hotelId = helper.checkId(hotelId, true);
 
   const tempAccount = await Account();
@@ -199,8 +199,8 @@ export async function addMgr(mgrName, userName, hotelId) {
 }
 
 export async function deleteMgr(applicantName, respondentName, hotelId) {
-  applicantName = helper.checkNameString(applicantName, "applicant username", true);
-  respondentName = helper.checkNameString(respondentName, "respondent username", true);
+  applicantName = helper.checkUserName(applicantName, "applicant username", true);
+  respondentName = helper.checkUserName(respondentName, "respondent username", true);
   hotelId = helper.checkId(hotelId, true);
 
   const tempAccount = await Account();
@@ -243,7 +243,7 @@ export async function deleteAccount(username) {
   const tempAccount = await Account();
 
   //get orders
-  const info = await tempAccount.find(
+  const info = await tempAccount.findOne(
     { username: username },
     { orders: 1, Identity: 1, hotel_id: 1 }
   );
@@ -541,7 +541,7 @@ export async function addReview(order_id, hotel_id, user_id, review, rating) {
   hotel_id = helper.checkId(hotel_id, true);
   user_id = helper.checkId(user_id, true);
   review = helper.checkString(review, "review", true);
-  rating = helper.checkRating(rating, true);
+  rating = helper.checkRating(Number(rating), true);
   const newReview = {
     hotel_id: new ObjectId(hotel_id),
     user_id: new ObjectId(user_id),

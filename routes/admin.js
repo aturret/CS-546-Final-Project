@@ -145,7 +145,7 @@ router
       return res.redirect("/admin/accounts");
     }
   })
-  .patch(isAdmin, upload.single("avatar"), async (req, res, next) => {
+  .patch(isAdmin, upload.single("avatarInput"), async (req, res, next) => {
     if (req.file) {
       req.body.avatarInput = `http://localhost:3000/public/uploads/${req.file.filename}`;
     }
@@ -175,8 +175,8 @@ router
         true
       );
 
-      avatar = avatarInput
-        ? helper.checkImageURL(avatarInput, true)
+      avatar = avatar
+        ? helper.checkImageURL(avatar, true)
         : undefined;
 
       firstName = helper.checkNameString(

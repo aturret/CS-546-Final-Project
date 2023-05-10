@@ -27,12 +27,17 @@ searchForms.forEach(form => {
 })
 
 
+
+
+
 forms.forEach(form => {
     console.log('hi');
     form.addEventListener('submit', async (event) => {
         const textInputs = form.querySelectorAll('input[type="text"]');
         const roomTypeInputs = form.querySelectorAll('select[class="roomType"]');
         const hotelStateInputs = form.querySelectorAll('select[id="hotelState"]');
+        const nameInputs = form.querySelectorAll('.name');
+        const userNameInputs = form.querySelectorAll('.userName');              
         const passwordInputs = form.querySelectorAll('input[type="password"]');
         const dateInputs = form.querySelectorAll('input[type="date"]');
         const emailInputs = form.querySelectorAll('input[type="email"]');
@@ -64,6 +69,12 @@ forms.forEach(form => {
             })
             textareas.forEach(input => {
                 input.value = checkString(input.value, input.name, false);
+            })
+            nameInputs.forEach(input => {                
+                input.value = checkNameString(input.value, input.name, false);
+            })
+            userNameInputs.forEach(input => {
+                input.value = checkUserName(input.value);
             })
             if (form.classList.contains('picForm')) {
                 picInputs.forEach(input => {
@@ -99,6 +110,20 @@ forms.forEach(form => {
 
 
 
+function checkUserName(username) {
+    username = username.trim();
+    if (/\s/.test(username)) throw `Error: Username cannot contain spaces`;
+    return username;
+}
+
+function checkNameString(strVal, key, flag) {
+    strVal = strVal.trim();
+    if (/\s/.test(strVal)) throw `Error: ${key} cannot contain spaces`;
+    if (/\d/.test(strVal)) throw `Error: ${key} cannot contain numbers`;
+    if (strVal.length < 2 || strVal.length > 25) throw `Error: ${key} must be between 2 and 25 characters`;
+    return strVal;
+}
+
 
 
 function checkString(s, key) {
@@ -116,6 +141,13 @@ function checkLaterDate(date1, date2) {
     if (date1 > date2) throw "Date must be later than the start date";
 }
 
+function checkPhone(n)
+{
+    n = n.trim()
+    if(!n || typeof n !== 'string') throw new "Phone number must exist and must be a string type.";
+    if(!/^\d{3}[-]?\d{3}[-]?\d{4}$/.test(n)) throw new "Cell phone number has to match the format. xxxxxxxxxxx, xxx-xxx-xxxxx or (xxx)xxx-xxxxx";
+    return n
+}
 // function checkDate(date) {
 //     if (!date || typeof date !== "string" || date.trim().length === 0) throw "releaseDate must exist and must be a non empty string.";
 //     if (!moment(date.trim(), "YYYY/MM/DD", true).isValid()) throw "releaseDate must be a valid date.";
@@ -132,13 +164,7 @@ function checkEmail(email) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw "Invalid email address"
     return email
 }
-function checkPhone(n) {
-    n = n.trim()
-    // if(n.length === 0) throw "Phone number must exist and must be a string type.";
-    if (!n || typeof n !== 'string') throw "Phone number must exist and must be a string type.";
-    if (!/^\d{3}[-]?\d{3}[-]?\d{4}$/.test(n)) throw "Cell phone number has to match the format. xxxxxxxxxxx, xxx-xxx-xxxxx or (xxx)xxx-xxxxx"
-    return n
-}
+
 function checkPassword(password) {
     if (!password || typeof password !== "string") throw "Password must exist and must be a string.";
     if (!/\d/.test(password)) throw "Password must contain at least one digit.";
@@ -146,6 +172,13 @@ function checkPassword(password) {
     if (password === password.toLowerCase()) throw "Password must have at least one upper case letter.";
 
     return password.trim()
+}
+
+function checkArray(arr, key, flag){
+    if (!arr || !Array.isArray(arr) || arr.length === 0) throw new CustomException(`${key} must exist and must be a non empty array.`, flag);
+    if (!arr.every(obj => typeof obj === "string" && obj.trim().length !== 0)) throw new CustomException(`Elements in ${key} must be non empty string type.`, flag);
+    arr.map(str => str.trim())
+    return arr
 }
 
 
@@ -156,3 +189,14 @@ function checkPassword(password) {
 //     return error;
 // }
 
+const deleteManager = document.getElementById("deleteMgr-form");
+deleteManager.addEventListener('submit', async (event) => {    
+    // event.preventDefault();
+    const yourname = deleteManager.querySelectorAll('.yourname')[0].value;
+    const userNameInput = deleteManager.querySelectorAll('.userNameInput')[0].value;
+    if (yourname === userNameInput) {
+        event.preventDefault();
+        console.log('sss');
+        clientError.innerHTML = "you cannot delete yourself";
+    }
+})

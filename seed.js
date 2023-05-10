@@ -99,9 +99,10 @@ async function addHotel(...args) {
   newHotel.rooms = [];
   newHotel.room_types = [];
   newHotel.overall_rating = NaN;
-  if (args[8] !== undefined && Array.isArray(args[8])) {
-    newHotel.facilities = helper.checkString(facility, "facility", true)
-  
+
+  if (args[8] !== undefined) {
+    
+    newHotel.facilities = helper.checkString(args[8], "facility", true)  
   } else if (!args[8]) {
     newHotel.facilities = "";
   } else {

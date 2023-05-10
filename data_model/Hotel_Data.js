@@ -161,19 +161,10 @@ export async function updateHotel(...args) {
   updateHotel.zip_code = helper.checkZip(args[5], false);
   updateHotel.phone = helper.checkPhone(args[6], false);
   updateHotel.email = helper.checkEmail(args[7], false);
-  updateHotel.picture = args[8]
+  updateHotel.pictures = args[8]
     ? args[8].map((url) => helper.checkImageURL(url, false))
     : undefined;
-  // if (args[9] && Array.isArray(args[9])) {
-  //   updateHotel.facilities = args[9] ? args[9].map((facility) =>
-  //     helper.checkString(facility, "facility", false)) : [];
-  // } else if (!args[9]) {
-  //   updateHotel.facilities = [];
-  // } else {
-  //   throw CustomException("Invalid facilities.", true);
-  // }
   updateHotel.facilities = helper.checkString(args[9], "facilities", true);
-
   const tempHotel = await hotelReg();
   const updateInfo = await tempHotel.findOneAndUpdate(
     { _id: hotel_id },
@@ -182,7 +173,6 @@ export async function updateHotel(...args) {
   );
   if (!updateInfo)
     throw CustomException(`Update hotel with id ${hotel_id} failed.`, true);
-
   return { message: `Hotel with id ${hotel_id} updated successfully.` };
 }
 //delete hotel
@@ -258,6 +248,7 @@ export async function deleteHotel(id) {
 
 //get hotel review
 export async function getHotelReview(id) {
+  
   id = new ObjectId(helper.checkId(id, true));
   const tempHotel = await hotelReg();
 
@@ -269,10 +260,11 @@ export async function getHotelReview(id) {
   const tempReview = await Review();
   const reviewList = await tempReview.find({ _id: { $in: reviewId } }).toArray();
   if (reviewList && !Array.isArray(reviewList)) reviewList = [reviewList];
-  if (reviewList.length === 0) throw CustomException("Review not found", false);
+  // if (reviewList.length === 0) throw CustomException("Review not found", false);
+  if (reviewList.length === 0) return [];
 
   //get user 
-  console.log(reviewList)
+  // console.log(reviewList)
   const tempAccount = await Account();
   for (let i of reviewList) {
     const userInfo = await tempAccount.findOne({ _id: i.user_id }, { username: 1, avatar: 1 });
@@ -376,15 +368,14 @@ export async function updateRoomType(id, hotel_id, roomType, price, picture) {
   id = new ObjectId(helper.checkId(id, true));
   hotel_id = new ObjectId(helper.checkId(hotel_id, true));
   roomType = helper.checkString(roomType, "room type", true);
-  price = helper.checkPrice(price, true);
-  picture = helper.checkImageURL(picture, true);
+  price = helper.checkPrice(Number(price), true);
   picture = picture
     ? picture.map((url) => helper.checkImageURL(url, true))
     : [];
   const updateInfo = {
     name: roomType,
     price: price,
-    picture: picture
+    pictures: picture
   }
 
   //get room type details

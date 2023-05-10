@@ -21,24 +21,24 @@ order has status: pending, completed, cancelled.
         <div class="orderItemInfo">
             <div class="hotelName"><a href="/hotel/{{hotelId}}">{{hotelName}}</a></div>
             <div class="roomType">
-                <p>{{roomType}}</a></p>
+                <p>Room Type: {{roomType}}</a></p>
             </div>
             <div class="orderPrice">
-                <p>{{orderPrice}}</p>
+                <p>Order Price: {{orderPrice}}</p>
             </div>
             <div class="startDate">
-                <p>{{startDate}}</p>
+                <p>Start Date:{{startDate}}</p>
             </div>
             <div class="endDate">
-                <p>{{endDate}}</p>
+                <p>End Date: {{endDate}}</p>
             </div>
             <div class="orderGuests">
                 <ul>
                     <li>
-                        <p>{{guest1.firstName}} {{guests1.lastName}}</p>
+                        <p><span>{{guest1.firstName}}</span> <span>{{guest1.lastName}}</span></p>
                     </li>
                     <li>
-                        <p>{{guest2.firstName}} {{guests2.lastName}}</p>
+                        <p>{{guest2.firstName}} {{guest2.lastName}}</p>
                     </li>
                 </ul>
 
@@ -103,7 +103,9 @@ order has status: pending, completed, cancelled.
                 </button>
             </div>
             <div hidden="true" id="addReviewWindow">
-                <form action="/dashboard/{{username}}/order_history/{{orderId}}/add_review" method="POST">
+                {{!-- <form action="/order/{{orderId}}/add_review" method="POST"> --}}
+                 <form action="/user/order_history/{{orderId}}/add_review" method="POST">
+                    <input type="hidden" name="hotelIdInput" value="{{hotelId}}">    
                     <label for="reviewCommentInput">Comment</label>
                     <textarea name="reviewCommentInput" placeholder="Comment"></textarea>
                     <label for="reviewRatingInput">Rating</label>
@@ -118,6 +120,8 @@ order has status: pending, completed, cancelled.
                 </form>
             </div>
         </div>
+        {{else}}
+        <p>You have reviewed this order!</p>
         {{/if}}
         {{/if}}
     </div>
